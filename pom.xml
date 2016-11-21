@@ -18,6 +18,7 @@
       <failOnMissingWebXml>false</failOnMissingWebXml>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
       <version.resteasy>3.0.11.Final</version.resteasy>
+      <iccr.group.id>org.iotacontrolcenter</iccr.group.id>
       <!--
 	<version.arquillian>1.1.8.Final</version.arquillian>
         <version.wildfly.server>10.0.0.Final</version.wildfly.server>
@@ -51,6 +52,26 @@
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+              <groupId>${iccr.group.id}</groupId>
+              <artifactId>iccr-dto</artifactId>
+              <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+              <groupId>${iccr.group.id}</groupId>
+              <artifactId>iccr-api</artifactId>
+              <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+              <groupId>${iccr.group.id}</groupId>
+              <artifactId>iccr-rest</artifactId>
+              <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+              <groupId>${iccr.group.id}</groupId>
+              <artifactId>iccr-main</artifactId>
+              <version>1.0.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -89,6 +110,13 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.18.1</version>
                 </plugin>
+                <!--
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-surefire-plugin</artifactId>
+                  <version>2.18.1</version>
+                  </plugin>
+                 -->
             </plugins>
         </pluginManagement>
 
@@ -190,6 +218,7 @@
        <module>iota-ctl</module>
        <module>iota-api</module>
        <module>rest</module>
+       <module>main</module>
        <module>packager</module>
        <module>installer</module>
     </modules>

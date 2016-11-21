@@ -9,18 +9,13 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>iccr-rest</artifactId>
-    <name>ICCR ReST Services</name>
+    <artifactId>iccr-main</artifactId>
+    <name>ICCR Wildfly Swarm Main</name>
 
     <dependencies>
       <dependency>
         <groupId>org.wildfly.swarm</groupId>
         <artifactId>jaxrs</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>${iccr.group.id}</groupId>
@@ -29,6 +24,10 @@
       <dependency>
         <groupId>${iccr.group.id}</groupId>
         <artifactId>iccr-api</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-rest</artifactId>
       </dependency>
     </dependencies>
 

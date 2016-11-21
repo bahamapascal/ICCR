@@ -14,9 +14,6 @@
     <name>ICCR Packager Parent</name>
 
     <modules>
-      <!--
-      <module>iccr-api</module>
-      <module>iccr-dto</module>
-      -->
+      <module>swarm</module>
     </modules>
 </project>
