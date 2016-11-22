@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 public class PropertySource {
 
@@ -36,6 +37,8 @@ public class PropertySource {
 
     private Properties props;
     private String confDir;
+    private String confFile;
+    private PropertiesConfiguration propWriter;
 
     private PropertySource() {
         System.out.println("creating new PropertySource");
@@ -45,6 +48,14 @@ public class PropertySource {
             System.out.println(CONF_DIR_PROP + " system setting not available, using default: " + CONF_DIR_DEFAULT);
             confDir = CONF_DIR_DEFAULT;
         }
+        confFile = confDir + "/" + CONF_FILE;
+
+        try {
+            propWriter = new PropertiesConfiguration(confFile);
+        }
+        catch(Exception e) {
+            System.out.println("PropertySource exception creating PropertiesConfiguration: " + e.getLocalizedMessage());
+        }
 
         props = new Properties();
         load();
@@ -52,7 +63,7 @@ public class PropertySource {
 
     public void load() {
         try {
-            InputStream is = new FileInputStream(confDir + "/" + CONF_FILE); // this.getClass().getResourceAsStream(confDir + "/" + CONF_FILE);
+            InputStream is = new FileInputStream(confFile); // this.getClass().getResourceAsStream(confDir + "/" + CONF_FILE);
             props.load(is);
         }
         catch(Exception e) {
@@ -67,11 +78,19 @@ public class PropertySource {
         }
         else {
             props.setProperty(key, (String)value);
+            propWriter.setProperty(key, value);
+
+            try {
+                propWriter.save();
+            }
+            catch(Exception e) {
+                System.out.println("PropertySource exception saving PropertiesConfiguration: " + e.getLocalizedMessage());
+            }
         }
     }
 
     private void setNeighbors(Object value) {
-        
+
     }
 
     public List<String> getPropertyKeys() {

@@ -49,7 +49,7 @@
         <plugin>
           <groupId>org.wildfly.swarm</groupId>
           <artifactId>wildfly-swarm-plugin</artifactId>
-          <version>${version.wildfly.swarm}</version>
+          <version>${version.wildfly-swarm}</version>
           <configuration>
             <mainClass>org.iotacontrolcenter.main.Main</mainClass>
           </configuration>
