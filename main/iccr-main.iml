@@ -58,5 +58,6 @@
     <orderEntry type="module" module-name="iccr-dto" />
     <orderEntry type="module" module-name="iccr-api" />
     <orderEntry type="module" module-name="iccr-rest" />
+    <orderEntry type="module" module-name="iccr-properties" />
   </component>
 </module>

@@ -1,0 +1,27 @@
+#!/bin/sh
+
+APPLICATION=iccr
+
+[ -r /etc/java/java.conf ] && . /etc/java/java.conf
+export JAVA_HOME
+
+# Get from iccr.properties
+export ICCR_DIR=/opt/iccr
+export ICCR_CONF_DIR=${ICCR_DIR}/conf
+export ICCR_LIB_DIR=${ICCR_DIR}/lib
+export ICCR_LOG_DIR=${ICCR_DIR}/logs
+export ICCR_JAR_NAME=iccr.jar
+
+iccrPortNumber=14266
+jvm_env="-DiccrConfDir=${ICCR_CONF_DIR}"
+jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
+#ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1
+ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
+
+echo
+echo ${ICCR_START_CMD}
+echo
+
+${ICCR_START_CMD}
+
+

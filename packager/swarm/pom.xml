@@ -9,7 +9,7 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>swarm</artifactId>
+    <artifactId>iccr-swarm</artifactId>
     <name>ICCR Swarm Packager</name>
     <packaging>jar</packaging>
 
@@ -44,6 +44,7 @@
     </dependencies>
 
     <build>
+      <finalName>iccr</finalName>
       <plugins>
         <plugin>
           <groupId>org.wildfly.swarm</groupId>

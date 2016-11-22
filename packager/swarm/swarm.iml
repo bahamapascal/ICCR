@@ -11,6 +11,7 @@
     <orderEntry type="module" module-name="iccr-dto" />
     <orderEntry type="module" module-name="iccr-api" />
     <orderEntry type="module" module-name="iccr-rest" />
+    <orderEntry type="module" module-name="iccr-properties" />
     <orderEntry type="module" module-name="iccr-main" />
     <orderEntry type="library" name="Maven: org.wildfly.swarm:jaxrs:2016.11.0" level="project" />
     <orderEntry type="library" name="Maven: org.wildfly.swarm:container:2016.11.0" level="project" />

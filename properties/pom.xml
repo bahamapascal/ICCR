@@ -14,6 +14,10 @@
 
     <dependencies>
       <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-dto</artifactId>
+      </dependency>
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <scope>test</scope>

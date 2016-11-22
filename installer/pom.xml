@@ -15,8 +15,8 @@
 
     <modules>
       <!--
-      <module>iccr-api</module>
-      <module>iccr-dto</module>
+      <module>iccr-installer</module>
+      <module>iccr-cli-installer</module>
       -->
     </modules>
 </project>

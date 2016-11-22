@@ -30,6 +30,10 @@
         <groupId>${iccr.group.id}</groupId>
         <artifactId>iccr-api</artifactId>
       </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-properties</artifactId>
+      </dependency>
     </dependencies>
 
 </project>
