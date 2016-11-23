@@ -9,8 +9,8 @@
       <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>iota-api</artifactId>
-    <name>IOTA API</name>
+    <artifactId>iota-agent</artifactId>
+    <name>IOTA Agent</name>
 
     <dependencies>
       <dependency>
@@ -18,6 +18,19 @@
         <artifactId>junit</artifactId>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-properties</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-persistence</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-dto</artifactId>
+      </dependency>
+
     </dependencies>
 
 </project>

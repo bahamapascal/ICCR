@@ -41,7 +41,7 @@ public class PropertySource {
     private PropertiesConfiguration propWriter;
 
     private PropertySource() {
-        System.out.println("creating new PropertySource");
+        System.out.println("new PropertySource");
 
         confDir = System.getProperty(CONF_DIR_PROP);
         if(confDir == null || confDir.isEmpty()) {

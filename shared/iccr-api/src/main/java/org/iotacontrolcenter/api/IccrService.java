@@ -11,7 +11,7 @@ import org.iotacontrolcenter.dto.*;
 /**
  * Service for ICCR public ReST API
  **/
-@Path("/rs")
+@Path("/iccr/rs")
 public interface IccrService {
 
     @GET
@@ -38,4 +38,11 @@ public interface IccrService {
     @Consumes(MediaType.APPLICATION_JSON)
     Response updateConfigProperty(@Context HttpServletRequest request,
                                   @DefaultValue("") @PathParam("key") String key, IccrPropertyDto prop);
+
+    @POST
+    @Path("/iota/cmd/{action}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    Response doIotaCmd(@Context HttpServletRequest request,
+                       @DefaultValue("") @PathParam("action") String action);
 }

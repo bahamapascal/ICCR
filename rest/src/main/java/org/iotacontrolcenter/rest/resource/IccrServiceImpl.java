@@ -116,6 +116,19 @@ public class IccrServiceImpl implements IccrService {
         return r.build();
     }
 
+    @Override
+    public Response doIotaCmd(HttpServletRequest request, String action) {
+        if (!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        Response.ResponseBuilder r;
+
+        r = Response.status(HttpURLConnection.HTTP_OK);
+        r.entity(new SimpleResponse(true, "property updated successfully"));
+
+        return r.build();
+    }
+
     private IccrPropertyDto getIotaNeighborsProperty() {
         List<NeighborDto> nbrs = new ArrayList<>();
         for(String id : props.getNeighborKeys()) {
