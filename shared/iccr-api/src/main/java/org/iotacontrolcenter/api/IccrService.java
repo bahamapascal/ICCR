@@ -43,6 +43,6 @@ public interface IccrService {
     @Path("/iota/cmd/{action}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    Response doIotaCmd(@Context HttpServletRequest request,
+    Response doIotaAction(@Context HttpServletRequest request,
                        @DefaultValue("") @PathParam("action") String action);
 }

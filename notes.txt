@@ -81,6 +81,12 @@ checked in
 -----------
 Tue: 11/22/2016
 
+Staging dist:
+cp installer/property-files/src/main/resources/iccr.properties /opt/iccr/conf
+cp installer/iccr-scripts/src/main/scripts/iccr-ctl /opt/iccr/bin/
+cp packager/swarm/target/iccr-swarm.jar /opt/iccr/lib/iccr.jar
+
+
 Finish properties: update writes out prop file
 
 Checked in
@@ -93,12 +99,23 @@ Delete iota-api
 
 Checked in
 
+Added iotaDownloadLink prop
+
+Created ActionFactory:
+install
+start
+stop
+deletedb
+delete
+
+Checked in
+
+todo:
+Manage logs: silence swarm, store changes to single file for audit purposes
+
 us 4 iccr install iota
 rest api: post rs/iota/cmd/{install}
-agent
 
-
-todo
 us 5 iccr remember iota install info
 agent
 
@@ -123,21 +140,20 @@ rest api: post /rs/iota/cmd/{delete}
 agent
 
 us 11 get iota node info
-rest api: post /rs/iota/nodeinfo
+rest api: get /rs/iota/nodeinfo
 agent
 
 us 12 get iota nbrs
-rest api: post /rs/iota/neighbors
+rest api: get /rs/iota/neighbors
 agent
 
-iota-api
+Add us for iotaDownloadLink
+
+us 26 configurable IOTA dld link
+iotaDownloadLink=
 
 
-
-todo:
 Will update of neighbor config prop need a specific dto for incoming handling?
-
-
 
 us 5 remember iota install info
 

@@ -1,21 +1,21 @@
 package org.iotacontrolcenter.dto;
 
 public class ActionResponse {
-    public boolean status;
+    public boolean success;
     public String msg;
     public IccrPropertyListDto props;
 
-    public ActionResponse(boolean status, String msg) {
-        this.status = status;
+    public ActionResponse(boolean success, String msg) {
+        this.success = success;
         this.msg = msg;
     }
 
-    public boolean isStatus() {
-        return status;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public String getMsg() {

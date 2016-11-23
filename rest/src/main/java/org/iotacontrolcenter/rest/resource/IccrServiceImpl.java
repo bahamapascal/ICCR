@@ -2,6 +2,7 @@ package org.iotacontrolcenter.rest.resource;
 
 import org.iotacontrolcenter.api.*;
 import org.iotacontrolcenter.dto.*;
+import org.iotacontrolcenter.iota.agent.Agent;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import java.util.List;
 public class IccrServiceImpl implements IccrService {
 
     private PropertySource props = PropertySource.getInstance();
+    private Agent agent = Agent.getInstance();
 
     public IccrServiceImpl() {
         System.out.println("creating new IccrServiceImpl");
@@ -117,14 +119,30 @@ public class IccrServiceImpl implements IccrService {
     }
 
     @Override
-    public Response doIotaCmd(HttpServletRequest request, String action) {
+    public Response doIotaAction(HttpServletRequest request, String action) {
         if (!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
         Response.ResponseBuilder r;
 
-        r = Response.status(HttpURLConnection.HTTP_OK);
-        r.entity(new SimpleResponse(true, "property updated successfully"));
+        try {
+            ActionResponse resp = agent.action(action);
+            r = Response.status(HttpURLConnection.HTTP_OK);
+            if(!resp.isSuccess()) {
+                r.entity(new SimpleResponse(false, resp.getMsg()));
+            }
+            else {
+                r.entity(new SimpleResponse(true, "Action succeeded"));
+            }
+        }
+        catch(IllegalArgumentException iae) {
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, "Unsupported action: " + iae.getLocalizedMessage()));
+        }
+        catch(Exception e) {
+            r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
+                    entity(new SimpleResponse(false, "Server error: " + e.getLocalizedMessage()));
+        }
 
         return r.build();
     }

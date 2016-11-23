@@ -1,6 +1,7 @@
 package org.iotacontrolcenter.iota.agent;
 
 import org.iotacontrolcenter.dto.ActionResponse;
+import org.iotacontrolcenter.iota.agent.action.IotaAction;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class Agent {
@@ -23,18 +24,14 @@ public class Agent {
     }
 
     public ActionResponse action(String cmd) {
-        if(!validAction(cmd)) {
+        if(!ActionFactory.isValidAction(cmd)) {
             System.out.println("Iota Agent: unsupported action: " + cmd);
             throw new IllegalArgumentException("Unsupported action: " + cmd);
         }
 
-        ActionResponse resp  = new ActionResponse(true, "happy");
-
-
-        return resp;
+        IotaAction iAction = ActionFactory.getAction(cmd);
+        return iAction.execute();
     }
 
-    private boolean validAction(String cmd) {
-        return true;
-    }
+
 }
