@@ -1,0 +1,162 @@
+Sun: 11/20/2016
+
+Made ~/projects/iccr
+
+Created github repo:  https://github.com/strongwares/iccr
+
+git clone https://github.com/strongwares/iccr.git
+~/projects/iccr/iccr$ ls
+README.md
+
+git config --global user.email "strongwares@gmail.com"
+git config --global user.name "strongwares"
+todo: git commit -m "First commit, working add, spend, move textotals operations."
+todo: git remote add origin https://github.com/strongwares/textant.git
+todo: ~/shared/textant$ git push -u origin master
+
+sudo apt-get install maven
+which mvn
+/usr/bin/mvn
+dana@optiPlex-780-1-ubuntu:~/projects/iccr/iccr$ mvn --version
+Apache Maven 3.0.5
+Maven home: /usr/share/maven
+Java version: 1.7.0_75, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-7-openjdk-amd64/jre
+Default locale: en_US, platform encoding: UTF-8
+OS name: "linux", version: "3.16.0-34-generic", arch: "amd64", family: "unix"
+
+
+Started upgrade to 16.04
+
+Defined rest service api: /rs/app/config/{id}
+
+Checked in first firefly-swarm packaging of uberjar with 
+---------------------
+Mon 11/21/16
+
+Added global gitignore:
+      ~/.gitignore_global
+      git config --global core.excludesfile ~/.gitignore_global
+
+Added check for api-access-key
+
+Add properties source to rest impl
+
+Add installer/iccr-scripts
+
+Added bash script to start iccr, setting env var, setting cmd line
+
+java env setting for prop file dir: iccrConfDir=/opt/iccr/conf
+
+define props:
+for passing to cmd line:
+iccrDir=/opt/iccr
+iccrConfDir=/opt/iccr/conf
+iccrLogDir=/opt/iccr/logs
+iccrLibDir=/opt/iccr/lib
+iccrBinDir=/opt/iccr/bin
+iccrLogLevel=DEBUG
+
+for iccr.prop:
+iccrStartAtStartup=false
+iccrStartIotaAtStartup=false
+iccrStopIotaAtShutdown=false
+iccrPortNumber=14266
+iotaDir=/opt/iota
+iotaStartCmd=java -jar IRI.jar
+iotaPortNumber=14265
+iotaNeighbors=al,bill,fred
+iotaNeighbor.key.al=al
+iotaNeighbor.ip.al=10.0.0.1
+iotaNeighbor.name.al=Al
+iotaNeighbor.descr.al=al's node
+iotaNeighbor.active.al=true
+iotaNeighborRefreshTime=10
+
+Deliver neighbors as neighbors dto
+
+Finish /app/config update operations
+
+checked in
+-----------
+Tue: 11/22/2016
+
+Finish properties: update writes out prop file
+
+Checked in
+
+Changed iota-api to iota-agent module
+
+Delete iccr-agent
+
+Delete iota-api
+
+Checked in
+
+us 4 iccr install iota
+rest api: post rs/iota/cmd/{install}
+agent
+
+
+todo
+us 5 iccr remember iota install info
+agent
+
+us 6 iccr iota get install info
+rest api: get rs/iota/installinfo
+agent
+
+us 7 iccr start iota
+rest api: post /rs/iota/cmd/{start}
+agent
+
+us 8 iccr stop iota
+rest api:  post /rs/iota/cmd/{stop}
+agent
+
+us 9 iccr delete iota db
+rest api: post /rs/iota/cmd/{deletedb}
+agent
+
+us 10 iccr delete iota
+rest api: post /rs/iota/cmd/{delete}
+agent
+
+us 11 get iota node info
+rest api: post /rs/iota/nodeinfo
+agent
+
+us 12 get iota nbrs
+rest api: post /rs/iota/neighbors
+agent
+
+iota-api
+
+
+
+todo:
+Will update of neighbor config prop need a specific dto for incoming handling?
+
+
+
+us 5 remember iota install info
+
+us 6 rest api for get iota isntall info
+
+test resources:
+iccr.properties
+
+installer:
+iccr.properties
+
+finish installer/iccr-scripts
+
+finish installer/property-files
+
+load api access key into resource impl
+
+add logging
+
+windows cmd script to control iccr
+
+autodetect if iota is already installed and/or running at install
