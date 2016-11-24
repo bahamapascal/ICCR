@@ -1,30 +1,38 @@
 package org.iotacontrolcenter.iota.agent.action;
 
+import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public abstract class AbstractAction {
 
-    private PropertySource propSource;
-    String[] propNames;
+    protected Localizer localizer;
+    protected String[] propNames;
+    protected PropertySource propSource;
 
-    protected AbstractAction(PropertySource propSource, String[] propNames) {
-        this.propSource = propSource;
+    protected AbstractAction(String[] propNames) {
         this.propNames = propNames;
+        propSource = PropertySource.getInstance();
+        localizer = Localizer.getInstance();
     }
 
-    protected boolean haveRequiredProperties() {
+    protected void preExecute() {
+        checkRequiredProps();
+        validatePreconditions();
+    }
+
+    protected void checkRequiredProps() {
         if(propNames != null && propNames.length > 0) {
             for(String key : propNames) {
                 String val = propSource.getString(key);
                 if(val == null || val.isEmpty()) {
-                    throw new IllegalStateException("Missing value for property " + key);
+                    throw new IllegalStateException(localizer.getLocalText("missingProperty") + ": " + key);
                 }
             }
         }
-        return true;
     }
 
-    protected boolean validatePreconditions();
+    protected void validatePreconditions() {
+    }
 
 
 }

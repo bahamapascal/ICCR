@@ -5,18 +5,15 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class DeleteIotaAction extends AbstractAction implements IotaAction  {
 
-    public DeleteIotaAction(PropertySource props) {
-        super(props);
-    }
-
-    @Override
-    public boolean setup() {
-        return haveRequiredProperties();
+    public DeleteIotaAction() {
+        super(new String[] { PropertySource.IOTA_APP_DIR_PROP });
     }
 
     @Override
     public ActionResponse execute() {
+        preExecute();
         ActionResponse resp = new ActionResponse(true, "happy");
         return resp;
     }
+
 }

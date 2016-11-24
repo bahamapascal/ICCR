@@ -134,7 +134,80 @@ execution: file exists, is running, answers query
 
 checked in
 
+-----------
+Th 11/24/16
+
+Locale values supported by jvm: http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+
+i18n tutorial: http://docs.oracle.com/javase/tutorial/i18n/index.html
+
+Locale properties
+# Possible values for languages (i.e. English, French, German, Spanish, Italian) are: en, fr, de, sp, it
+# See http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+#iccrLanguageLocale=de
+iccrLanguageLocale=en
+# Possible values for English speaking countries (i.e. US, GreatBritain) are: US, GB, etc
+# Possible values for German speaking countries (i.e. Germany, Austria, Switzerland) are: DE, AT, CH
+# See http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+#iccrCountryLocale=DE
+iccrCountryLocale=US
+
+Localizer
+
+MessagesBundle_de_DE.properties
+MessagesBundle_en_US.properties
+
+Action execute framework
+
+ActionProcessFactory
+
+OsProcessAction
+ProcessBuilder: args, env, file
+ ProcessBuilder for status check: ps fax | grep IRI
+
+
+curl -H "Content-Type: application/json" -X POST http://localhost:14266/iccr/rs/iota/cmd/status
+2016-11-24 17:24:47,457 INFO  [stdout] (default task-3) starting to execute process command (iotastatus):  ps fax | grep IRI | grep -v grep
+2016-11-24 17:24:47,700 INFO  [stdout] (default task-3) exception trying to execute an action (name: iotastatus, cmd:  ps fax | grep IRI | grep -v grep): Cannot run program "ps fax | grep IRI | grep -v grep": error=2, No such file or directory
+2016-11-24 17:24:47,702 INFO  [stdout] (default task-3) exception trying to execute an action (name: iotastatus, cmd:  ps fax | grep IRI | grep -v grep): Cannot run program "ps fax | grep IRI | grep -v grep": error=2, No such file or directory
+
+
 todo:
+iotastatus only do if linux
+
+ProcessBuilder for iccr ctl
+ProcessBuilder for iota ctl
+
+log exceptions that are caught by rest resource
+
+copy updated props to conf
+copy msg bundles to conf
+
+HttpAction
+
+Http client framework: resteasy?
+
+iccr-cli using http client to talk to iccr over iccr rest api
+
+StatusAction execution
+
+Shutdown hook
+
+Server emit localized text
+
+new us: audit log
+
+new us: localized text
+iccrCountryLocale=US
+iccrLanguageLocale=en
+#iccrCountryLocale=DE
+#iccrLanguageLocale=de
+
+
+How best to do neighbors in java prop file: each nbr needs a key?
+
+Do specific app/config/neighbors get/set rest api?
+
 InstallAction:
 validate props iotaDir, iotaDownloadLink, iotaDownloadFilename
 get Iota status
@@ -143,6 +216,7 @@ make backup copy of iota
 download
 remember version and date
 
+update us 4 additional prop validations
 
 us 5 iccr remember iota install info
 

@@ -1,9 +1,12 @@
 package org.iotacontrolcenter.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ActionResponse {
     public boolean success;
     public String msg;
-    public IccrPropertyListDto props;
+    private List<IccrPropertyDto> properties;
 
     public ActionResponse(boolean success, String msg) {
         this.success = success;
@@ -26,18 +29,29 @@ public class ActionResponse {
         this.msg = msg;
     }
 
-    public IccrPropertyListDto getProps() {
-        return props;
+    public List<IccrPropertyDto> getProperties() {
+        return properties;
     }
 
-    public void setProps(IccrPropertyListDto props) {
-        this.props = props;
+    public void setProperties(List<IccrPropertyDto> properties) {
+        this.properties = properties;
     }
 
-    public void addProperty(IccrPropertyDto prop) {
-        if(props == null) {
-            props = new IccrPropertyListDto();
+    public void addProperty(IccrPropertyDto property) {
+        if(properties == null) {
+            properties = new ArrayList<>();
         }
-        props.addProperty(prop);
+        properties.add(property);
+    }
+
+    public IccrPropertyDto getProperty(String key) {
+        IccrPropertyDto rval = null;
+        for(IccrPropertyDto dto : properties) {
+            if(dto.getKey().equals(key)) {
+                rval = dto;
+                break;
+            }
+        }
+        return rval;
     }
 }

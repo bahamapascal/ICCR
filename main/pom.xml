@@ -29,6 +29,10 @@
         <groupId>${iccr.group.id}</groupId>
         <artifactId>iccr-rest</artifactId>
       </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-properties</artifactId>
+      </dependency>
     </dependencies>
 
 </project>

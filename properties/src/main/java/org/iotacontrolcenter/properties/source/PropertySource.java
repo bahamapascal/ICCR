@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
+import org.iotacontrolcenter.dto.IccrPropertyDto;
+import org.iotacontrolcenter.dto.NeighborDto;
 
 public class PropertySource {
 
@@ -23,8 +26,14 @@ public class PropertySource {
     private static final Pattern PATTERN_TRUE = Pattern.compile("1|on|true|yes", Pattern.CASE_INSENSITIVE);
     private static final Pattern PATTERN_FALSE = Pattern.compile("0|off|false|no", Pattern.CASE_INSENSITIVE);
     private static final String CONF_FILE = "iccr.properties";
-    private static final String CONF_DIR_PROP = "iccrConfDir";
-    private static final String CONF_DIR_DEFAULT = "/opt/iccr/conf";
+
+    public static final String CONF_DIR_PROP = "iccrConfDir";
+    public static final String CONF_DIR_DEFAULT = "/opt/iccr/conf";
+
+    private static final String LOC_COUNTRY_PROP = "iccrCountryLocale";
+    private static final String LOC_LANG_PROP = "iccrLanguageLocale";
+    private static final String LOC_LANG_DEFAULT = "en";
+    private static final String LOC_COUNTRY_DEFAULT = "US";
 
     public static final String ICCR_START_AT_START_PROP="iccrStartAtStartup";
     public static final String ICCR_START_IOTA_AT_START_PROP="iccrStartIotaAtStartup";
@@ -67,7 +76,7 @@ public class PropertySource {
 
     public void load() {
         try {
-            InputStream is = new FileInputStream(confFile); // this.getClass().getResourceAsStream(confDir + "/" + CONF_FILE);
+            InputStream is = new FileInputStream(confFile);
             props.load(is);
         }
         catch(Exception e) {
@@ -93,6 +102,7 @@ public class PropertySource {
         }
     }
 
+    // TODO
     private void setNeighbors(Object value) {
 
     }
@@ -109,6 +119,22 @@ public class PropertySource {
         keys.add(IOTA_START_PROP);
         keys.add(IOTA_NBR_REFRESH_PROP);
         return keys;
+    }
+
+    public String getLocaleLanguage() {
+        String val = getString(LOC_LANG_PROP);
+        if(val == null || val.isEmpty()) {
+            val = LOC_LANG_DEFAULT;
+        }
+        return val;
+    }
+
+    public String getLocaleCountry() {
+        String val = getString(LOC_COUNTRY_PROP);
+        if(val == null || val.isEmpty()) {
+            val = LOC_COUNTRY_DEFAULT;
+        }
+        return val;
     }
 
     public List<String> getNeighborKeys() {
@@ -163,6 +189,24 @@ public class PropertySource {
             }
         }
         return keys;
+    }
+
+    public IccrIotaNeighborsPropertyDto getIotaNeighbors() {
+        List<NeighborDto> nbrs = new ArrayList<>();
+        for(String id : getNeighborKeys()) {
+            try {
+                nbrs.add(new NeighborDto(
+                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id),
+                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".ip." + id),
+                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id),
+                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
+                        getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id)));
+            }
+            catch(Exception e) {
+                System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());
+            }
+        }
+        return new IccrIotaNeighborsPropertyDto(PropertySource.IOTA_NEIGHBORS_PROP, nbrs);
     }
 
 }

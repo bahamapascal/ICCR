@@ -5,18 +5,15 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class StopIotaAction extends AbstractAction implements IotaAction {
 
-    public StopIotaAction(PropertySource props) {
-        super(props);
-    }
-
-    @Override
-    public boolean setup() {
-        return haveRequiredProperties();
+    public StopIotaAction() {
+        super(null);
     }
 
     @Override
     public ActionResponse execute() {
+        preExecute();
         ActionResponse resp = new ActionResponse(true, "happy");
         return resp;
     }
+
 }
