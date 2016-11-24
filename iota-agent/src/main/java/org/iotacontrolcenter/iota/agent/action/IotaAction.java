@@ -4,4 +4,5 @@ import org.iotacontrolcenter.dto.ActionResponse;
 
 public interface IotaAction {
     ActionResponse execute();
+    boolean setup();
 }

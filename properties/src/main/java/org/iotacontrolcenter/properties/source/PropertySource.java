@@ -29,7 +29,10 @@ public class PropertySource {
     public static final String ICCR_START_AT_START_PROP="iccrStartAtStartup";
     public static final String ICCR_START_IOTA_AT_START_PROP="iccrStartIotaAtStartup";
     public static final String ICCR_STOP_IOTA_AT_SHUTDOWN_PROP="iccrStopIotaAtShutdown";
+
+    public static final String IOTA_APP_DIR_PROP = "iotaDir";
     public static final String IOTA_DLD_LINK_PROP="iotaDownloadLink";
+    public static final String IOTA_DLD_FILENAME_PROP="iotaDownloadFilename";
     public static final String IOTA_PORT_NUMBER_PROP="iotaPortNumber";
     public static final String IOTA_START_PROP="iotaStartCmd";
     public static final String IOTA_NBR_REFRESH_PROP="iotaNeighborRefreshTime";
@@ -101,6 +104,8 @@ public class PropertySource {
         keys.add(ICCR_STOP_IOTA_AT_SHUTDOWN_PROP);
         keys.add(IOTA_PORT_NUMBER_PROP);
         keys.add(IOTA_DLD_LINK_PROP);
+        keys.add(IOTA_DLD_FILENAME_PROP);
+        keys.add(IOTA_APP_DIR_PROP);
         keys.add(IOTA_START_PROP);
         keys.add(IOTA_NBR_REFRESH_PROP);
         return keys;

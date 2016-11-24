@@ -61,7 +61,10 @@ for iccr.prop:
 iccrStartAtStartup=false
 iccrStartIotaAtStartup=false
 iccrStopIotaAtShutdown=false
+
 iccrPortNumber=14266
+iotaDownloadLink=http://85.93.93.110
+iotaDownloadFilename=IRI.jar
 iotaDir=/opt/iota
 iotaStartCmd=java -jar IRI.jar
 iotaPortNumber=14265
@@ -110,14 +113,38 @@ delete
 
 Checked in
 
-todo:
-Manage logs: silence swarm, store changes to single file for audit purposes
+------------
+Wed: 11/23/2016
+
+Add us for configurable IOTA dld link: us 26 iotaDownloadLink
+
+Add us for configurable IOTA dld link: us 27 iotaDownloadFilename
+
+Added prop iotaDownloadFile=IRI.jar
+
+AbstractAction validate preconditions
 
 us 4 iccr install iota
 rest api: post rs/iota/cmd/{install}
 
+new us 28 Iota Status Action
+StatusAction
+validate props iotaDir
+execution: file exists, is running, answers query
+
+checked in
+
+todo:
+InstallAction:
+validate props iotaDir, iotaDownloadLink, iotaDownloadFilename
+get Iota status
+stop Iota if necessary
+make backup copy of iota
+download
+remember version and date
+
+
 us 5 iccr remember iota install info
-agent
 
 us 6 iccr iota get install info
 rest api: get rs/iota/installinfo
@@ -125,19 +152,24 @@ agent
 
 us 7 iccr start iota
 rest api: post /rs/iota/cmd/{start}
-agent
+StartAction:
+validate props iotaDir, iotaStartCmd, iotaPortNumber
 
 us 8 iccr stop iota
 rest api:  post /rs/iota/cmd/{stop}
-agent
+StopAction:
+validate props iotaDir
+
 
 us 9 iccr delete iota db
 rest api: post /rs/iota/cmd/{deletedb}
-agent
+DeletedbAction:
+validate props iotaDir
 
 us 10 iccr delete iota
 rest api: post /rs/iota/cmd/{delete}
-agent
+DeleteAction:
+validate props iotaDir
 
 us 11 get iota node info
 rest api: get /rs/iota/nodeinfo
@@ -147,11 +179,7 @@ us 12 get iota nbrs
 rest api: get /rs/iota/neighbors
 agent
 
-Add us for iotaDownloadLink
-
-us 26 configurable IOTA dld link
-iotaDownloadLink=
-
+Manage logs: silence swarm, store changes to single file for audit purposes
 
 Will update of neighbor config prop need a specific dto for incoming handling?
 

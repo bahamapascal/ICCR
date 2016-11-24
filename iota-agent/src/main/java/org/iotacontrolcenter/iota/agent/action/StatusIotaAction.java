@@ -3,12 +3,10 @@ package org.iotacontrolcenter.iota.agent.action;
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
-public class InstallIotaAction extends AbstractAction implements IotaAction {
+public class StatusIotaAction extends AbstractAction implements IotaAction {
 
-
-    public InstallIotaAction(PropertySource props) {
-        super(props, new String[] { PropertySource.IOTA_DLD_LINK_PROP, PropertySource.IOTA_DLD_FILENAME_PROP,
-                PropertySource.IOTA_APP_DIR_PROP });
+    public StatusIotaAction(PropertySource props) {
+        super(props, new String[] { PropertySource.IOTA_APP_DIR_PROP });
     }
 
     @Override
