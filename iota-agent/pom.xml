@@ -19,6 +19,10 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+      </dependency>
+      <dependency>
         <groupId>${iccr.group.id}</groupId>
         <artifactId>iccr-properties</artifactId>
       </dependency>

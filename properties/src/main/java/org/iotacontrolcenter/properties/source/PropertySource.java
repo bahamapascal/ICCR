@@ -27,8 +27,8 @@ public class PropertySource {
     private static final Pattern PATTERN_FALSE = Pattern.compile("0|off|false|no", Pattern.CASE_INSENSITIVE);
     private static final String CONF_FILE = "iccr.properties";
 
-    public static final String CONF_DIR_PROP = "iccrConfDir";
-    public static final String CONF_DIR_DEFAULT = "/opt/iccr/conf";
+    public static final String ICCR_DIR_PROP = "iccrDir";
+    public static final String ICCR_DIR_DEFAULT = "/opt/iccr";
 
     private static final String LOC_COUNTRY_PROP = "iccrCountryLocale";
     private static final String LOC_LANG_PROP = "iccrLanguageLocale";
@@ -49,18 +49,33 @@ public class PropertySource {
     public static final String IOTA_NEIGHBOR_PROP_PREFIX="iotaNeighbor";
 
     private Properties props;
+    private String bakDir;
+    private String binDir;
     private String confDir;
     private String confFile;
+    private String iccrDir;
+    private String osName;
+    private String tmpDir;
     private PropertiesConfiguration propWriter;
 
     private PropertySource() {
         System.out.println("new PropertySource");
 
-        confDir = System.getProperty(CONF_DIR_PROP);
-        if(confDir == null || confDir.isEmpty()) {
-            System.out.println(CONF_DIR_PROP + " system setting not available, using default: " + CONF_DIR_DEFAULT);
-            confDir = CONF_DIR_DEFAULT;
+        osName = System.getProperty("os.name").toLowerCase();
+
+        System.out.println("os.name: " + osName);
+
+        iccrDir = System.getProperty(ICCR_DIR_PROP);
+        if(iccrDir == null || iccrDir.isEmpty()) {
+            System.out.println(ICCR_DIR_PROP + " system setting not available, using default: " + ICCR_DIR_DEFAULT);
+            iccrDir = ICCR_DIR_DEFAULT;
         }
+
+        confDir = iccrDir + "/conf";
+        binDir = iccrDir + "/bin";
+        tmpDir = iccrDir + "/tmp";
+        bakDir = iccrDir + "/bak";
+
         confFile = confDir + "/" + CONF_FILE;
 
         try {
@@ -83,6 +98,46 @@ public class PropertySource {
             System.out.println("failed to load iccr.properties from " + confDir);
             e.printStackTrace();
         }
+    }
+
+    public String getIotaDownloadUrl() {
+        return getString(IOTA_DLD_LINK_PROP) + "/" + getString(IOTA_DLD_FILENAME_PROP);
+    }
+
+    public String getLocalIotaUrl() {
+        return "http://localhost:" + getString(IOTA_PORT_NUMBER_PROP) + "/";
+    }
+
+    public String getIccrBinDir() {
+        return binDir;
+    }
+
+    public String getIccrConfDir() {
+        return confDir;
+    }
+
+    public String getIccrBakDir() {
+        return bakDir;
+    }
+
+    public String getIccrTmpDir() {
+        return tmpDir;
+    }
+
+    public String getIccrDir() {
+        return iccrDir;
+    }
+
+    public String getOsName() {
+        return osName;
+    }
+
+    public boolean osIsWindows() {
+        return (osName.indexOf("win") >= 0);
+    }
+
+    public boolean osIsMax() {
+        return (osName.indexOf("mac") >= 0);
     }
 
     public void setProperty(String key, Object value) {

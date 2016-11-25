@@ -2,11 +2,11 @@ package org.iotacontrolcenter.dto;
 
 public class IccrPropertyDto {
     private String key;
-    private Object value;
+    private String value;
 
     public IccrPropertyDto() { }
 
-    public IccrPropertyDto(String key, Object value) {
+    public IccrPropertyDto(String key, String value) {
         this.key = key;
         this.value = value;
     }
@@ -19,11 +19,11 @@ public class IccrPropertyDto {
         this.key = key;
     }
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 

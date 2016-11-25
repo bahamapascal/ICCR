@@ -9,7 +9,8 @@ public class IccrIotaNeighborsPropertyDto extends IccrPropertyDto {
     private List<NeighborDto> nbrs;
 
     public IccrIotaNeighborsPropertyDto(String key, List<NeighborDto> nbrs) {
-        super(key, nbrs);
+        super(key, null);
+        this.nbrs = nbrs;
     }
 
     public List<NeighborDto> getNbrs() {

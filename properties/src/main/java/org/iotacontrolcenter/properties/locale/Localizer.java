@@ -33,13 +33,9 @@ public class Localizer {
     private Localizer() {
         System.out.println("new Localizer");
 
-        confDir = System.getProperty(PropertySource.CONF_DIR_PROP);
-        if(confDir == null || confDir.isEmpty()) {
-            System.out.println("Localizer: " + PropertySource.CONF_DIR_PROP +
-                    " system setting not available, using default: " + PropertySource.CONF_DIR_DEFAULT);
-            confDir = PropertySource.CONF_DIR_DEFAULT;
-        }
         propSource = PropertySource.getInstance();
+
+        confDir = propSource.getIccrConfDir();
 
         lang = propSource.getLocaleLanguage();
         country = propSource.getLocaleCountry();

@@ -1,9 +1,10 @@
 package org.iotacontrolcenter.iota.agent.action;
 
 import org.iotacontrolcenter.dto.ActionResponse;
-import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class StopIotaAction extends AbstractAction implements IotaAction {
+
+    public static final String ACTION_PROP = "stopIota";
 
     public StopIotaAction() {
         super(null);
@@ -12,6 +13,8 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
     @Override
     public ActionResponse execute() {
         preExecute();
+
+
         ActionResponse resp = new ActionResponse(true, "happy");
         return resp;
     }

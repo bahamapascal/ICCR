@@ -10,9 +10,10 @@ README.md
 
 git config --global user.email "strongwares@gmail.com"
 git config --global user.name "strongwares"
-todo: git commit -m "First commit, working add, spend, move textotals operations."
-todo: git remote add origin https://github.com/strongwares/textant.git
-todo: ~/shared/textant$ git push -u origin master
+git commit -m "First commit..."
+git remote add origin https://github.com/strongwares/<>.git
+git add <>
+git push -u origin master
 
 sudo apt-get install maven
 which mvn
@@ -120,7 +121,7 @@ Add us for configurable IOTA dld link: us 26 iotaDownloadLink
 
 Add us for configurable IOTA dld link: us 27 iotaDownloadFilename
 
-Added prop iotaDownloadFile=IRI.jar
+Added prop iotaDownloadFilename=IRI.jar
 
 AbstractAction validate preconditions
 
@@ -171,21 +172,58 @@ curl -H "Content-Type: application/json" -X POST http://localhost:14266/iccr/rs/
 2016-11-24 17:24:47,700 INFO  [stdout] (default task-3) exception trying to execute an action (name: iotastatus, cmd:  ps fax | grep IRI | grep -v grep): Cannot run program "ps fax | grep IRI | grep -v grep": error=2, No such file or directory
 2016-11-24 17:24:47,702 INFO  [stdout] (default task-3) exception trying to execute an action (name: iotastatus, cmd:  ps fax | grep IRI | grep -v grep): Cannot run program "ps fax | grep IRI | grep -v grep": error=2, No such file or directory
 
+checked in
+
+New checkiotastatus.bash script
+
+new dir to dld to /opt/iccr/tmp
+new dir make backup copies to /opt/iccr/bak
+
+Pass iccrDir jvm env to iccr instead of conf dir
+
+iotastatus only do osprocess if !win
+
+use apache Http components framework
+
+Http/HttpMethod HttpGet HttpPost
+
+iotastatus do iotainfo httpaction if win
+
+download iota action
+
+checkin
 
 todo:
-iotastatus only do if linux
+get release conn after read
+
+post release conn after read
+
+update i13n install iota action
+
+persist iota dld info
+
+stop iota action
+
+backup iota action/process
+
+install iota action/process
+
+iota get node info
+
+is processfactory needed?
 
 ProcessBuilder for iccr ctl
+
 ProcessBuilder for iota ctl
+
+Action for restart iccr action
+
+Process for restart iccr
 
 log exceptions that are caught by rest resource
 
 copy updated props to conf
 copy msg bundles to conf
-
-HttpAction
-
-Http client framework: resteasy?
 
 iccr-cli using http client to talk to iccr over iccr rest api
 
@@ -203,6 +241,7 @@ iccrLanguageLocale=en
 #iccrCountryLocale=DE
 #iccrLanguageLocale=de
 
+Set nbrs in rest API support direct set of neighbors
 
 How best to do neighbors in java prop file: each nbr needs a key?
 
@@ -278,3 +317,9 @@ add logging
 windows cmd script to control iccr
 
 autodetect if iota is already installed and/or running at install
+
+change us drop bulk set
+
+change us add direct set of nbrs in separate endpoint
+
+new us iotaDownloadFilename=IRI.jar

@@ -2,6 +2,7 @@ package org.iotacontrolcenter.iota.agent.process;
 
 
 import org.iotacontrolcenter.properties.locale.Localizer;
+import org.iotacontrolcenter.properties.source.PropertySource;
 
 import java.io.*;
 import java.util.Arrays;
@@ -19,20 +20,30 @@ public abstract class OsProcess {
     protected InputStream outputStream;
     protected ProcessBuilder pb;
     protected Process p;
+    protected PropertySource propSource;
     protected int resultCode;
     protected String startError;
 
-
-    protected OsProcess(String name, String[] args, Map<String, String> env, File dir) {
+    protected OsProcess(String name) {
         this.name = name;
-        this.args = args;
-        this.env = env;
-        this.dir = dir;
         localizer = Localizer.getInstance();
+        propSource = PropertySource.getInstance();
     }
 
     public String getName() {
         return name;
+    }
+
+    public void setArgs(String[] args) {
+        this.args = args;
+    }
+
+    public void setEnv(Map<String, String> env) {
+        this.env = env;
+    }
+
+    public void setDir(File dir) {
+        this.dir = dir;
     }
 
     public String getProcessActionName() {
@@ -135,7 +146,7 @@ public abstract class OsProcess {
 
     protected void validateCommand() {
         if(args == null || args.length == 0) {
-            throw new IllegalStateException(localizer.getLocalTextWithFixed(getProcessActionName() + ": ", "emptyCmd"));
+            throw new IllegalStateException(localizer.getFixedWithLocalText(getProcessActionName() + ": ", "emptyCmd"));
         }
     }
 

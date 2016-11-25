@@ -10,10 +10,13 @@ export ICCR_DIR=/opt/iccr
 export ICCR_CONF_DIR=${ICCR_DIR}/conf
 export ICCR_LIB_DIR=${ICCR_DIR}/lib
 export ICCR_LOG_DIR=${ICCR_DIR}/logs
+export ICCR_TMP_DIR=${ICCR_DIR}/tmp
+export ICCR_BIN_DIR=${ICCR_DIR}/bin
+export ICCR_BAK_DIR=${ICCR_DIR}/bak
 export ICCR_JAR_NAME=iccr.jar
 
 iccrPortNumber=14266
-jvm_env="-DiccrConfDir=${ICCR_CONF_DIR}"
+jvm_env="-DiccrDir=${ICCR_DIR}"
 jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
 #ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1
 ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"

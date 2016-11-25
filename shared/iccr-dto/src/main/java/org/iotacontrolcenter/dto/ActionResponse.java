@@ -8,6 +8,9 @@ public class ActionResponse {
     public String msg;
     private List<IccrPropertyDto> properties;
 
+    public ActionResponse() {
+    }
+
     public ActionResponse(boolean success, String msg) {
         this.success = success;
         this.msg = msg;

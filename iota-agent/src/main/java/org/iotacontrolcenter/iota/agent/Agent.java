@@ -1,7 +1,6 @@
 package org.iotacontrolcenter.iota.agent;
 
 import org.iotacontrolcenter.dto.ActionResponse;
-import org.iotacontrolcenter.iota.agent.action.IotaAction;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 

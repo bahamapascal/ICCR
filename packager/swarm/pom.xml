@@ -30,6 +30,10 @@
         <groupId>${iccr.group.id}</groupId>
         <artifactId>iccr-main</artifactId>
       </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+      </dependency>
       <!--
       <dependency>
         <groupId>javax</groupId>
