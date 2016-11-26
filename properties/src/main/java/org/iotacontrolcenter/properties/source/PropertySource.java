@@ -1,13 +1,14 @@
 package org.iotacontrolcenter.properties.source;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
-import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.NeighborDto;
 
 public class PropertySource {
@@ -39,11 +40,13 @@ public class PropertySource {
     public static final String ICCR_START_IOTA_AT_START_PROP="iccrStartIotaAtStartup";
     public static final String ICCR_STOP_IOTA_AT_SHUTDOWN_PROP="iccrStopIotaAtShutdown";
 
-    public static final String IOTA_APP_DIR_PROP = "iotaDir";
     public static final String IOTA_DLD_LINK_PROP="iotaDownloadLink";
     public static final String IOTA_DLD_FILENAME_PROP="iotaDownloadFilename";
-    public static final String IOTA_PORT_NUMBER_PROP="iotaPortNumber";
+
+    public static final String IOTA_APP_DIR_PROP = "iotaDir";
     public static final String IOTA_START_PROP="iotaStartCmd";
+    public static final String IOTA_PORT_NUMBER_PROP="iotaPortNumber";
+
     public static final String IOTA_NBR_REFRESH_PROP="iotaNeighborRefreshTime";
     public static final String IOTA_NEIGHBORS_PROP="iotaNeighbors";
     public static final String IOTA_NEIGHBOR_PROP_PREFIX="iotaNeighbor";
@@ -53,10 +56,13 @@ public class PropertySource {
     private String binDir;
     private String confDir;
     private String confFile;
+    private String dataDir;
+    private String dldDir;
     private String iccrDir;
     private String osName;
     private String tmpDir;
     private PropertiesConfiguration propWriter;
+    private DateTimeFormatter ymdhmsFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private PropertySource() {
         System.out.println("new PropertySource");
@@ -71,10 +77,13 @@ public class PropertySource {
             iccrDir = ICCR_DIR_DEFAULT;
         }
 
-        confDir = iccrDir + "/conf";
-        binDir = iccrDir + "/bin";
-        tmpDir = iccrDir + "/tmp";
         bakDir = iccrDir + "/bak";
+        binDir = iccrDir + "/bin";
+        confDir = iccrDir + "/conf";
+        dldDir = iccrDir + "/download";
+        dataDir = iccrDir + "/data";
+        tmpDir = iccrDir + "/tmp";
+
 
         confFile = confDir + "/" + CONF_FILE;
 
@@ -100,8 +109,36 @@ public class PropertySource {
         }
     }
 
+    public String getNowDateTimestamp() {
+        return ymdhmsFormatter.format(LocalDateTime.now());
+    }
+
     public String getIotaDownloadUrl() {
-        return getString(IOTA_DLD_LINK_PROP) + "/" + getString(IOTA_DLD_FILENAME_PROP);
+        return getString(IOTA_DLD_LINK_PROP) + "/" + getIotaDownloadFilename();
+    }
+
+    public String getIotaDownloadFilename() {
+        return getString(IOTA_DLD_FILENAME_PROP);
+    }
+
+    public String getIotaStartCmd() {
+        return getString(IOTA_START_PROP);
+    }
+
+    public String getIotaAppDir() {
+        return getString(IOTA_APP_DIR_PROP);
+    }
+
+    public String getIriJarFilePath() {
+        return getIotaAppDir() + "/" + getIriJarFileInStartCmd();
+    }
+
+    public String getIriJarFileInStartCmd() {
+        // Something like: java -jar IRI.jar
+        String iotaStartCmd = getIotaStartCmd();
+        String jarFile = iotaStartCmd.replaceAll("^.*java.*-jar +", "");
+        jarFile = jarFile.replaceAll("\\.jar.*$",".jar");
+        return jarFile;
     }
 
     public String getLocalIotaUrl() {
@@ -118,6 +155,14 @@ public class PropertySource {
 
     public String getIccrBakDir() {
         return bakDir;
+    }
+
+    public String getIccrDownloadDir() {
+        return dldDir;
+    }
+
+    public String getIccrDataDir() {
+        return dataDir;
     }
 
     public String getIccrTmpDir() {

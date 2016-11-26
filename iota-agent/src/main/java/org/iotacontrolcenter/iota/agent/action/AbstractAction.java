@@ -1,11 +1,13 @@
 package org.iotacontrolcenter.iota.agent.action;
 
+import org.iotacontrolcenter.persistence.PersistenceService;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public abstract class AbstractAction {
 
     protected Localizer localizer;
+    protected PersistenceService persister;
     protected String[] propNames;
     protected PropertySource propSource;
 
@@ -13,6 +15,7 @@ public abstract class AbstractAction {
         this.propNames = propNames;
         propSource = PropertySource.getInstance();
         localizer = Localizer.getInstance();
+        persister = PersistenceService.getInstance();
     }
 
     protected void preExecute() {

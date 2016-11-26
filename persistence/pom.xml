@@ -18,6 +18,14 @@
         <artifactId>junit</artifactId>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>${iccr.group.id}</groupId>
+        <artifactId>iccr-properties</artifactId>
+      </dependency>
     </dependencies>
 
 </project>

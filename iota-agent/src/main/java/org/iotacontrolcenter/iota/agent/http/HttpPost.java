@@ -79,12 +79,5 @@ public class HttpPost extends HttpMethod  {
                     " (name: " + name + ", URL: " + url + "): " + ioe.getLocalizedMessage());
             System.out.println(startError);
         }
-        /*
-        finally {
-            if(post != null) {
-                post.releaseConnection();
-            }
-        }
-        */
     }
 }

@@ -3,6 +3,7 @@ package org.iotacontrolcenter.iota.agent.http;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.iotacontrolcenter.properties.locale.Localizer;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 public abstract class HttpMethod {
 
     protected Map<String, String> headers;
+    protected HttpRequestBase httpRequestBase;
     protected Localizer localizer;
     protected String name;
     protected CloseableHttpResponse response;
@@ -95,16 +97,12 @@ public abstract class HttpMethod {
 
     public byte[] responseAsByteArray() {
         try {
-            /*
-            System.out.println("as byte array consuming entity");
-
-            // This consumes the returned content and closes the stream;
-            EntityUtils.consume(response.getEntity());
-
-            System.out.println("done consuming entity");
-            */
-
-            return EntityUtils.toByteArray(response.getEntity());
+            byte[] bytes = EntityUtils.toByteArray(response.getEntity());
+            if(httpRequestBase != null) {
+                httpRequestBase.releaseConnection();
+                httpRequestBase = null;
+            }
+            return bytes;
         }
         catch(IOException ioe) {
             System.out.println("to byte array ioe:");
@@ -116,16 +114,14 @@ public abstract class HttpMethod {
 
     public String responseAsString() {
         try {
-            /*
-            System.out.println("as byte array consuming entity");
+            String resp = EntityUtils.toString(response.getEntity());
 
-            // This consumes the returned content and closes the stream;
-            EntityUtils.consume(response.getEntity());
+            if(httpRequestBase != null) {
+                httpRequestBase.releaseConnection();
+                httpRequestBase = null;
+            }
 
-            System.out.println("done consuming entity");
-            */
-
-            return EntityUtils.toString(response.getEntity());
+            return resp;
         }
         catch(IOException ioe) {
             System.out.println("to string ioe:");

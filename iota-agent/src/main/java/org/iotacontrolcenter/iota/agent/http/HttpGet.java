@@ -55,14 +55,8 @@ public class HttpGet extends HttpMethod {
 
             response = client.execute(get);
 
-            /*
-            System.out.println("consuming entity");
-
-            // This consumes the returned content and closes the stream;
-            EntityUtils.consume(response.getEntity());
-
-            System.out.println("done consuming entity");
-            */
+            // For releasigng connection in calls from the base:
+            httpRequestBase = get;
         }
         catch(IOException ioe) {
             System.out.println("httpget io exe:");
@@ -73,13 +67,6 @@ public class HttpGet extends HttpMethod {
                     " (name: " + name + ", URL: " + url + "): " + ioe.getLocalizedMessage());
             System.out.println(startError);
         }
-        /*
-        finally {
-            if(get != null) {
-                get.releaseConnection();
-            }
-        }
-        */
     }
 
 }

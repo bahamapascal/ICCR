@@ -10,9 +10,10 @@ README.md
 
 git config --global user.email "strongwares@gmail.com"
 git config --global user.name "strongwares"
-git commit -m "First commit..."
+
 git remote add origin https://github.com/strongwares/<>.git
 git add <>
+git commit -m "..."
 git push -u origin master
 
 sudo apt-get install maven
@@ -136,7 +137,7 @@ execution: file exists, is running, answers query
 checked in
 
 -----------
-Th 11/24/16
+Thu 11/24/16
 
 Locale values supported by jvm: http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
@@ -191,30 +192,100 @@ iotastatus do iotainfo httpaction if win
 
 download iota action
 
-checkin
+Checked in
 
-todo:
-get release conn after read
+-----------
+Fri 11/25/16
 
-post release conn after read
+http get release conn after read
+
+http post release conn after read
 
 update i13n install iota action
 
-persist iota dld info
-
-stop iota action
-
-backup iota action/process
-
 install iota action/process
 
+write out downloaded iri jar
+
+us 5 iccr remember iota install info: persistor captures event csv
+
+persist iota dld info: audit dir, iota-event.csv:
+<date,<event>,<data>,<data2>
+<date>,download,<dld link>,<filepath>
+<date>,fail download,<dldlink>,<msg>
+<date>,fail download,<filepath>,<msg>
+<date>,install,<filepath>,<iri.jar>
+<date>,fail install,<filepath>,<msg>
+<date>,stop,?,?
+<date>,fail stop,?,<msg>
+<date>,start,<cmd>
+<date>,fail start,?,<msg>
+
+Get start cmd or iri.jar in start cmd for putting in persistence in install iota action
+
+InstallAction:
+validate props iotaDir, iotaDownloadLink, iotaDownloadFilename
+get Iota status
+download
+persist events, version, and date
+process and script to install new iri <dldFilePath>: copy iotaDir/iriFileName to /opt/iccr/bak/iri.jar.timestamp; cp dldFilePath to iriFilePath
+and make backup copy of iota
+start iota
+      startiota.bash
+      gets startCmd from iccr.props
+      gets portNum from iccr.props
+      could get jvm args from iccr.props
+      stores pid
+stop Iota if necessary:
+     process and script to nicely kill
+     need pid
+
+Sync dld file name Iri-version.jar.time with name of jar in start cmd (java -jar iri.jar)
+
+start iota action: from script that picks up the configured prop
+
+? on start, first verify if the iri.jar exists in iota dir
+
+us 7 iccr start iota
+rest api: post /rs/iota/cmd/{start}
+StartAction: validate props iotaDir, iotaStartCmd, iotaPortNumber
+
+us 8 iccr stop iota
+rest api:  post /rs/iota/cmd/{stop}
+StopAction: validate props iotaDir
+script: stopiota.bash
+
+----
+Sat 11/26/2016
+
+new AgentUtil utilities
+
+install iri first validates iota dir exists
+
+startiota first validates iota dir exists
+
+Emit newline to iota-events.csv
+
+Checked in
+
+install action do file ops instead of spawning osprocess
+
+todo:
+see question: add nbrs should always be done in start?
+
+capture output of os process to debug failure
+
+write action status strings to a place that a rest api long poll can query for scrolling log window in UI
+
+stop iota action: from script that knows how it was started?
+
 iota get node info
+
+purge iccr.properties that aren't configurable from api
 
 is processfactory needed?
 
 ProcessBuilder for iccr ctl
-
-ProcessBuilder for iota ctl
 
 Action for restart iccr action
 
@@ -231,9 +302,13 @@ StatusAction execution
 
 Shutdown hook
 
-Server emit localized text
+update dld us with note: dld file will be stored, but copied to iri.jar in start cmd
 
-new us: audit log
+need localized date for event log csv
+
+Server emit localized text for status in UI
+
+new us: event csv
 
 new us: localized text
 iccrCountryLocale=US
@@ -247,32 +322,11 @@ How best to do neighbors in java prop file: each nbr needs a key?
 
 Do specific app/config/neighbors get/set rest api?
 
-InstallAction:
-validate props iotaDir, iotaDownloadLink, iotaDownloadFilename
-get Iota status
-stop Iota if necessary
-make backup copy of iota
-download
-remember version and date
-
 update us 4 additional prop validations
-
-us 5 iccr remember iota install info
 
 us 6 iccr iota get install info
 rest api: get rs/iota/installinfo
 agent
-
-us 7 iccr start iota
-rest api: post /rs/iota/cmd/{start}
-StartAction:
-validate props iotaDir, iotaStartCmd, iotaPortNumber
-
-us 8 iccr stop iota
-rest api:  post /rs/iota/cmd/{stop}
-StopAction:
-validate props iotaDir
-
 
 us 9 iccr delete iota db
 rest api: post /rs/iota/cmd/{deletedb}
@@ -323,3 +377,42 @@ change us drop bulk set
 change us add direct set of nbrs in separate endpoint
 
 new us iotaDownloadFilename=IRI.jar
+
+new us export iota event info csv
+
+
+*****
+questions:
+Are neighbors required before starting iota, should starting iota first check for neighbors being configured?
+
+Is IRI being started with sudo?
+
+Starting iota has a single command: java -jar IRI.jar
+Additional arguments can be passed to the java VM: java -DpropName=propValue -jar IRI.jar
+Arguments can be passed as command line input to the IRI.jar: java -jar IRI.jar <arg1> <arg2>
+Actual filename of IRI.jar can be changed:  java -jar IRI-1.1.0.jar
+Needs sudo and run in background with output redirected to a file: sudo nohup java -jar IRI.jar > /opt/iota/iri.console 2>&1 &
+All together:   sudo nohup java -DpropName=propVal -jar IRI-1.1.0.jar <port> <nbr1> <nbr2>  > /opt/iota/iri.console 2>&1 &
+
+Info needed to run IRI:
+1) List of key value pairs of properties to pass java VM
+2) Path to which IOTA or IRI jar file to run
+3) Command line arguments to pass to IOTA
+
+Or just 4 props with OS specific details
+iotaDir=/opt/iota
+iotaStartCmd=java -jar IRI.jar
+iotaPortNumber=14265
+
+and maybe jvm args:
+iotaJvmArgKeys=a,b,c
+iotaJvmArg.a=a-val
+iotaJvmArg.b=b-val
+iotaJvmArg.c=c-val
+
+Could result in a script:  startIota.bash <jarname> <portNumber> <jvmargs>
+jvmargs="-Dprop=value"
+cd $iotaDir
+sudo nohup java ${jvmargs} -jar IRI.jar $iotaPortNumber > iota.console 2>&1 &
+capture pid
+*****
