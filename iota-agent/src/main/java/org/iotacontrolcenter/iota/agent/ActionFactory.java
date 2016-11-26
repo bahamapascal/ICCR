@@ -7,6 +7,7 @@ public class ActionFactory {
 
     public static final String INSTALL = "install";
     public static final String START = "start";
+    public static final String RESTART = "restart";
     public static final String STATUS = "status";
     public static final String STOP = "stop";
     public static final String DELETEDB = "deletedb";
@@ -18,6 +19,9 @@ public class ActionFactory {
         }
         else if(START.equals(cmd)) {
             return new StartIotaAction();
+        }
+        else if(RESTART.equals(cmd)) {
+            return new RestartIotaAction();
         }
         else if(STATUS.equals(cmd)) {
             return new StatusIotaAction();
@@ -38,11 +42,12 @@ public class ActionFactory {
         return cmd != null &&
                 !cmd.isEmpty() && (
                         cmd.equals(INSTALL) ||
-                        cmd.equals(START) ||
-                        cmd.equals(STATUS) ||
-                        cmd.equals(STOP) ||
-                        cmd.equals(DELETEDB) ||
-                        cmd.equals(DELETE) );
+                                cmd.equals(START) ||
+                                cmd.equals(RESTART) ||
+                                cmd.equals(STATUS) ||
+                                cmd.equals(STOP) ||
+                                cmd.equals(DELETEDB) ||
+                                cmd.equals(DELETE) );
     }
 
 }

@@ -19,6 +19,10 @@ public class IccrPropertyDto {
         this.key = key;
     }
 
+    public boolean valueIsSuccess() {
+        return value != null && !value.isEmpty() && value.toLowerCase().equals("true");
+    }
+
     public String getValue() {
         return value;
     }

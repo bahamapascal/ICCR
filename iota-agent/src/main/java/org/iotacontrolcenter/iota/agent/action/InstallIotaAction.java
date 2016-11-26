@@ -123,7 +123,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
 
                 // Now copy into place the newly downloaded file, from download dir to the iota iri.jar file
                 // that was specified in the start iota cmd:
-                boolean installed = installNewIota(dldFilePath, iriJarFile);
+                boolean installed = installNewIota(dldFilePath, iriJarFilePath, iriJarFile);
                 if(installed) {
                     persister.logIotaAction(PersistenceService.IOTA_INSTALL,
                             dldFilePath,
@@ -146,9 +146,12 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
 
                 boolean started = startIota();
                 if(started) {
+                    // The start action is logging this event
+                    /*
                     persister.logIotaAction(PersistenceService.IOTA_START,
                             propSource.getIotaStartCmd(),
                             "");
+                    */
                 }
                 else {
                     System.out.println(ACTION_PROP + " " +
@@ -158,14 +161,15 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                     resp.setSuccess(false);
                     resp.setMsg(localizer.getLocalText("startIotaFail"));
 
+                    // The start action is logging this event
+                    /*
                     persister.logIotaAction(PersistenceService.IOTA_START_FAIL,
                             propSource.getIotaStartCmd(),
                             resp.getMsg());
+                    */
 
                     return resp;
                 }
-
-                // Add neighbors is done in start?
             }
             else {
                 rval = false;
@@ -196,7 +200,55 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         return resp;
     }
 
-    private boolean installNewIota(String dldFilePath, String iriJarFile) {
+    private boolean installNewIota(String dldFilePath, String iriJarFilePath, String iriJarFile) {
+        boolean rval = true;
+
+        System.out.println("installing new iri jar from " + dldFilePath +
+                ", copying to " + iriJarFilePath);
+
+        // General preconditions were already validated (i.e. iotaDir exists)
+        if(!AgentUtil.fileExists(dldFilePath)) {
+            System.out.println(ACTION_PROP + " " +
+                    localizer.getLocalText("storeIotaFail") +
+                    ": (" + dldFilePath + "), " +
+                    localizer.getLocalText("missingFile"));
+            return false;
+        }
+
+        if(AgentUtil.fileExists(iriJarFilePath)) {
+            String iriBackupFilePath = propSource.getIccrBakDir() + "/" +
+                    iriJarFile + "." + propSource.getNowDateTimestamp();
+
+            System.out.println("installNewIota make backup: " +
+                    "copy " + iriJarFilePath + " to " + iriBackupFilePath);
+
+            try {
+                FileUtils.copyFile(new File(iriJarFilePath), new File(iriBackupFilePath));
+            }
+            catch(IOException ioe) {
+                System.out.println(ACTION_PROP + " " +
+                        localizer.getLocalText("backupIotaFail") +
+                        ": (" + iriJarFilePath + ")");
+                return false;
+            }
+        }
+
+        System.out.println("installNewIota installing: " +
+                "copy " + dldFilePath + " to " + iriJarFilePath);
+
+        try {
+            FileUtils.copyFile(new File(dldFilePath), new File(iriJarFilePath));
+        }
+        catch(IOException ioe) {
+            System.out.println(ACTION_PROP + " " +
+                    localizer.getLocalText("installIotaFail") +
+                    ": (" + dldFilePath + " -> " + iriJarFilePath + ")");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean installNewIotaByScript(String dldFilePath, String iriJarFile) {
         boolean rval = true;
 
         System.out.println("installing new iri jar from " + dldFilePath +
@@ -257,7 +309,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         ActionResponse resp = status.execute();
         wasIotaActive = resp.isSuccess() &&
                 resp.getProperty(StatusIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP).getValue().equals("true");
+                resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
     private boolean stopIota() {
@@ -265,7 +317,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         ActionResponse resp = stopper.execute();
         return resp.isSuccess() &&
                 resp.getProperty(StopIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StopIotaAction.ACTION_PROP).getValue().equals("true");
+                resp.getProperty(StopIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
     private boolean startIota() {
@@ -273,7 +325,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         ActionResponse resp = starter.execute();
         return resp.isSuccess() &&
                 resp.getProperty(StartIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StartIotaAction.ACTION_PROP).getValue().equals("true");
+                resp.getProperty(StartIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
 }

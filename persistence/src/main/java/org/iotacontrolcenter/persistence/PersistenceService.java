@@ -17,6 +17,8 @@ public class PersistenceService {
     public static final String IOTA_STOP_FAIL = "stopFail";
     public static final String IOTA_START = "start";
     public static final String IOTA_START_FAIL = "startFail";
+    public static final String IOTA_RESTART = "restart";
+    public static final String IOTA_RESTART_FAIL = "restartFail";
 
     private static PersistenceService instance;
     private static Object SYNC_INST = new Object();

@@ -270,14 +270,65 @@ Checked in
 
 install action do file ops instead of spawning osprocess
 
+fixed stopiota.bash
+
+fixed startiota.bash
+
+start iota log event
+
+stop iota log event
+
+test:
+status
+stop
+start
+status
+stop
+start
+install
+status
+stop
+install
+status
+
+start needs to check if already running
+status
+start
+start
+status
+stop
+status
+start
+restart
+
+new restart command
+
+checked in
+
 todo:
+write localized date to iota-event.csv
+
+fill out delete action
+
+fill out deletedb
+
+us 9 iccr delete iota db
+rest api: post /rs/iota/cmd/{deletedb}
+DeletedbAction:
+validate props iotaDir
+
+us 10 iccr delete iota
+rest api: post /rs/iota/cmd/{delete}
+DeleteAction:
+validate props iotaDir
+
+see question: should install also start, it is now
+
 see question: add nbrs should always be done in start?
 
 capture output of os process to debug failure
 
 write action status strings to a place that a rest api long poll can query for scrolling log window in UI
-
-stop iota action: from script that knows how it was started?
 
 iota get node info
 
@@ -304,11 +355,11 @@ Shutdown hook
 
 update dld us with note: dld file will be stored, but copied to iri.jar in start cmd
 
-need localized date for event log csv
-
 Server emit localized text for status in UI
 
 new us: event csv
+
+new us: restart
 
 new us: localized text
 iccrCountryLocale=US
@@ -327,16 +378,6 @@ update us 4 additional prop validations
 us 6 iccr iota get install info
 rest api: get rs/iota/installinfo
 agent
-
-us 9 iccr delete iota db
-rest api: post /rs/iota/cmd/{deletedb}
-DeletedbAction:
-validate props iotaDir
-
-us 10 iccr delete iota
-rest api: post /rs/iota/cmd/{delete}
-DeleteAction:
-validate props iotaDir
 
 us 11 get iota node info
 rest api: get /rs/iota/nodeinfo

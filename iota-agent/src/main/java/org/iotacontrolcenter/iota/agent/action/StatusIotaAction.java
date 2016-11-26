@@ -70,6 +70,9 @@ public class StatusIotaAction extends AbstractAction implements IotaAction {
                     System.out.println(proc.getStartError());
                     msg = proc.getStartError();
                 }
+                else {
+                    msg = localizer.getLocalText("processFail");
+                }
             } else {
                 rc = proc.getResultCode();
                 System.out.println(proc.getName() + " " +

@@ -6,6 +6,7 @@ import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.iota.agent.process.IotaStartProcess;
 import org.iotacontrolcenter.iota.agent.process.OsProcess;
+import org.iotacontrolcenter.persistence.PersistenceService;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class StartIotaAction extends AbstractAction implements IotaAction {
@@ -40,6 +41,14 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
 
         ActionResponse resp = new ActionResponse();
 
+        if(isActive()) {
+            System.out.println("startIota: already active");
+            resp.setSuccess(true);
+            resp.setMsg(localizer.getLocalText("startIotaAlreadyActive"));
+            resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
+            return resp;
+        }
+
         OsProcess proc = new IotaStartProcess();
         boolean rval = proc.start();
         String msg = localizer.getLocalText("processSuccess");
@@ -48,6 +57,9 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
             if (proc.isStartError()) {
                 System.out.println(proc.getStartError());
                 msg = proc.getStartError();
+            }
+            else {
+                msg = localizer.getLocalText("processFail");
             }
         } else {
             rc = proc.getResultCode();
@@ -64,7 +76,28 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         }
         resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));
 
+        if(resp.isSuccess() &&
+                resp.getProperty(ACTION_PROP) != null &&
+                resp.getProperty(ACTION_PROP).valueIsSuccess()) {
+            persister.logIotaAction(PersistenceService.IOTA_START,
+                    propSource.getIotaStartCmd(),
+                    "");
+        }
+        else {
+            persister.logIotaAction(PersistenceService.IOTA_START_FAIL,
+                    propSource.getIotaStartCmd(),
+                    resp.getMsg());
+        }
+
         return resp;
+    }
+
+    private boolean isActive() {
+        StatusIotaAction status = new StatusIotaAction();
+        ActionResponse resp = status.execute();
+        return resp.isSuccess() &&
+                resp.getProperty(StatusIotaAction.ACTION_PROP) != null &&
+                resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
 }

@@ -13,26 +13,14 @@ if [ ! -f "${iotaPidFile}" ]; then
     exit 0
 fi
 
-#useSudo="sudo "
-useSudo=""
-
-echo "cd $iotaDir"
 cd $iotaDir
 
 iotaPid=`cat $iotaPidFile`
 
-echo "IOTA PID: $iotaPid"
-
-stopCmd="${useSudo} kill ${iotaPid}"
-
-echo "${stopCmd}"
-$stopCmd
+kill ${iotaPid}
 
 statusCode=$?
 
-echo "statusCode: $statusCode"
-
-echo "rm -f $iotaPidFile"
 rm -f $iotaPidFile
 
 exit $statusCode

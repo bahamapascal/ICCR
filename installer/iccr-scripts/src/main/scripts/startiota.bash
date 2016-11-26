@@ -10,29 +10,16 @@ iotaStartCmd=`grep iotaStartCmd $iccrDir/conf/iccr.properties | sed -e 's/iotaSt
 iotaPortNumber=`grep iotaPortNumber $iccrDir/conf/iccr.properties | sed -e 's/iotaPortNumber=//g'`
 iotaPidFile=$iotaDir/iota.pid
 
-#useSudo="sudo "
-useSudo=""
-
-useNohup="nohup "
-#useNohup=
-
-toConsoleLog=" > console.log 2>&1 "
-toConsoleLog=""
-
-startCmd="${useSudo} ${useNohup} ${iotaStartCmd} ${iotaPortNumber} ${toConsoleLog} &"
-
-echo "cd $iotaDir"
 cd $iotaDir
 
+startCmd="nohup ${iotaStartCmd} ${iotaPortNumber} > console.log 2>&1 &"
 echo "${startCmd}"
-$startCmd
+nohup ${iotaStartCmd} ${iotaPortNumber}  > console.log 2>&1 &
 
 statusCode=$?
 
 iriPid=$!
 
-echo "statusCode: $statusCode"
-echo "PID: $iriPid"
 echo $iriPid > $iotaPidFile
 
 exit $statusCode
