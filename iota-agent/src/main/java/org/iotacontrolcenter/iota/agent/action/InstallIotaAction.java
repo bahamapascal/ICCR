@@ -59,6 +59,35 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         String iriJarFilePath = null;
         String iriJarFile= null;
         try {
+
+            // First stop active in order to restart with new version just downloaded:
+            if(wasIotaActive) {
+                System.out.println(ACTION_PROP + " " +
+                        localizer.getLocalText("stoppingIota"));
+
+                boolean stopped = AgentUtil.stopIota();
+                if(stopped) {
+                    persister.logIotaAction(PersistenceService.IOTA_STOP,
+                            "",
+                            "");
+                }
+                else {
+                    System.out.println(ACTION_PROP + " " +
+                            localizer.getLocalText("stopIotaFail"));
+
+                    resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
+                    resp.setSuccess(false);
+                    resp.setMsg(localizer.getLocalText("stopIotaFail"));
+
+                    persister.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
+                            "",
+                            resp.getMsg());
+
+                    return resp;
+                }
+            }
+
+            // Now do the download while it is stopping
             iotaDld.execute();
 
             if(iotaDld.isResponseSuccess()) {
@@ -94,32 +123,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                         propSource.getIotaDownloadUrl(),
                         dldFilePath + " (" + jarBytes.length + " bytes)");
 
-                // Stop active in order to restart with new version just downloaded:
-                if(wasIotaActive) {
-                    System.out.println(ACTION_PROP + " " +
-                            localizer.getLocalText("stoppingIota"));
 
-                    boolean stopped = AgentUtil.stopIota();
-                    if(stopped) {
-                        persister.logIotaAction(PersistenceService.IOTA_STOP,
-                                "",
-                                "");
-                    }
-                    else {
-                        System.out.println(ACTION_PROP + " " +
-                                localizer.getLocalText("stopIotaFail"));
-
-                        resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
-                        resp.setSuccess(false);
-                        resp.setMsg(localizer.getLocalText("stopIotaFail"));
-
-                        persister.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
-                                "",
-                                resp.getMsg());
-
-                        return resp;
-                    }
-                }
 
                 // Now copy into place the newly downloaded file, from download dir to the iota iri.jar file
                 // that was specified in the start iota cmd:

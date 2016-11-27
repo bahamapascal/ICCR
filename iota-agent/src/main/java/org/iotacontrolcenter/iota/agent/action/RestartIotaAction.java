@@ -56,7 +56,6 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
             Thread.sleep(1000);
         }
         catch(Exception e) {
-
         }
 
         System.out.println("restartIota, starting...");

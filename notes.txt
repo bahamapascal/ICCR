@@ -354,9 +354,11 @@ fixed addding payload to iota cmd
 
 checked in
 
-todo:
-add neighbors to iota
+action to add neighbors to iota
 
+add neighbors in start action
+
+todo:
 iri exception on getNodeInfo and getNeighbors
 java.lang.ClassCastException: java.lang.String cannot be cast to java.util.Map
 	at iri.API$Request.process(API.java:167)

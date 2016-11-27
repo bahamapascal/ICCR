@@ -300,7 +300,9 @@ public class PropertySource {
                         getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".ip." + id),
                         getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id),
                         getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
-                        getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id)));
+                        getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id),
+                        getInteger(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".port." + id),
+                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".scheme." + id)));
             }
             catch(Exception e) {
                 System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());

@@ -72,6 +72,20 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
                     localizer.getLocalText("resultCode") + ": " + rc);
         }
 
+        if(rval) {
+
+            // Pause for a sec to let it spin up
+            try {
+                Thread.sleep(2000);
+            }
+            catch(Exception e) {
+            }
+
+            if(!addNeighbors()) {
+                System.out.println("Failed to add neighbors");
+            }
+        }
+
         resp.setSuccess(rval);
         resp.setMsg(msg);
 
@@ -94,6 +108,16 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         }
 
         return resp;
+    }
+
+    private boolean addNeighbors() {
+        System.out.println("started, adding neighbors...");
+
+        AddNeighborsIotaAction addNbrs = new AddNeighborsIotaAction();
+        ActionResponse resp = addNbrs.execute();
+        return resp.isSuccess() &&
+                resp.getProperty(AddNeighborsIotaAction.ACTION_PROP) != null &&
+                resp.getProperty(AddNeighborsIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
 }

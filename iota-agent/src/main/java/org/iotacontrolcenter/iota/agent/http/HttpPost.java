@@ -14,22 +14,22 @@ import java.util.Map;
 
 public class HttpPost extends HttpMethod  {
 
-    private String payload;
+    private Object payload;
 
-    public HttpPost(String name) {
-        this(name, null, null, null);
+    public HttpPost(String name, String url) {
+        this(name, url, null, null);
     }
 
-    public HttpPost(String name, String url, String payload) {
+    public HttpPost(String name, String url, Object payload) {
         this(name, url, payload, null);
     }
 
-    public HttpPost(String name, String url, String payload, Map<String, String> headers) {
+    public HttpPost(String name, String url, Object payload, Map<String, String> headers) {
         super(name, url, headers);
         this.payload = payload;
     }
 
-    public void setPayload(String payload) {
+    public void setPayload(Object payload) {
         this.payload = payload;
     }
 
@@ -43,7 +43,7 @@ public class HttpPost extends HttpMethod  {
             throw new IllegalStateException(localizer.getFixedWithLocalText(name + ": ", "emptyHttpRequestUrl"));
         }
 
-        if(payload == null || payload.isEmpty()) {
+        if(payload == null) {
             throw new IllegalStateException(localizer.getLocalTextWithFixed("emptyHttpRequestPayload",
                     " (" + name + "): " + url));
         }

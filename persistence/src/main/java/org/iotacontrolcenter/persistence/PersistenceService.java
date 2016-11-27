@@ -23,6 +23,7 @@ public class PersistenceService {
     public static final String IOTA_DELETE_FAIL = "deleteIotaFail";
     public static final String IOTA_DELETE_DB = "deleteIotaDb";
     public static final String IOTA_DELETE_DB_FAIL = "deleteIotaDbFail";
+    public static final String IOTA_ADD_NBRS_FAIL = "addIotaNeighborsFail";
 
     private static PersistenceService instance;
     private static Object SYNC_INST = new Object();

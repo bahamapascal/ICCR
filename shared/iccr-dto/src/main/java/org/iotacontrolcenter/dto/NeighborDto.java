@@ -2,21 +2,43 @@ package org.iotacontrolcenter.dto;
 
 
 public class NeighborDto {
-    private String key;
-    private String ip;
-    private String name;
-    private String descr;
+
     private boolean active;
+    private String descr;
+    private String ip;
+    private String key;
+    private String name;
+    private int port = 14265;
+    private String scheme = "udp";
 
     public NeighborDto() {
     }
 
-    public NeighborDto(String key, String ip, String name, String descr, boolean active) {
+    public NeighborDto(String key, String ip, String name, String descr,
+                       boolean active, int port, String scheme) {
         this.key = key;
         this.ip = ip;
         this.name = name;
         this.descr = descr;
         this.active = active;
+        this.port = port;
+        this.scheme = scheme;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public String getKey() {
@@ -59,14 +81,20 @@ public class NeighborDto {
         this.active = active;
     }
 
+    public String toUri() {
+        return scheme + "://" + ip + ":" + String.valueOf(port);
+    }
+
     @Override
     public String toString() {
         return "NeighborDto{" +
                 "key='" + key + '\'' +
-                ", ip='" + ip + '\'' +
                 ", name='" + name + '\'' +
                 ", descr='" + descr + '\'' +
-                ", active=" + active +
+                ", active=" + active + '\'' +
+                ", scheme='" + scheme + '\'' +
+                ", ip='" + ip + '\'' +
+                ", port='" + port +
                 '}';
     }
 }
