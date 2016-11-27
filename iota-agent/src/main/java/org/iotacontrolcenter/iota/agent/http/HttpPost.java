@@ -1,7 +1,10 @@
 package org.iotacontrolcenter.iota.agent.http;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -63,12 +66,14 @@ public class HttpPost extends HttpMethod  {
                     post.setHeader(k, v);
                 });
             }
+            Gson gson = new GsonBuilder().create();
+            post.setEntity(new StringEntity(gson.toJson(payload), "UTF-8"));
 
             CloseableHttpClient client = HttpClientBuilder.create().disableAutomaticRetries().build();
 
             response = client.execute(post);
 
-            // For releasigng connection in calls from the base:
+            // For releasing connection in calls from the base:
             httpRequestBase = post;
         }
         catch(IOException ioe) {

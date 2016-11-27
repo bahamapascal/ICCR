@@ -27,6 +27,10 @@
         <artifactId>httpclient</artifactId>
       </dependency>
       <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+      </dependency>
+      <dependency>
         <groupId>${iccr.group.id}</groupId>
         <artifactId>iccr-properties</artifactId>
       </dependency>

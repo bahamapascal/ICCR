@@ -350,8 +350,18 @@ getNeighbors
 
 checked in
 
+fixed addding payload to iota cmd
+
+checked in
+
 todo:
 add neighbors to iota
+
+iri exception on getNodeInfo and getNeighbors
+java.lang.ClassCastException: java.lang.String cannot be cast to java.util.Map
+	at iri.API$Request.process(API.java:167)
+	at iri.API$Request$1.completed(API.java:112)
+
 
 UI note: content from iota is in "content" prop, it may contain exception property
 

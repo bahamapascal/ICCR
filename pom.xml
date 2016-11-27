@@ -13,6 +13,7 @@
     <properties>
       <iccr.group.id>org.iotacontrolcenter</iccr.group.id>
 
+      <version.gjson>2.3.1</version.gjson>
       <version.junit>4.12</version.junit>
       <version.wildfly-swarm>2016.11.0</version.wildfly-swarm>
       <version.apache-httpclient>4.5.2</version.apache-httpclient>
@@ -65,6 +66,11 @@
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+              <groupId>com.google.code.gson</groupId>
+              <artifactId>gson</artifactId>
+              <version>${version.gjson}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
