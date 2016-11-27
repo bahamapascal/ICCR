@@ -305,23 +305,35 @@ new restart command
 
 checked in
 
-todo:
 write localized date to iota-event.csv
 
-fill out delete action
-
-fill out deletedb
-
-us 9 iccr delete iota db
-rest api: post /rs/iota/cmd/{deletedb}
-DeletedbAction:
-validate props iotaDir
-
+fill out delete action: stop, delete IRI.jar
 us 10 iccr delete iota
 rest api: post /rs/iota/cmd/{delete}
 DeleteAction:
 validate props iotaDir
 
+
+fill out deletedb: stop, delete *.iri
+us 9 iccr delete iota db
+rest api: post /rs/iota/cmd/{deletedb}
+DeletedbAction:
+validate props iotaDir
+
+deletedb
+start
+delete
+start -> fail
+download
+status
+start
+stop
+start
+restart
+
+checked in
+
+todo:
 see question: should install also start, it is now
 
 see question: add nbrs should always be done in start?

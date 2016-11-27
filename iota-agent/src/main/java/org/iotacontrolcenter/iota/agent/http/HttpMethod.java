@@ -20,7 +20,7 @@ public abstract class HttpMethod {
     protected String name;
     protected CloseableHttpResponse response;
     protected String startError;
-    protected int timeOutSec = 10;
+    protected int timeOutSec = 30;
     protected String url;
 
     public HttpMethod(String name) {

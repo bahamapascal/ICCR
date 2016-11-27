@@ -21,7 +21,8 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
     protected void validatePreconditions() {
 
         if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
+            throw new IllegalStateException(localizer.getLocalText("missingDirectory") +
+                    ": " + propSource.getIotaAppDir());
         }
     }
 
@@ -31,9 +32,10 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
 
         ActionResponse resp = new ActionResponse();
 
-        if (isActive()) {
+        if (AgentUtil.isIotaActive()) {
             System.out.println("restartIota, first stopping");
-            if(!stopIt()) {
+
+            if(!AgentUtil.stopIota()) {
                 System.out.println(ACTION_PROP + " " +
                         localizer.getLocalText("stopIotaFail"));
 
@@ -49,7 +51,6 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
             }
         }
 
-        System.out.println("restartIota, starting...");
         // Pause for a sec to let it stop...
         try {
             Thread.sleep(1000);
@@ -57,7 +58,10 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
         catch(Exception e) {
 
         }
-        ActionResponse startResp = startIt();
+
+        System.out.println("restartIota, starting...");
+
+        ActionResponse startResp = AgentUtil.startIota();
         if(startResp.isSuccess() &&
                 startResp.getProperty(StartIotaAction.ACTION_PROP) != null &&
                 startResp.getProperty(StartIotaAction.ACTION_PROP).valueIsSuccess()) {
@@ -65,9 +69,12 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
             resp.setSuccess(true);
 
+            // Confusing to have restart event after start has logged
+            /*
             persister.logIotaAction(PersistenceService.IOTA_RESTART,
                     propSource.getIotaStartCmd(),
                     "");
+             */
         }
         else {
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
@@ -78,30 +85,7 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
                     "",
                     "");
         }
-
         return resp;
-    }
-
-    private ActionResponse startIt() {
-        StartIotaAction starter = new StartIotaAction();
-        return starter.execute();
-    }
-
-    private boolean stopIt() {
-        StopIotaAction stopper = new StopIotaAction();
-        ActionResponse resp = stopper.execute();
-        return resp.isSuccess() &&
-                resp.getProperty(StopIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StopIotaAction.ACTION_PROP).valueIsSuccess();
-    }
-
-
-    private boolean isActive() {
-        StatusIotaAction status = new StatusIotaAction();
-        ActionResponse resp = status.execute();
-        return resp.isSuccess() &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
 }

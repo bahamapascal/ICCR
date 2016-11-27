@@ -50,9 +50,7 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
         if(resp.isSuccess() &&
                 resp.getProperty(ACTION_PROP) != null &&
                 resp.getProperty(ACTION_PROP).valueIsSuccess()) {
-            persister.logIotaAction(PersistenceService.IOTA_STOP,
-                    "",
-                    "");
+            persister.logIotaAction(PersistenceService.IOTA_STOP);
         }
         else {
             persister.logIotaAction(PersistenceService.IOTA_STOP_FAIL,

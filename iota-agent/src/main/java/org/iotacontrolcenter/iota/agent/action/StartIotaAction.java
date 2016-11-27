@@ -26,6 +26,10 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
             throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
         }
 
+        if (!AgentUtil.fileExists(propSource.getIriJarFilePath())) {
+            throw new IllegalStateException(localizer.getLocalText("missingFile") + ": " + propSource.getIriJarFilePath());
+        }
+
         // Do we need to have neighbors in order to start?
         if(false) {
             IccrIotaNeighborsPropertyDto nbrs = propSource.getIotaNeighbors();
@@ -41,7 +45,7 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
 
         ActionResponse resp = new ActionResponse();
 
-        if(isActive()) {
+        if(AgentUtil.isIotaActive()) {
             System.out.println("startIota: already active");
             resp.setSuccess(true);
             resp.setMsg(localizer.getLocalText("startIotaAlreadyActive"));
@@ -90,14 +94,6 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         }
 
         return resp;
-    }
-
-    private boolean isActive() {
-        StatusIotaAction status = new StatusIotaAction();
-        ActionResponse resp = status.execute();
-        return resp.isSuccess() &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
 }

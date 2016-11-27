@@ -47,7 +47,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
     public ActionResponse execute() {
         preExecute();
 
-        setWasIotaActive();
+        wasIotaActive = AgentUtil.isIotaActive();
 
         ActionResponse resp = new ActionResponse();
         boolean rval = true;
@@ -99,7 +99,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                     System.out.println(ACTION_PROP + " " +
                             localizer.getLocalText("stoppingIota"));
 
-                    boolean stopped = stopIota();
+                    boolean stopped = AgentUtil.stopIota();
                     if(stopped) {
                         persister.logIotaAction(PersistenceService.IOTA_STOP,
                                 "",
@@ -144,14 +144,9 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                     return resp;
                 }
 
-                boolean started = startIota();
+                boolean started = AgentUtil.startIotaBoolean();
                 if(started) {
                     // The start action is logging this event
-                    /*
-                    persister.logIotaAction(PersistenceService.IOTA_START,
-                            propSource.getIotaStartCmd(),
-                            "");
-                    */
                 }
                 else {
                     System.out.println(ACTION_PROP + " " +
@@ -160,13 +155,6 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                     resp.setSuccess(false);
                     resp.setMsg(localizer.getLocalText("startIotaFail"));
-
-                    // The start action is logging this event
-                    /*
-                    persister.logIotaAction(PersistenceService.IOTA_START_FAIL,
-                            propSource.getIotaStartCmd(),
-                            resp.getMsg());
-                    */
 
                     return resp;
                 }
@@ -302,30 +290,6 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
             rval = false;
         }
         return rval;
-    }
-
-    private void setWasIotaActive() {
-        StatusIotaAction status = new StatusIotaAction();
-        ActionResponse resp = status.execute();
-        wasIotaActive = resp.isSuccess() &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
-    }
-
-    private boolean stopIota() {
-        StopIotaAction stopper = new StopIotaAction();
-        ActionResponse resp = stopper.execute();
-        return resp.isSuccess() &&
-                resp.getProperty(StopIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StopIotaAction.ACTION_PROP).valueIsSuccess();
-    }
-
-    private boolean startIota() {
-        StartIotaAction starter = new StartIotaAction();
-        ActionResponse resp = starter.execute();
-        return resp.isSuccess() &&
-                resp.getProperty(StartIotaAction.ACTION_PROP) != null &&
-                resp.getProperty(StartIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
 }

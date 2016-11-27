@@ -5,6 +5,8 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -25,6 +27,7 @@ public class Localizer {
     private String country;
     private Locale defaultLoc;
     private ResourceBundle defLocText;
+    private DateTimeFormatter eventDtf;
     private String lang;
     private Locale loc;
     private ResourceBundle locText;
@@ -41,6 +44,8 @@ public class Localizer {
         country = propSource.getLocaleCountry();
         loc = new Locale(lang, country);
 
+        eventDtf = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(loc);
+
         try {
             // Need to load the resource bundle prop file from the ICCR conf dir
             File file = new File(confDir);
@@ -54,6 +59,10 @@ public class Localizer {
         catch(Exception e) {
             System.out.println("Localizer exception: " + e.getLocalizedMessage());
         }
+    }
+
+    public String getEventTime() {
+        return eventDtf.format(LocalDateTime.now());
     }
 
     public String getLocalTextWithFixed(String key, String fixed) {

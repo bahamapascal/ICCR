@@ -19,6 +19,10 @@ public class PersistenceService {
     public static final String IOTA_START_FAIL = "startFail";
     public static final String IOTA_RESTART = "restart";
     public static final String IOTA_RESTART_FAIL = "restartFail";
+    public static final String IOTA_DELETE = "deleteIota";
+    public static final String IOTA_DELETE_FAIL = "deleteIotaFail";
+    public static final String IOTA_DELETE_DB = "deleteIotaDb";
+    public static final String IOTA_DELETE_DB_FAIL = "deleteIotaDbFail";
 
     private static PersistenceService instance;
     private static Object SYNC_INST = new Object();
@@ -44,13 +48,21 @@ public class PersistenceService {
         iotaEventFilepath = propSource.getIccrDataDir() + "/" + IOTA_EVENT_FILE;
     }
 
+    public void logIotaAction(String event) {
+        this.logIotaAction(event, "", "");
+    }
+
     public void logIotaAction(String event, String data, String msg) {
+        //System.out.println("logIotaAction : " + event);
         try {
-            String line = localizer.getLocalText(event) + "," + data;
+            String line = localizer.getEventTime() + "," +  localizer.getLocalText(event) + "," + data;
             if(msg != null && !msg.isEmpty()) {
                 line += "," + msg;
             }
             line += System.lineSeparator();
+
+            //System.out.println(line);
+
             FileUtils.write(new File(iotaEventFilepath), line, true);
         }
         catch(IOException ioe) {
