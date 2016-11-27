@@ -6,6 +6,7 @@ import java.util.List;
 public class ActionResponse {
     public boolean success;
     public String msg;
+    public String content;
     private List<IccrPropertyDto> properties;
 
     public ActionResponse() {
@@ -30,6 +31,14 @@ public class ActionResponse {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public List<IccrPropertyDto> getProperties() {

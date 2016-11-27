@@ -12,6 +12,8 @@ public class ActionFactory {
     public static final String STOP = "stop";
     public static final String DELETEDB = "deletedb";
     public static final String DELETE = "delete";
+    public static final String NODEINFO = "nodeinfo";
+    public static final String NEIGHBORS = "neighbors";
 
     public static IotaAction getAction(String cmd) {
         if(INSTALL.equals(cmd)) {
@@ -35,6 +37,12 @@ public class ActionFactory {
         else if(DELETE.equals(cmd)) {
             return new DeleteIotaAction();
         }
+        else if(NODEINFO.equals(cmd)) {
+            return new NodeInfoIotaAction();
+        }
+        else if(NEIGHBORS.equals(cmd)) {
+            return new NeighborsIotaAction();
+        }
         throw new IllegalArgumentException(Localizer.getInstance().getFixedWithLocalText("ActionFactory (" + cmd + "): ", "unsupportedAction"));
     }
 
@@ -47,6 +55,8 @@ public class ActionFactory {
                                 cmd.equals(STATUS) ||
                                 cmd.equals(STOP) ||
                                 cmd.equals(DELETEDB) ||
+                                cmd.equals(NODEINFO) ||
+                                cmd.equals(NEIGHBORS) ||
                                 cmd.equals(DELETE) );
     }
 

@@ -2,11 +2,13 @@ package org.iotacontrolcenter.rest.resource;
 
 import org.iotacontrolcenter.api.*;
 import org.iotacontrolcenter.dto.*;
+import org.iotacontrolcenter.iota.agent.ActionFactory;
 import org.iotacontrolcenter.iota.agent.Agent;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.*;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 
@@ -128,6 +130,64 @@ public class IccrServiceImpl implements IccrService {
 
         try {
             ActionResponse resp = agent.action(action);
+            r = Response.status(HttpURLConnection.HTTP_OK);
+            r.entity(resp);
+        }
+        catch(IllegalArgumentException iae) {
+            // Message is already localized
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, iae.getMessage()));
+        }
+        catch(IllegalStateException ise) {
+            // Message is already localized
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, ise.getMessage()));
+        }
+        catch(Exception e) {
+            r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+        }
+
+        return r.build();
+    }
+
+    @Override
+    public Response getIotaNodeInfo(HttpServletRequest request) {
+        if (!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        Response.ResponseBuilder r;
+        try {
+            ActionResponse resp = agent.action(ActionFactory.NODEINFO);
+            r = Response.status(HttpURLConnection.HTTP_OK);
+            r.entity(resp);
+        }
+        catch(IllegalArgumentException iae) {
+            // Message is already localized
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, iae.getMessage()));
+        }
+        catch(IllegalStateException ise) {
+            // Message is already localized
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, ise.getMessage()));
+        }
+        catch(Exception e) {
+            r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+        }
+
+        return r.build();
+    }
+
+    @Override
+    public Response getIotaNeighbors(HttpServletRequest request) {
+        if (!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        Response.ResponseBuilder r;
+        try {
+            ActionResponse resp = agent.action(ActionFactory.NEIGHBORS);
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(resp);
         }

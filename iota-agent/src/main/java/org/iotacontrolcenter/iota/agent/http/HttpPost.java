@@ -66,13 +66,10 @@ public class HttpPost extends HttpMethod  {
 
             CloseableHttpClient client = HttpClientBuilder.create().disableAutomaticRetries().build();
 
-            System.out.println("executing post");
             response = client.execute(post);
 
-            System.out.println("consuming entity");
-
-            // This consumes the returned content and closes the stream;
-            EntityUtils.consume(response.getEntity());
+            // For releasigng connection in calls from the base:
+            httpRequestBase = post;
         }
         catch(IOException ioe) {
             startError = localizer.getLocalTextWithFixed("httpRequestException",

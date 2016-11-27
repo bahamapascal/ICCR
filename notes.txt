@@ -333,16 +333,45 @@ restart
 
 checked in
 
+us 11 get iota node info
+rest api: get /rs/iota/nodeinfo
+agent
+
+us 12 get iota nbrs
+rest api: get /rs/iota/neighbors
+agent
+
+stop
+getNodeInfo
+getNeighbors
+start
+getNodeInfo
+getNeighbors
+
+checked in
+
 todo:
-see question: should install also start, it is now
+add neighbors to iota
+
+UI note: content from iota is in "content" prop, it may contain exception property
+
+log exceptions that are caught by rest resource
+
+us 6 iccr iota get install info
+rest api: get rs/iota/installinfo
+agent
+
+us 6 rest api for get iota isntall info
+
+
+
+see question: should install also start, it does now
 
 see question: add nbrs should always be done in start?
 
 capture output of os process to debug failure
 
 write action status strings to a place that a rest api long poll can query for scrolling log window in UI
-
-iota get node info
 
 purge iccr.properties that aren't configurable from api
 
@@ -353,11 +382,6 @@ ProcessBuilder for iccr ctl
 Action for restart iccr action
 
 Process for restart iccr
-
-log exceptions that are caught by rest resource
-
-copy updated props to conf
-copy msg bundles to conf
 
 iccr-cli using http client to talk to iccr over iccr rest api
 
@@ -387,25 +411,9 @@ Do specific app/config/neighbors get/set rest api?
 
 update us 4 additional prop validations
 
-us 6 iccr iota get install info
-rest api: get rs/iota/installinfo
-agent
-
-us 11 get iota node info
-rest api: get /rs/iota/nodeinfo
-agent
-
-us 12 get iota nbrs
-rest api: get /rs/iota/neighbors
-agent
-
 Manage logs: silence swarm, store changes to single file for audit purposes
 
 Will update of neighbor config prop need a specific dto for incoming handling?
-
-us 5 remember iota install info
-
-us 6 rest api for get iota isntall info
 
 test resources:
 iccr.properties
