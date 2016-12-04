@@ -4,6 +4,7 @@ import org.iotacontrolcenter.api.*;
 import org.iotacontrolcenter.dto.*;
 import org.iotacontrolcenter.iota.agent.ActionFactory;
 import org.iotacontrolcenter.iota.agent.Agent;
+import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
@@ -162,6 +163,30 @@ public class IccrServiceImpl implements IccrService {
 
         System.out.println("updateIotaNbrsConfig ");
 
+        // If IOTA was active, need to update its nbrs list, we'll just remove all prev, then update config,
+        // then add all current
+        boolean wasActive = AgentUtil.isIotaActive();
+
+        if(wasActive) {
+
+            IccrIotaNeighborsPropertyDto prevNbrs = propSource.getIotaNeighbors();
+            if(prevNbrs != null && !prevNbrs.getNbrs().isEmpty()) {
+
+                System.out.println("updateIotaNbrsConfig: IOTA was active, removing neighbors");
+
+                try {
+                    ActionResponse resp1 = agent.action(ActionFactory.REMOVENEIGHBORS, null);
+                } catch (Exception e) {
+                    System.out.println("updateIotaNbrsConfig remove nbrs exception: ");
+                    e.printStackTrace();
+                }
+            }
+            else {
+                System.out.println("updateIotaNbrsConfig: IOTA was active, but no neighbors were configured");
+            }
+        }
+
+        boolean ok = true;
         try {
             propSource.setIotaNeighbors(prop);
 
@@ -169,10 +194,23 @@ public class IccrServiceImpl implements IccrService {
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
         }
         catch(Exception e) {
+            ok = false;
             System.out.println("updateIotaNbrsConfig exception: ");
             e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
                     entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+        }
+
+        if(ok && wasActive) {
+            System.out.println("updateIotaNbrsConfig: IOTA was active, adding current neighbors");
+
+            try {
+                ActionResponse resp2 = agent.action(ActionFactory.ADDNEIGHBORS, null);
+            }
+            catch(Exception e) {
+                System.out.println("updateIotaNbrsConfig add nbrs exception: ");
+                e.printStackTrace();
+            }
         }
 
         return r.build();

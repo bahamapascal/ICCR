@@ -4,13 +4,13 @@ package org.iotacontrolcenter.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IotaNeighborsCommandDto extends IotaCommandDto {
+public class IotaAddNeighborsCommandDto extends IotaCommandDto {
 
     public static final String CMD = "addNeighbors";
 
     private List<String> uris;
 
-    public IotaNeighborsCommandDto() {
+    public IotaAddNeighborsCommandDto() {
         super(CMD);
     }
 
@@ -27,5 +27,12 @@ public class IotaNeighborsCommandDto extends IotaCommandDto {
             uris = new ArrayList<>();
         }
         uris.add(uri);
+    }
+
+    @Override
+    public String toString() {
+        return "IotaAddNeighborsCommandDto{" +
+                "uris=" + uris +
+                '}';
     }
 }

@@ -3,6 +3,8 @@ package org.iotacontrolcenter.iota.agent;
 import org.iotacontrolcenter.iota.agent.action.*;
 import org.iotacontrolcenter.properties.locale.Localizer;
 
+import java.util.List;
+
 public class ActionFactory {
 
     public static final String INSTALL = "install";
@@ -14,6 +16,22 @@ public class ActionFactory {
     public static final String DELETE = "delete";
     public static final String NODEINFO = "nodeinfo";
     public static final String NEIGHBORS = "neighbors";
+    public static final String ADDNEIGHBORS = "addNeighbors";
+    public static final String REMOVENEIGHBORS = "removeNeighbors";
+
+    private static final String[] cmdList = {
+            INSTALL,
+            START,
+            RESTART,
+            STATUS,
+            STOP,
+            DELETEDB,
+            DELETE,
+            NODEINFO,
+            NEIGHBORS,
+            ADDNEIGHBORS,
+            REMOVENEIGHBORS
+    };
 
     public static IotaAction getAction(String cmd) {
         if(INSTALL.equals(cmd)) {
@@ -43,21 +61,24 @@ public class ActionFactory {
         else if(NEIGHBORS.equals(cmd)) {
             return new NeighborsIotaAction();
         }
+        else if(ADDNEIGHBORS.equals(cmd)) {
+            return new AddNeighborsIotaAction();
+        }
+        else if(REMOVENEIGHBORS.equals(cmd)) {
+            return new RemoveNeighborsIotaAction();
+        }
         throw new IllegalArgumentException(Localizer.getInstance().getFixedWithLocalText("ActionFactory (" + cmd + "): ", "unsupportedAction"));
     }
 
     public static boolean isValidAction(String cmd) {
-        return cmd != null &&
-                !cmd.isEmpty() && (
-                        cmd.equals(INSTALL) ||
-                                cmd.equals(START) ||
-                                cmd.equals(RESTART) ||
-                                cmd.equals(STATUS) ||
-                                cmd.equals(STOP) ||
-                                cmd.equals(DELETEDB) ||
-                                cmd.equals(NODEINFO) ||
-                                cmd.equals(NEIGHBORS) ||
-                                cmd.equals(DELETE) );
+        if(cmd != null && !cmd.isEmpty()) {
+            for(String s : cmdList) {
+                if(s.equals(cmd)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

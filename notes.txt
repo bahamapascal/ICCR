@@ -381,11 +381,17 @@ after iota stop added pause and status check
 
 checked in
 
-> support for api key
+support for api key
+
+checked in
+
+added remove nbrs cmd and dto
+
+on set nbrs config, remove current config nbrs, update props, then add nbrs
+
+checked in
 
 todo:
-on set nbrs config, remove nbrs, then add nbrs
-
 support for https
 
 us 6 iccr iota get install info
