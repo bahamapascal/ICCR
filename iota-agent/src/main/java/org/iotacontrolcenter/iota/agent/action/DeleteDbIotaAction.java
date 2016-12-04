@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
 
     public static final String ACTION_PROP = "deleteIotaDb";
+    private boolean wasIotaActive = false;
 
     public DeleteDbIotaAction() {
         super(new String[] { PropertySource.IOTA_APP_DIR_PROP });
@@ -38,15 +39,17 @@ public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
         boolean rval = true;
         String msg = "";
 
-        if (AgentUtil.isIotaActive()) {
-            System.out.println("deleteIotaDb, first stopping");
+        wasIotaActive = AgentUtil.isIotaActive();
+
+        if (wasIotaActive) {
+            System.out.println(ACTION_PROP + ", first stopping IOTA");
             if(!AgentUtil.stopIota()) {
                 System.out.println(ACTION_PROP + " " +
                         localizer.getLocalText("deleteIotaDbFail"));
 
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                 resp.setSuccess(false);
-                resp.setMsg(localizer.getLocalText("deleteIotaDbFail"));
+                resp.setMsg(localizer.getLocalText("deleteIotaDbFail") + " failed to stop IOTA");
 
                 persister.logIotaAction(PersistenceService.IOTA_DELETE_DB_FAIL,
                         "",
@@ -69,6 +72,9 @@ public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
                     System.out.println(ACTION_PROP + " " +
                             localizer.getLocalText("deleteIotaDbFail") +
                             ": " + ioe.getLocalizedMessage());
+
+                    ioe.printStackTrace();
+
                     //rval = false;
                 }
             } );
@@ -78,12 +84,11 @@ public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
             System.out.println(ACTION_PROP + " " +
                     localizer.getLocalText("deleteIotaDbFail") +
                     ": " + msg);
+
+            ioe.printStackTrace();
+
             rval = false;
         }
-
-        resp.setSuccess(rval);
-        resp.setMsg(msg);
-        resp.addProperty(new IccrPropertyDto(ACTION_PROP, rval ? "true" : "false"));
 
         if(rval) {
             persister.logIotaAction(PersistenceService.IOTA_DELETE_DB);
@@ -91,6 +96,41 @@ public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
         else {
             persister.logIotaAction(PersistenceService.IOTA_DELETE_DB_FAIL);
         }
+
+        if(wasIotaActive) {
+            System.out.println(ACTION_PROP + ", restarting IOTA");
+
+            if(rval) {
+
+                // Pause for a sec to let it spin up
+                try {
+                    Thread.sleep(2000);
+                }
+                catch(Exception e) {
+                }
+
+            }
+
+            boolean started = AgentUtil.startIotaBoolean();
+            if(started) {
+                // The start action is logging this event
+            }
+            else {
+                System.out.println(ACTION_PROP + " " +
+                        localizer.getLocalText("startIotaFail"));
+
+                resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
+                resp.setSuccess(false);
+                resp.setMsg(localizer.getLocalText("startIotaFail"));
+
+                return resp;
+            }
+        }
+
+        resp.setSuccess(rval);
+        resp.setMsg(msg);
+        resp.addProperty(new IccrPropertyDto(ACTION_PROP, rval ? "true" : "false"));
+
         return resp;
     }
 }

@@ -369,8 +369,22 @@ fixed setting nbr list
 
 checked in
 
+send dld link and filename as actionprops to install iota cmd
+
+checked in
+--------
+Sun: 12/4/2016
+
+on delete db, if iota was running, restrt it after delete
+
+after iota stop added pause and status check
+
+checked in
+
+> support for api key
+
 todo:
-support for api key
+on set nbrs config, remove nbrs, then add nbrs
 
 support for https
 
@@ -390,9 +404,7 @@ iccr-cli using http client to talk to iccr over iccr rest api
 
 Shutdown hook
 
-
-
-
+why is there an iccr startup logging error
 
 
 iri exception on getNodeInfo and getNeighbors
