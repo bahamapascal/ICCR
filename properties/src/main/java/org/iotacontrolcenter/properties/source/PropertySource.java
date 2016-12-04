@@ -31,6 +31,7 @@ public class PropertySource {
 
     public static final String ICCR_DIR_PROP = "iccrDir";
     public static final String ICCR_DIR_DEFAULT = "/opt/iccr";
+    public static final String ICCR_API_KEY_PROP = "iccrApiKey";
 
     private static final String LOC_COUNTRY_PROP = "iccrCountryLocale";
     private static final String LOC_LANG_PROP = "iccrLanguageLocale";
@@ -109,6 +110,10 @@ public class PropertySource {
             System.out.println("failed to load iccr.properties from " + confDir);
             e.printStackTrace();
         }
+    }
+
+    public String getApiKey() {
+        return getString(ICCR_API_KEY_PROP);
     }
 
     public String getNowDateTimestamp() {

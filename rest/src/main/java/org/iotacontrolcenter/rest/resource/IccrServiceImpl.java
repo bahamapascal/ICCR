@@ -16,7 +16,7 @@ public class IccrServiceImpl implements IccrService {
 
     private Agent agent = Agent.getInstance();
     private Localizer localizer = Localizer.getInstance();
-    private PropertySource props = PropertySource.getInstance();
+    private PropertySource propSource = PropertySource.getInstance();
 
 
     public IccrServiceImpl() {
@@ -32,10 +32,10 @@ public class IccrServiceImpl implements IccrService {
 
         IccrPropertyListDto propList = new IccrPropertyListDto();
 
-        for(String key : props.getPropertyKeys()) {
-            propList.addProperty(new IccrPropertyDto(key, props.getString(key)));
+        for(String key : propSource.getPropertyKeys()) {
+            propList.addProperty(new IccrPropertyDto(key, propSource.getString(key)));
         }
-        //propList.addProperty(props.getIotaNeighbors());
+        //propList.addProperty(propSource.getIotaNeighbors());
         r.entity(propList);
         return r.build();
     }
@@ -57,10 +57,10 @@ public class IccrServiceImpl implements IccrService {
         IccrPropertyDto prop;
 
         if(key.equals(PropertySource.IOTA_NEIGHBORS_PROP)) {
-            prop = props.getIotaNeighbors();
+            prop = propSource.getIotaNeighbors();
         }
         else {
-            prop = new IccrPropertyDto(key, props.getString(key));
+            prop = new IccrPropertyDto(key, propSource.getString(key));
         }
 
         r.entity(prop);
@@ -73,7 +73,7 @@ public class IccrServiceImpl implements IccrService {
             return unauthorizedResponse(request);
         }
         Response.ResponseBuilder r = Response.status(HttpURLConnection.HTTP_OK);
-        IccrIotaNeighborsPropertyDto prop = props.getIotaNeighbors();
+        IccrIotaNeighborsPropertyDto prop = propSource.getIotaNeighbors();
 
         r.entity(prop);
         return r.build();
@@ -97,7 +97,7 @@ public class IccrServiceImpl implements IccrService {
         try {
             for(IccrPropertyDto prop : properties.getProperties()) {
                 System.out.println(prop.getKey() + " -> " + prop.getValue());
-                props.setProperty(prop.getKey(), prop.getValue());
+                propSource.setProperty(prop.getKey(), prop.getValue());
             }
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
@@ -129,10 +129,10 @@ public class IccrServiceImpl implements IccrService {
 
         try {
             if(key.equals(PropertySource.IOTA_NEIGHBORS_PROP)) {
-                props.setIotaNeighbors((IccrIotaNeighborsPropertyDto)prop);
+                propSource.setIotaNeighbors((IccrIotaNeighborsPropertyDto)prop);
             }
             else {
-                props.setProperty(prop.getKey(), prop.getValue());
+                propSource.setProperty(prop.getKey(), prop.getValue());
             }
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
@@ -163,7 +163,7 @@ public class IccrServiceImpl implements IccrService {
         System.out.println("updateIotaNbrsConfig ");
 
         try {
-            props.setIotaNeighbors(prop);
+            propSource.setIotaNeighbors(prop);
 
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
@@ -293,8 +293,7 @@ public class IccrServiceImpl implements IccrService {
 
     private boolean authorizedRequest(HttpServletRequest request) {
         String apiAccessKey = request.getHeader(ResourceUtil.API_ACCESS_KEY_PROP);
-        // TODO
-        return true; //apiAccessKey != null && !apiAccessKey.isEmpty() && apiAccessKey.equals();
+        return apiAccessKey != null && !apiAccessKey.isEmpty() && apiAccessKey.equals(propSource.getApiKey());
     }
 
     private Response unauthorizedResponse(HttpServletRequest request) {
