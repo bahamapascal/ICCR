@@ -1,6 +1,7 @@
 package org.iotacontrolcenter.properties.source;
 
 import java.io.*;
+import java.rmi.NotBoundException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class PropertySource {
     public static final String ICCR_START_AT_START_PROP="iccrStartAtStartup";
     public static final String ICCR_START_IOTA_AT_START_PROP="iccrStartIotaAtStartup";
     public static final String ICCR_STOP_IOTA_AT_SHUTDOWN_PROP="iccrStopIotaAtShutdown";
+    public static final String ICCR_PORT_NUMBER_PROP = "iccrPortNumber";
 
     public static final String IOTA_DLD_LINK_PROP="iotaDownloadLink";
     public static final String IOTA_DLD_FILENAME_PROP="iotaDownloadFilename";
@@ -186,10 +188,7 @@ public class PropertySource {
     }
 
     public void setProperty(String key, Object value) {
-        if(key.equals(IOTA_NEIGHBORS_PROP)) {
-            setNeighbors(value);
-        }
-        else {
+
             props.setProperty(key, (String)value);
             propWriter.setProperty(key, value);
 
@@ -199,12 +198,6 @@ public class PropertySource {
             catch(Exception e) {
                 System.out.println("PropertySource exception saving PropertiesConfiguration: " + e.getLocalizedMessage());
             }
-        }
-    }
-
-    // TODO
-    private void setNeighbors(Object value) {
-
     }
 
     public List<String> getPropertyKeys() {
@@ -212,6 +205,7 @@ public class PropertySource {
         keys.add(ICCR_START_AT_START_PROP);
         keys.add(ICCR_START_IOTA_AT_START_PROP);
         keys.add(ICCR_STOP_IOTA_AT_SHUTDOWN_PROP);
+        keys.add(ICCR_PORT_NUMBER_PROP);
         keys.add(IOTA_PORT_NUMBER_PROP);
         keys.add(IOTA_DLD_LINK_PROP);
         keys.add(IOTA_DLD_FILENAME_PROP);
@@ -289,6 +283,27 @@ public class PropertySource {
             }
         }
         return keys;
+    }
+
+    public void setIotaNeighbors(IccrIotaNeighborsPropertyDto nbrs) {
+        String nbrKeys = nbrs.nbrKeys();
+        String id;
+        for(NeighborDto nbr : nbrs.getNbrs()) {
+            System.out.println("updated neighbor: " + nbr);
+            id = nbr.getKey();
+            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id, nbr.getKey());
+            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".ip." + id, nbr.getIp());
+            if(nbr.getName() != null) {
+                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, nbr.getName());
+            }
+            if(nbr.getDescr() != null) {
+                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescr());
+            }
+            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id, String.valueOf(nbr.isActive()).toLowerCase());
+            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".port." + id, Integer.toString(nbr.getPort()));
+            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".scheme." + id, nbr.getScheme());
+        }
+        setProperty(IOTA_NEIGHBORS_PROP, nbrKeys);
     }
 
     public IccrIotaNeighborsPropertyDto getIotaNeighbors() {

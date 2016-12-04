@@ -85,6 +85,21 @@ public class NeighborDto {
         return scheme + "://" + ip + ":" + String.valueOf(port);
     }
 
+    public void setUri(String uri) {
+        if(uri == null || uri.isEmpty()) {
+            throw new IllegalArgumentException("Neighbor value is empty");
+        }
+        int idx1 = uri.indexOf(":");
+        int idx2 = uri.indexOf("//");
+        int idx3 = uri.indexOf(":", idx2);
+        String scheme = uri.substring(0, idx1);
+        String ip = uri.substring(idx2+2, idx3);
+        String port = uri.substring(idx3+1);
+        setScheme(scheme);
+        setIp(ip);
+        setPort(Integer.valueOf(port));
+    }
+
     @Override
     public String toString() {
         return "NeighborDto{" +
@@ -96,5 +111,28 @@ public class NeighborDto {
                 ", ip='" + ip + '\'' +
                 ", port='" + port +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof NeighborDto)) return false;
+
+        NeighborDto that = (NeighborDto) o;
+
+        if (getPort() != that.getPort()) return false;
+        if (!getIp().equals(that.getIp())) return false;
+        if (!getKey().equals(that.getKey())) return false;
+        return getScheme().equals(that.getScheme());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getIp().hashCode();
+        result = 31 * result + getKey().hashCode();
+        result = 31 * result + getPort();
+        result = 31 * result + getScheme().hashCode();
+        return result;
     }
 }

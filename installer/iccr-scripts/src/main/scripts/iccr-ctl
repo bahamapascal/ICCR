@@ -18,6 +18,7 @@ export ICCR_JAR_NAME=iccr.jar
 iccrPortNumber=14266
 jvm_env="-DiccrDir=${ICCR_DIR}"
 jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
+jvm_env="${jvm_env} -Dswarm.log.org.wildfly.swarm=ERROR"
 #ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1
 ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
 

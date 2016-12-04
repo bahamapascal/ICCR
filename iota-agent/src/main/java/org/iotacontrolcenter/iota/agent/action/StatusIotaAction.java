@@ -10,7 +10,7 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class StatusIotaAction extends AbstractAction implements IotaAction {
 
-    public static final String ACTION_PROP = "iotastatus";
+    public static final String ACTION_PROP = "statusIota";
 
     public StatusIotaAction() {
         super(new String[] { PropertySource.IOTA_APP_DIR_PROP,

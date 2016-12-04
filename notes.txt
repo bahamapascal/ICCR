@@ -358,7 +358,43 @@ action to add neighbors to iota
 
 add neighbors in start action
 
+checked in
+
+------
+Sat:12/3/16
+
+add separate nbr list get/set rest resources
+
+fixed setting nbr list
+
+checked in
+
 todo:
+support for api key
+
+support for https
+
+us 6 iccr iota get install info
+rest api: get rs/iota/installinfo
+agent
+
+us 6 rest api for get iota isntall info
+
+ProcessBuilder for iccr ctl
+
+Action for restart iccr action
+
+Process for restart iccr
+
+iccr-cli using http client to talk to iccr over iccr rest api
+
+Shutdown hook
+
+
+
+
+
+
 iri exception on getNodeInfo and getNeighbors
 java.lang.ClassCastException: java.lang.String cannot be cast to java.util.Map
 	at iri.API$Request.process(API.java:167)
@@ -368,14 +404,6 @@ java.lang.ClassCastException: java.lang.String cannot be cast to java.util.Map
 UI note: content from iota is in "content" prop, it may contain exception property
 
 log exceptions that are caught by rest resource
-
-us 6 iccr iota get install info
-rest api: get rs/iota/installinfo
-agent
-
-us 6 rest api for get iota isntall info
-
-
 
 see question: should install also start, it does now
 
@@ -388,18 +416,6 @@ write action status strings to a place that a rest api long poll can query for s
 purge iccr.properties that aren't configurable from api
 
 is processfactory needed?
-
-ProcessBuilder for iccr ctl
-
-Action for restart iccr action
-
-Process for restart iccr
-
-iccr-cli using http client to talk to iccr over iccr rest api
-
-StatusAction execution
-
-Shutdown hook
 
 update dld us with note: dld file will be stored, but copied to iri.jar in start cmd
 
