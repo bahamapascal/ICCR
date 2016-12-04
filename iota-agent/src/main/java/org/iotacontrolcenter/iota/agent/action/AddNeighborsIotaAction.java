@@ -1,9 +1,6 @@
 package org.iotacontrolcenter.iota.agent.action;
 
-import org.iotacontrolcenter.dto.ActionResponse;
-import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
-import org.iotacontrolcenter.dto.IccrPropertyDto;
-import org.iotacontrolcenter.dto.IotaNeighborsCommandDto;
+import org.iotacontrolcenter.dto.*;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.iota.agent.http.AddIotaNeighbors;
 import org.iotacontrolcenter.persistence.PersistenceService;
@@ -27,7 +24,7 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
     }
 
     @Override
-    public ActionResponse execute() {
+    public ActionResponse execute(IccrPropertyListDto actionProps) {
         preExecute();
 
         ActionResponse resp = new ActionResponse();

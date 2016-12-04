@@ -2,6 +2,7 @@ package org.iotacontrolcenter.iota.agent.action;
 
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
+import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.process.IotaStopProcess;
 import org.iotacontrolcenter.iota.agent.process.OsProcess;
 import org.iotacontrolcenter.persistence.PersistenceService;
@@ -15,7 +16,7 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
     }
 
     @Override
-    public ActionResponse execute() {
+    public ActionResponse execute(IccrPropertyListDto actionProps) {
         preExecute();
 
         ActionResponse resp = new ActionResponse();

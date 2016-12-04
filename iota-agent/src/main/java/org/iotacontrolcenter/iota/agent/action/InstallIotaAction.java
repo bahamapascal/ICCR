@@ -3,6 +3,7 @@ package org.iotacontrolcenter.iota.agent.action;
 import org.apache.commons.io.FileUtils;
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
+import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.iota.agent.http.GetIotaLibrary;
 import org.iotacontrolcenter.iota.agent.process.IotaBakupAndInstallProcess;
@@ -44,7 +45,8 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
     }
 
     @Override
-    public ActionResponse execute() {
+    public ActionResponse execute(IccrPropertyListDto actionProps) {
+        System.out.println("installIota,  props: " + actionProps);
         preExecute();
 
         wasIotaActive = AgentUtil.isIotaActive();
@@ -52,6 +54,16 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         ActionResponse resp = new ActionResponse();
         boolean rval = true;
         String msg = null;
+
+        // client may have provided the desired download link and filename:
+        if(actionProps != null && actionProps.getProperties() != null && !actionProps.getProperties().isEmpty()) {
+            for(IccrPropertyDto prop : actionProps.getProperties()) {
+                System.out.println("installIota, using " + prop);
+                propSource.setProperty(prop.getKey(), prop.getValue());
+            }
+        }
+
+        System.out.println("installIota, from: " + propSource.getIotaDownloadUrl());
 
         // Download new IRI.jar:
         GetIotaLibrary iotaDld = new GetIotaLibrary(propSource.getIotaDownloadUrl());
@@ -172,6 +184,9 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
 
                 persister.logIotaAction(PersistenceService.IOTA_DLD_FAIL, propSource.getIotaDownloadUrl(), msg);
+
+                // Adding url to msg to send back to client after the action was logged
+                msg = propSource.getIotaDownloadUrl() + " " + msg;
             }
         }
         catch(IllegalStateException ise) {

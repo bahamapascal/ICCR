@@ -55,7 +55,7 @@ public interface IccrService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     Response doIotaAction(@Context HttpServletRequest request,
-                       @DefaultValue("") @PathParam("action") String action);
+                       @DefaultValue("") @PathParam("action") String action, IccrPropertyListDto actionProps);
 
     @GET
     @Path("/iota/neighbors")

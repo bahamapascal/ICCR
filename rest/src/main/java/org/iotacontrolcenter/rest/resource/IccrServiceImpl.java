@@ -179,31 +179,35 @@ public class IccrServiceImpl implements IccrService {
     }
 
     @Override
-    public Response doIotaAction(HttpServletRequest request, String action) {
+    public Response doIotaAction(HttpServletRequest request, String action, IccrPropertyListDto actionProps) {
         if (!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
         Response.ResponseBuilder r;
 
         try {
-            ActionResponse resp = agent.action(action);
+            ActionResponse resp = agent.action(action, actionProps);
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(resp);
         }
         catch(IllegalArgumentException iae) {
-            // Message is already localized
             System.out.println("doIotaAction illegal arg error: " + iae.getMessage());
+            iae.printStackTrace();
+            // Message is already localized
             r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
                     entity(new SimpleResponse(false, iae.getMessage()));
         }
         catch(IllegalStateException ise) {
-            // Message is already localized
             System.out.println("doIotaAction illegal state error: " + ise.getMessage());
+            ise.printStackTrace();
+            // Message is already localized
+
             r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
                     entity(new SimpleResponse(false, ise.getMessage()));
         }
         catch(Exception e) {
             System.out.println("doIotaAction server error: " + e.getMessage());
+            e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
                     entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
@@ -218,7 +222,7 @@ public class IccrServiceImpl implements IccrService {
         }
         Response.ResponseBuilder r;
         try {
-            ActionResponse resp = agent.action(ActionFactory.NODEINFO);
+            ActionResponse resp = agent.action(ActionFactory.NODEINFO, null);
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(resp);
         }
@@ -256,7 +260,7 @@ public class IccrServiceImpl implements IccrService {
         }
         Response.ResponseBuilder r;
         try {
-            ActionResponse resp = agent.action(ActionFactory.NEIGHBORS);
+            ActionResponse resp = agent.action(ActionFactory.NEIGHBORS, null);
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(resp);
         }

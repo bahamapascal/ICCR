@@ -3,6 +3,7 @@ package org.iotacontrolcenter.iota.agent.action;
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
+import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.iota.agent.process.IotaStartProcess;
 import org.iotacontrolcenter.iota.agent.process.OsProcess;
@@ -12,6 +13,8 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 public class StartIotaAction extends AbstractAction implements IotaAction {
 
     public static final String ACTION_PROP = "startIota";
+
+    private IccrPropertyListDto actionProps;
 
     public StartIotaAction() {
         super(new String[] { PropertySource.IOTA_APP_DIR_PROP,
@@ -40,7 +43,8 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
     }
 
     @Override
-    public ActionResponse execute() {
+    public ActionResponse execute(IccrPropertyListDto actionProps) {
+        this.actionProps = actionProps;
         preExecute();
 
         ActionResponse resp = new ActionResponse();
@@ -114,7 +118,7 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         System.out.println("started, adding neighbors...");
 
         AddNeighborsIotaAction addNbrs = new AddNeighborsIotaAction();
-        ActionResponse resp = addNbrs.execute();
+        ActionResponse resp = addNbrs.execute(actionProps);
         return resp.isSuccess() &&
                 resp.getProperty(AddNeighborsIotaAction.ACTION_PROP) != null &&
                 resp.getProperty(AddNeighborsIotaAction.ACTION_PROP).valueIsSuccess();

@@ -1,6 +1,7 @@
 package org.iotacontrolcenter.iota.agent;
 
 import org.iotacontrolcenter.dto.ActionResponse;
+import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
@@ -26,12 +27,12 @@ public class Agent {
         localizer = Localizer.getInstance();
     }
 
-    public ActionResponse action(String cmd) {
+    public ActionResponse action(String cmd, IccrPropertyListDto actionProps) {
         if(!ActionFactory.isValidAction(cmd)) {
             throw new IllegalArgumentException(localizer.getFixedWithLocalText("IotaAgent (" + cmd + "): ", "unsupportedAction"));
         }
 
-        return ActionFactory.getAction(cmd).execute();
+        return ActionFactory.getAction(cmd).execute(actionProps);
     }
 
 

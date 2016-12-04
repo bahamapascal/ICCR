@@ -45,7 +45,7 @@ public class AgentUtil {
 
     public static  boolean stopIota() {
         StopIotaAction stopper = new StopIotaAction();
-        ActionResponse resp = stopper.execute();
+        ActionResponse resp = stopper.execute(null);
         return resp.isSuccess() &&
                 resp.getProperty(StopIotaAction.ACTION_PROP) != null &&
                 resp.getProperty(StopIotaAction.ACTION_PROP).valueIsSuccess();
@@ -53,7 +53,7 @@ public class AgentUtil {
 
     public static boolean isIotaActive() {
         StatusIotaAction status = new StatusIotaAction();
-        ActionResponse resp = status.execute();
+        ActionResponse resp = status.execute(null);
         return resp.isSuccess() &&
                 resp.getProperty(StatusIotaAction.ACTION_PROP) != null &&
                 resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
@@ -61,12 +61,12 @@ public class AgentUtil {
 
     public static ActionResponse startIota() {
         StartIotaAction starter = new StartIotaAction();
-        return starter.execute();
+        return starter.execute(null);
     }
 
     public static boolean startIotaBoolean() {
         StartIotaAction starter = new StartIotaAction();
-        ActionResponse resp =  starter.execute();
+        ActionResponse resp =  starter.execute(null);
         return resp.isSuccess() &&
                 resp.getProperty(StartIotaAction.ACTION_PROP) != null &&
                 resp.getProperty(StartIotaAction.ACTION_PROP).valueIsSuccess();
