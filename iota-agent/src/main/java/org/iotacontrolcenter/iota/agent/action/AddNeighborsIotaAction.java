@@ -44,7 +44,9 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
             if(nbrs == null || nbrs.getNbrs() == null || nbrs.getNbrs().isEmpty()) {
                 System.out.println(ACTION_PROP + ", neighbors property is empty");
                 resp.setSuccess(true);
-                resp.setMsg("neighbors was empty, nothing to add");
+                resp.setMsg("Neighbors was empty, nothing to add");
+                resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
+                resp.setContent("Neighbors was empty, nothing to add");
                 return resp;
             }
 

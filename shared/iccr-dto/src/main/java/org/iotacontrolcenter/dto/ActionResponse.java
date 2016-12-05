@@ -58,10 +58,12 @@ public class ActionResponse {
 
     public IccrPropertyDto getProperty(String key) {
         IccrPropertyDto rval = null;
-        for(IccrPropertyDto dto : properties) {
-            if(dto.getKey().equals(key)) {
-                rval = dto;
-                break;
+        if(properties != null) {
+            for (IccrPropertyDto dto : properties) {
+                if (dto.getKey().equals(key)) {
+                    rval = dto;
+                    break;
+                }
             }
         }
         return rval;
