@@ -392,6 +392,12 @@ on set nbrs config, remove current config nbrs, update props, then add nbrs
 fixed check for empty nbrs when starting
 
 checked in
+---------
+Mon: 12/5/2016
+
+support delete ICCR Event log
+
+checkin
 
 todo:
 support for https

@@ -47,6 +47,11 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
                 resp.setMsg("Neighbors was empty, nothing to add");
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                 resp.setContent("Neighbors was empty, nothing to add");
+
+                persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS_FAIL,
+                        "",
+                        "Neighbors configuration is empty");
+
                 return resp;
             }
 
@@ -57,12 +62,26 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
                 }
             });
 
+            if(payload.getUris().isEmpty()) {
+                resp.setSuccess(true);
+                resp.setMsg("No active neighbors, nothing to add");
+                resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
+                resp.setContent("No active neighbors, nothing to add");
+
+                persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS_FAIL,
+                        "",
+                        "No active neighbors, nothing to add");
+
+                return resp;
+            }
+
             request.setPayload(payload);
 
             try {
                 request.execute();
 
                 if(request.isResponseSuccess()) {
+
                     msg = "success";
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                     resp.setContent(request.responseAsString());
@@ -73,6 +92,8 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
                     persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS);
                 }
                 else {
+                    System.out.println(request.getName() + " addNeighbors response was not successful");
+
                     rval = false;
                     msg = request.getResponseReason();
                     if(msg == null || msg.isEmpty()) {

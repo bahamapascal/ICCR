@@ -6,6 +6,8 @@ import org.iotacontrolcenter.properties.source.PropertySource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PersistenceService {
 
@@ -24,7 +26,7 @@ public class PersistenceService {
     public static final String IOTA_DELETE_DB = "deleteIotaDb";
     public static final String IOTA_DELETE_DB_FAIL = "deleteIotaDbFail";
     public static final String IOTA_ADD_NBRS_FAIL = "addIotaNeighbors";
-    public static final String IOTA_ADD_NBRS = "addIotaNeighborsFail";
+    public static final String IOTA_ADD_NBRS = "addIotaNeighbors";
     public static final String IOTA_REMOVE_NBRS_FAIL = "removeIotaNeighborsFail";
     public static final String IOTA_REMOVE_NBRS = "removeIotaNeighbors";
 
@@ -52,6 +54,23 @@ public class PersistenceService {
         iotaEventFilepath = propSource.getIccrDataDir() + "/" + IOTA_EVENT_FILE;
     }
 
+    public List<String> getEventLog() throws IOException {
+        File f = new File(iotaEventFilepath);
+
+        //if(f.exists()) {
+        try {
+            return FileUtils.readLines(f);
+        }
+        catch(Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public void deleteEventLog() throws IOException {
+        System.out.println("deleting Event log");
+        FileUtils.deleteQuietly(new File(iotaEventFilepath));
+    }
+
     public void logIotaAction(String event) {
         this.logIotaAction(event, "", "");
     }
@@ -67,7 +86,14 @@ public class PersistenceService {
 
             //System.out.println(line);
 
-            FileUtils.write(new File(iotaEventFilepath), line, true);
+            File f = new File(iotaEventFilepath);
+            /*
+            if(!f.exists()) {
+                f.createNewFile();
+            }
+            */
+
+            FileUtils.write(f, line, true);
         }
         catch(IOException ioe) {
             System.out.println("logIotaAction, exception writing to file (" +
