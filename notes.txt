@@ -389,6 +389,8 @@ added remove nbrs cmd and dto
 
 on set nbrs config, remove current config nbrs, update props, then add nbrs
 
+fixed check for empty nbrs when starting
+
 checked in
 
 todo:
