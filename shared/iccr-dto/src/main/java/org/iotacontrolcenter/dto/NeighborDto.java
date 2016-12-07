@@ -5,40 +5,31 @@ public class NeighborDto {
 
     private boolean active;
     private String descr;
-    private String ip;
     private String key;
     private String name;
-    private int port = 14265;
-    private String scheme = "udp";
+    private String uri;
+    private int numAt = 0;
+    private int numIt = 0;
+    private int numNt =0;
 
     public NeighborDto() {
     }
 
-    public NeighborDto(String key, String ip, String name, String descr,
-                       boolean active, int port, String scheme) {
+    public NeighborDto(String key, String uri, String name, String descr,
+                       boolean active) {
         this.key = key;
-        this.ip = ip;
         this.name = name;
         this.descr = descr;
         this.active = active;
-        this.port = port;
-        this.scheme = scheme;
+        this.uri = uri;
     }
 
-    public String getScheme() {
-        return scheme;
+    public String getUri() {
+        return uri;
     }
 
-    public void setScheme(String scheme) {
-        this.scheme = scheme;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     public String getKey() {
@@ -47,14 +38,6 @@ public class NeighborDto {
 
     public void setKey(String key) {
         this.key = key;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
     }
 
     public String getName() {
@@ -81,23 +64,28 @@ public class NeighborDto {
         this.active = active;
     }
 
-    public String toUri() {
-        return scheme + "://" + ip + ":" + String.valueOf(port);
+    public int getNumAt() {
+        return numAt;
     }
 
-    public void setUri(String uri) {
-        if(uri == null || uri.isEmpty()) {
-            throw new IllegalArgumentException("Neighbor value is empty");
-        }
-        int idx1 = uri.indexOf(":");
-        int idx2 = uri.indexOf("//");
-        int idx3 = uri.indexOf(":", idx2);
-        String scheme = uri.substring(0, idx1);
-        String ip = uri.substring(idx2+2, idx3);
-        String port = uri.substring(idx3+1);
-        setScheme(scheme);
-        setIp(ip);
-        setPort(Integer.valueOf(port));
+    public void setNumAt(int numAt) {
+        this.numAt = numAt;
+    }
+
+    public int getNumIt() {
+        return numIt;
+    }
+
+    public void setNumIt(int numIt) {
+        this.numIt = numIt;
+    }
+
+    public int getNumNt() {
+        return numNt;
+    }
+
+    public void setNumNt(int numNt) {
+        this.numNt = numNt;
     }
 
     @Override
@@ -107,9 +95,7 @@ public class NeighborDto {
                 ", name='" + name + '\'' +
                 ", descr='" + descr + '\'' +
                 ", active=" + active + '\'' +
-                ", scheme='" + scheme + '\'' +
-                ", ip='" + ip + '\'' +
-                ", port='" + port +
+                ", uri='" + uri + '\'' +
                 '}';
     }
 
@@ -120,19 +106,14 @@ public class NeighborDto {
 
         NeighborDto that = (NeighborDto) o;
 
-        if (getPort() != that.getPort()) return false;
-        if (!getIp().equals(that.getIp())) return false;
-        if (!getKey().equals(that.getKey())) return false;
-        return getScheme().equals(that.getScheme());
-
+        if (getUri() != that.getUri()) return false;
+        return getKey().equals(that.getKey());
     }
 
     @Override
     public int hashCode() {
-        int result = getIp().hashCode();
+        int result = getUri().hashCode();
         result = 31 * result + getKey().hashCode();
-        result = 31 * result + getPort();
-        result = 31 * result + getScheme().hashCode();
         return result;
     }
 }

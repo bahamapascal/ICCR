@@ -54,7 +54,7 @@ public class RemoveNeighborsIotaAction extends AbstractAction implements IotaAct
                 IccrIotaNeighborsPropertyDto nbrs = propSource.getIotaNeighbors();
                 nbrs.getNbrs().forEach((nbr) -> {
                     if (nbr.isActive()) {
-                        payload.addUri(nbr.toUri());
+                        payload.addUri(nbr.getUri());
                     }
                 });
             }

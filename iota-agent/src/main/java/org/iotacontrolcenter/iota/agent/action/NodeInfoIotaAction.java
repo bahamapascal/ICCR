@@ -1,9 +1,12 @@
 package org.iotacontrolcenter.iota.agent.action;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
+import org.iotacontrolcenter.dto.IotaGetNodeInfoResponseDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.iota.agent.http.GetIotaNodeInfo;
 import org.iotacontrolcenter.properties.source.PropertySource;
@@ -48,6 +51,21 @@ public class NodeInfoIotaAction extends AbstractAction implements IotaAction {
                     msg = "success";
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                     resp.setContent(request.responseAsString());
+
+                    IotaGetNodeInfoResponseDto dto = null;
+                    try {
+                        Gson gson = new GsonBuilder().create();
+                        dto = gson.fromJson(resp.getContent(), IotaGetNodeInfoResponseDto.class);
+
+                        System.out.println("mapped " + ACTION_PROP + " response dto: " + dto);
+                    }
+                    catch(Exception e) {
+                        System.out.println(ACTION_PROP + ", exception mapping json response: " + e);
+                    }
+
+                    System.out.println(ACTION_PROP + ", content: " + resp.getContent());
+
+                    //request.rep
 
                     System.out.println(request.getName() + " " +
                             localizer.getLocalText("httpRequestSuccess"));

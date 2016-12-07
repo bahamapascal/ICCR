@@ -18,7 +18,7 @@ public abstract class HttpMethod {
     protected HttpRequestBase httpRequestBase;
     protected Localizer localizer;
     protected String name;
-    protected CloseableHttpResponse response;
+    public CloseableHttpResponse response;
     protected String startError;
     protected int timeOutSec = 30;
     protected String url;

@@ -399,7 +399,99 @@ support delete ICCR Event log
 
 checkin
 
+delivered 1.0.0
+
+2201  cd /opt/iccr/
+ 2202  ls
+ 2203  ls bak
+ 2204  ls bin
+ 2205  ls conf
+ 2206  emacs -nw conf/iccr.properties 
+ 2207  ls data/
+ 2208  rm data/iota-event.csv 
+ 2209  ls download/
+ 2210  rm download/*
+ 2211  ls lib/
+ 2212  ls logs/
+ 2213  rm logs/iccr.log 
+ 2214  ls tmp/
+ 2215  pwd
+ 2216  emacs -nw bin/iccr-ctl 
+ 2217  bin/iccr-ctl 
+ 2218  ps
+ 2219  ps -f
+ 2220  kill 11167
+ 2221  emacs -nw bin/iccr-ctl 
+ 2222  bin/iccr-ctl 
+ 2223  ps
+ 2224  emacs -nw bin/iccr-ctl 
+ 2225  bin/iccr-ctl 
+ 2226  ps
+ 2227  ps -f
+ 2228  tail -f logs/iccr.log 
+ 2229  ls
+ 2230  ps
+ 2231  kill 11521
+ 2232  ps
+ 2233  tail -f logs/iccr.log 
+ 2234  rm logs/iccr.log 
+ 2235  ls
+ 2236  cd ..
+ 2237  ls
+ 2238  tar -czvf iccr.tgz iccr
+ 2239  tar -czvf ~/iccr.tgz iccr
+
+
+tar -czvf ~/iccr.tgz iccr
+iccr/
+iccr/bin/
+iccr/bin/stopiota.bash
+iccr/bin/iccr-ctl
+iccr/bin/installiri.bash
+iccr/bin/startiota.bash
+iccr/bin/checkiotastatus.bash
+iccr/data/
+iccr/download/
+iccr/lib/
+iccr/lib/iccr.jar
+iccr/conf/
+iccr/conf/iccr.properties
+iccr/conf/MessagesBundle_en_US.properties
+iccr/conf/MessagesBundle_de_DE.properties
+iccr/bak/
+iccr/tmp/
+iccr/logs/
+
+------------
+Tue: 12/6/2016
+
+added changelog.txt
+
+Change default value for IOTA download link: iotaDownloadLink=http://188.138.57.93
+
+Change default value for IOTA download filename: iotaDownloadFilename=IRI-1.1.1.1.jar
+
+Added numAt, numIt, numNt fields to NeighborDto
+
+Changed iccr start cmd in start script to redir to log and run in background and capture pid
+
+Fixed iotaGetNeighbors cmd
+
+Parse getNeighbors response into dto:
+getIotaNeighbors, content: {"neighbors": [{"address": "/10.0.0.0:14265", "numberOfAllTransactions": 0, "numberOfNewTransactions": 0, "numberOfInvalidTransactions": 0}], "duration": 1}
+
+Parse getNodeInfo response into dto:
+getIotaNodeInfo, content: {"appName": "IRI", "appVersion": "1.1.0", "jreAvailableProcessors": 2, "jreFreeMemory": 47309536, "jreMaxMemory": 883949568, "jreTotalMemory": 60293120, "latestMilestone": "999999999999999999999999999999999999999999999999999999999999999999999999999999999", "latestMilestoneIndex": 0, "latestSolidSubtangleMilestone": "999999999999999999999999999999999999999999999999999999999999999999999999999999999", "latestSolidSubtangleMilestoneIndex": 0, "neighbors": 1, "packetsQueueSize": 0, "time": 1481092954120, "tips": 1, "transactionsToRequest": 0, "duration": 1}
+
+Fixed getNeighbor and getNodeInfo IOTA API calls
+
+Bumped iccr version to 1.0.1-SNAPSHOT
+
+checked in
+
 todo:
+> pass iota nbr and nodeinfo dto back to client
+
 support for https
 
 us 6 iccr iota get install info
@@ -418,18 +510,12 @@ iccr-cli using http client to talk to iccr over iccr rest api
 
 Shutdown hook
 
-why is there an iccr startup logging error
-
-
-iri exception on getNodeInfo and getNeighbors
-java.lang.ClassCastException: java.lang.String cannot be cast to java.util.Map
-	at iri.API$Request.process(API.java:167)
-	at iri.API$Request$1.completed(API.java:112)
+d why is there an iccr startup logging error: removed logging directive
 
 
 UI note: content from iota is in "content" prop, it may contain exception property
 
-log exceptions that are caught by rest resource
+d log exceptions that are caught by rest resource
 
 see question: should install also start, it does now
 

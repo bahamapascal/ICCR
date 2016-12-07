@@ -1,0 +1,15 @@
+Version 1.0.0
+
+Delivered Monday 12/5/2016
+-----------------------------
+Version 1.0.1
+
+Change default value for IOTA download link:
+iotaDownloadLink=http://188.138.57.93
+
+Change default value for IOTA download filename:
+iotaDownloadFilename=IRI-1.1.1.1.jar
+
+Changed iccr start cmd in start script to redir to log and run in background and capture pid
+
+Fixed getNeighbor and getNodeInfo IOTA API calls

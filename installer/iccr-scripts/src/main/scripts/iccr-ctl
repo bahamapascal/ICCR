@@ -14,6 +14,7 @@ export ICCR_TMP_DIR=${ICCR_DIR}/tmp
 export ICCR_BIN_DIR=${ICCR_DIR}/bin
 export ICCR_BAK_DIR=${ICCR_DIR}/bak
 export ICCR_JAR_NAME=iccr.jar
+export ICCR_PID_FILE=${ICCR_DIR}/iccr.pid
 
 iccrPortNumber=14266
 jvm_env="-DiccrDir=${ICCR_DIR}"
@@ -23,12 +24,20 @@ jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
 #jvm_env="${jvm_env} -Dswarm.log.org.wildfly.swarm=ERROR"
 #jvm_env="${jvm_env} -Dswarm.logging=ERROR"
 #ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1
-ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
+#ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
+#echo
+#echo ${ICCR_START_CMD}
+#echo
+#${ICCR_START_CMD}
 
-echo
-echo ${ICCR_START_CMD}
-echo
+nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
 
-${ICCR_START_CMD}
+iccrPid=$!
+
+echo $iccrPid > ${ICCR_PID_FILE}
+
+echo $iccrPid
+
+exit $statusCode
 
 

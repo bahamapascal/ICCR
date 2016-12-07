@@ -293,21 +293,22 @@ public class PropertySource {
     public void setIotaNeighbors(IccrIotaNeighborsPropertyDto nbrs) {
         String nbrKeys = nbrs.nbrKeys();
         String id;
-        for(NeighborDto nbr : nbrs.getNbrs()) {
-            System.out.println("updated neighbor: " + nbr);
-            id = nbr.getKey();
-            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id, nbr.getKey());
-            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".ip." + id, nbr.getIp());
-            if(nbr.getName() != null) {
-                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, nbr.getName());
+        if(nbrs.getNbrs() != null) {
+            for (NeighborDto nbr : nbrs.getNbrs()) {
+                System.out.println("updated neighbor: " + nbr);
+                id = nbr.getKey();
+                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id, nbr.getKey());
+                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id, nbr.getUri());
+                if (nbr.getName() != null) {
+                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, nbr.getName());
+                }
+                if (nbr.getDescr() != null) {
+                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescr());
+                }
+                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id, String.valueOf(nbr.isActive()).toLowerCase());
             }
-            if(nbr.getDescr() != null) {
-                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescr());
-            }
-            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id, String.valueOf(nbr.isActive()).toLowerCase());
-            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".port." + id, Integer.toString(nbr.getPort()));
-            setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".scheme." + id, nbr.getScheme());
         }
+        System.out.println("Updated nbr keys: " + nbrKeys);
         setProperty(IOTA_NEIGHBORS_PROP, nbrKeys);
     }
 
@@ -317,12 +318,10 @@ public class PropertySource {
             try {
                 nbrs.add(new NeighborDto(
                         getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id),
-                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".ip." + id),
+                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id),
                         getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id),
                         getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
-                        getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id),
-                        getInteger(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".port." + id),
-                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".scheme." + id)));
+                        getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id)));
             }
             catch(Exception e) {
                 System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());

@@ -58,7 +58,7 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
             IotaAddNeighborsCommandDto payload = new IotaAddNeighborsCommandDto();
             nbrs.getNbrs().forEach((nbr) -> {
                 if(nbr.isActive()) {
-                    payload.addUri(nbr.toUri());
+                    payload.addUri(nbr.getUri());
                 }
             });
 

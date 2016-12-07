@@ -4,6 +4,7 @@ package org.iotacontrolcenter.iota.agent.http;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -27,6 +28,7 @@ public class HttpPost extends HttpMethod  {
     public HttpPost(String name, String url, Object payload, Map<String, String> headers) {
         super(name, url, headers);
         this.payload = payload;
+        System.out.println("constructor: payload: " + payload);
     }
 
     public void setPayload(Object payload) {
@@ -66,9 +68,23 @@ public class HttpPost extends HttpMethod  {
                     post.setHeader(k, v);
                 });
             }
-            Gson gson = new GsonBuilder().create();
-            post.setEntity(new StringEntity(gson.toJson(payload), "UTF-8"));
 
+            StringEntity entity = null;
+            if(payload instanceof  String) {
+                entity = new StringEntity((String)payload, ContentType.create("application/json", "UTF-8"));
+                post.setEntity(entity);
+
+                System.out.println("Post string payload entity: '" + EntityUtils.toString(entity) + "'" +
+                        ", len: " + entity.getContentLength());
+            }
+            else {
+                Gson gson = new GsonBuilder().create();
+                entity = new StringEntity(gson.toJson(payload), ContentType.create("application/json", "UTF-8"));
+                post.setEntity(entity);
+
+                System.out.println("Post object payload entity: '" + EntityUtils.toString(entity) + "'" +
+                        ", len: " + entity.getContentLength());
+            }
             CloseableHttpClient client = HttpClientBuilder.create().disableAutomaticRetries().build();
 
             response = client.execute(post);

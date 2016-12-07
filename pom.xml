@@ -5,7 +5,7 @@
 
     <groupId>org.iotacontrolcenter</groupId>
     <artifactId>iccr-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>ICCR Parent</name>
     <description>ICCR Parent</description>
@@ -75,37 +75,37 @@
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-persistence</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-properties</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-dto</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-api</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iota-agent</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-rest</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-main</artifactId>
-              <version>1.0.0-SNAPSHOT</version>
+              <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
