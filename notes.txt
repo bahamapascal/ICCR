@@ -512,8 +512,20 @@ IOTA log console api
 
 checked in
 
+-------------
+Thu: 12/8/2016
+
+Added start, stop, status command line options to iccr-ctl
+
+Added support for command line options to iccr-ctl when starting: nossl debug or info
+
 todo:
-support for https
+> support for https
+
+Discovery of existing IOTA nodes:
+if not in config: add?
+
+
 ProcessBuilder for iccr ctl
 Action for restart iccr action
 Process for restart iccr

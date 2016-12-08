@@ -14,4 +14,18 @@ Changed iccr start cmd in start script to redir to log and run in background and
 
 Fixed getNeighbor and getNodeInfo IOTA API calls
 
-Added /iota/log resource and file lines loader
+Added /iota/log resource and file lines loader to support /iota/log REST resource.
+
+Added support to the iccr-ctl script to stop a running iccr process by passing "stop" on the command line.
+
+Added support to the iccr-ctl script to check status of the iccr process by passing "status" on the command line.
+
+Added support for disabling TLS (HTTPS). The iccr-ctl script can be passed "nossl" on the command line to disable ICCR using (TLS) HTTPS transport.
+
+Added support for configurable logging levels of the activity of the lower level wildfly swarm framework. The default is now "error", not very  verbose, only log framework errors. The iccr-ctl script can be passed either "info" or "debug" on the command line to cause increased logging output.
+
+
+
+
+
+

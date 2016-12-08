@@ -15,22 +15,119 @@ export ICCR_BIN_DIR=${ICCR_DIR}/bin
 export ICCR_BAK_DIR=${ICCR_DIR}/bak
 export ICCR_JAR_NAME=iccr.jar
 export ICCR_PID_FILE=${ICCR_DIR}/iccr.pid
+export WHAT_APP=ICCR
+export JAR_CHUNK="${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
+
+cd $ICCR_DIR
+
+# Stopping:
+if [ "${1}" = "stop" ]; then
+
+    if [ -f $ICCR_PID_FILE ]; then
+        iccrPid=`cat $ICCR_PID_FILE`
+
+        kill ${iccrPid}
+
+        statusCode=$?
+
+        rm -f $ICCR_PID_FILE
+
+        exit $statusCode
+    else
+        rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+
+        statusCode=$?
+
+        if [ ! -z "${rval}" -a $statusCode -eq 0 ]; then
+            echo "$WHAT_APP seemed to be alive, but PID file not found, killing PID $rval"
+            kill $rval
+        fi
+    fi
+    exit 1
+elif [ "${1}" = "status" ]; then
+    if [ -f $ICCR_PID_FILE ]; then
+        iccrPid=`cat $ICCR_PID_FILE`
+
+        rval=`ps fax | grep ${iccrPid} | grep -v grep`
+
+        statusCode=$?
+
+        if [ $statusCode -eq 0 ]; then
+            echo "${WHAT_APP} is alive, PID ${iccrPid}"
+        else
+            echo "${WHAT_APP} is not alive, PID was ${iccrPid}"
+        fi
+    else
+        rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+
+        statusCode=$?
+
+        if [ ! -z "${rval}" -a $statusCode -eq 0 ]; then
+            echo "${WHAT_APP} seems to be alive, but no PID file (PID $rval ?)"
+        else
+            echo "${WHAT_APP} is not alive"
+        fi
+    fi
+    exit $statusCode
+fi
+# Else we're starting:
+# Are we already running?
+if [ -f $ICCR_PID_FILE ]; then
+    iccrPid=`cat $ICCR_PID_FILE`
+
+    rval=`ps fax | grep ${iccrPid} | grep -v grep`
+
+    statusCode=$?
+
+    if [ $statusCode -eq 0 ]; then
+        echo "${WHAT_APP} is already alive, PID ${iccrPid}"
+        exit 0
+    fi
+else
+    rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
+
+    statusCode=$?
+
+    if [ ! -z "${rval}" -a $statusCode -eq 0 ]; then
+        echo "${WHAT_APP} is already alive, but no PID file (PID is $rval ?)"
+        exit 0
+    fi
+fi
+
+echo Starting $WHAT_APP
 
 iccrPortNumber=14266
 jvm_env="-DiccrDir=${ICCR_DIR}"
 jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
 
-# Neither of these attempts work to configure swarm logging:
-#jvm_env="${jvm_env} -Dswarm.log.org.wildfly.swarm=ERROR"
-#jvm_env="${jvm_env} -Dswarm.logging=ERROR"
-#ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1
-#ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
+loglevel=
+nossl=
+
+for arg in "$@"; do
+    if [ "${arg}" = "debug" ]; then
+        loglevel=debug
+    fi
+    if [ "${arg}" = "info" ]; then
+        loglevel=info
+    fi
+    if [ "${arg}" = "nossl" ]; then
+        nossl="nossl"
+    fi
+done
+
+iccrargs="${nossl} ${loglevel}"
+
+
+#ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}  ${iccrargs} "
+#ICCR_START_CMD="nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &"
+
 #echo
 #echo ${ICCR_START_CMD}
 #echo
 #${ICCR_START_CMD}
 
-nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
+#java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs}
+nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
 
 iccrPid=$!
 

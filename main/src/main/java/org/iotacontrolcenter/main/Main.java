@@ -8,10 +8,37 @@ import org.wildfly.swarm.logging.LoggingFraction;
 
 public class Main {
 
+    public static boolean debug = false;
+    public static boolean info = false;
+    public static boolean noSsl = false;
+
     public static void main(String[] args) throws Exception {
 
+        if(args != null) {
+            if(args.length > 0) {
+                System.out.println("args[0] -> " + args[0]);
+                noSsl = args[0].toLowerCase().equals("nossl");
+                debug = args[0].toLowerCase().equals("debug");
+                info = args[0].toLowerCase().equals("info");
+            }
+            if(args.length > 1) {
+                System.out.println("args[1] -> " + args[1]);
+                debug = args[1].toLowerCase().equals("debug");
+                info = args[1].toLowerCase().equals("info");
+            }
+        }
+
         Swarm swarm = new Swarm();
-        swarm.fraction(LoggingFraction.createDebugLoggingFraction() );
+
+        if(info) {
+            swarm.fraction(LoggingFraction.createDefaultLoggingFraction());
+        }
+        else if(debug) {
+            swarm.fraction(LoggingFraction.createDebugLoggingFraction());
+        }
+        else{
+            swarm.fraction(LoggingFraction.createErrorLoggingFraction());
+        }
 
         JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class, "iccr-app.war");
         deployment.addClass(IccrServiceImpl.class);
