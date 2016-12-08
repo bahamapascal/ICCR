@@ -227,6 +227,7 @@ InstallAction:
 validate props iotaDir, iotaDownloadLink, iotaDownloadFilename
 get Iota status
 download
+write action status strings to a place that a rest api long poll can query for scrolling log window in UI
 persist events, version, and date
 process and script to install new iri <dldFilePath>: copy iotaDir/iriFileName to /opt/iccr/bak/iri.jar.timestamp; cp dldFilePath to iriFilePath
 and make backup copy of iota
@@ -487,12 +488,45 @@ Fixed getNeighbor and getNodeInfo IOTA API calls
 
 Bumped iccr version to 1.0.1-SNAPSHOT
 
+pass iota nbr and nodeinfo response text back to client
+
+log exceptions that are caught by rest resource
+
+Set nbrs in rest API support direct set of neighbors
+
+finish installer/iccr-scripts
+
+finish installer/property-files
+
+load api access key into resource impl
+
+Check iccr startup logging error: removed logging directive
+
+
+checked in
+
+-------------
+Wed: 12/7/2016
+
+IOTA log console api
+
 checked in
 
 todo:
-> pass iota nbr and nodeinfo dto back to client
-
 support for https
+ProcessBuilder for iccr ctl
+Action for restart iccr action
+Process for restart iccr
+Shutdown hook
+
+Finish changelog
+
+Set version to 1.0.1
+Create patch pkg
+Create new release  pkg
+Upload to g drive
+Msg Pascal
+
 
 us 6 iccr iota get install info
 rest api: get rs/iota/installinfo
@@ -500,30 +534,16 @@ agent
 
 us 6 rest api for get iota isntall info
 
-ProcessBuilder for iccr ctl
-
-Action for restart iccr action
-
-Process for restart iccr
 
 iccr-cli using http client to talk to iccr over iccr rest api
 
-Shutdown hook
-
-d why is there an iccr startup logging error: removed logging directive
-
-
 UI note: content from iota is in "content" prop, it may contain exception property
-
-d log exceptions that are caught by rest resource
 
 see question: should install also start, it does now
 
 see question: add nbrs should always be done in start?
 
 capture output of os process to debug failure
-
-write action status strings to a place that a rest api long poll can query for scrolling log window in UI
 
 purge iccr.properties that aren't configurable from api
 
@@ -543,8 +563,6 @@ iccrLanguageLocale=en
 #iccrCountryLocale=DE
 #iccrLanguageLocale=de
 
-Set nbrs in rest API support direct set of neighbors
-
 How best to do neighbors in java prop file: each nbr needs a key?
 
 Do specific app/config/neighbors get/set rest api?
@@ -553,19 +571,13 @@ update us 4 additional prop validations
 
 Manage logs: silence swarm, store changes to single file for audit purposes
 
-Will update of neighbor config prop need a specific dto for incoming handling?
+x Will update of neighbor config prop need a specific dto for incoming handling?
 
 test resources:
 iccr.properties
 
 installer:
 iccr.properties
-
-finish installer/iccr-scripts
-
-finish installer/property-files
-
-load api access key into resource impl
 
 add logging
 

@@ -41,21 +41,36 @@ public class PersistenceService {
         }
     }
 
-    private static final String IOTA_EVENT_FILE = "iota-event.csv";
+    private static final String ICCR_IOTA_EVENT_FILE = "iota-event.csv";
+    private static final String IOTA_LOG_FILE = "console.log";
 
     private Localizer localizer;
     private PropertySource propSource;
-    private String iotaEventFilepath;
+    private String iccrEventFilepath;
+    private String iotaLogFilepath;
 
     private PersistenceService() {
         System.out.println("new PersistenceService");
         propSource = PropertySource.getInstance();
         localizer = Localizer.getInstance();
-        iotaEventFilepath = propSource.getIccrDataDir() + "/" + IOTA_EVENT_FILE;
+        iccrEventFilepath = propSource.getIccrDataDir() + "/" + ICCR_IOTA_EVENT_FILE;
+        iotaLogFilepath = propSource.getIotaAppDir() + "/" + IOTA_LOG_FILE;
+    }
+
+    public List<String> getIotaLog() throws IOException {
+        File f = new File(iotaLogFilepath);
+
+        //if(f.exists()) {
+        try {
+            return FileUtils.readLines(f);
+        }
+        catch(Exception e) {
+            return new ArrayList<>();
+        }
     }
 
     public List<String> getEventLog() throws IOException {
-        File f = new File(iotaEventFilepath);
+        File f = new File(iccrEventFilepath);
 
         //if(f.exists()) {
         try {
@@ -68,7 +83,7 @@ public class PersistenceService {
 
     public void deleteEventLog() throws IOException {
         System.out.println("deleting Event log");
-        FileUtils.deleteQuietly(new File(iotaEventFilepath));
+        FileUtils.deleteQuietly(new File(iccrEventFilepath));
     }
 
     public void logIotaAction(String event) {
@@ -86,7 +101,7 @@ public class PersistenceService {
 
             //System.out.println(line);
 
-            File f = new File(iotaEventFilepath);
+            File f = new File(iccrEventFilepath);
             /*
             if(!f.exists()) {
                 f.createNewFile();
@@ -97,7 +112,7 @@ public class PersistenceService {
         }
         catch(IOException ioe) {
             System.out.println("logIotaAction, exception writing to file (" +
-                        iotaEventFilepath + "): " +ioe.getLocalizedMessage());
+                    iccrEventFilepath + "): " +ioe.getLocalizedMessage());
         }
     }
 

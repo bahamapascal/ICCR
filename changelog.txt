@@ -13,3 +13,5 @@ iotaDownloadFilename=IRI-1.1.1.1.jar
 Changed iccr start cmd in start script to redir to log and run in background and capture pid
 
 Fixed getNeighbor and getNodeInfo IOTA API calls
+
+Added /iota/log resource and file lines loader

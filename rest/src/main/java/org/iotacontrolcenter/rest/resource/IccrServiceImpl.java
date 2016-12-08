@@ -20,6 +20,7 @@ public class IccrServiceImpl implements IccrService {
     private Agent agent = Agent.getInstance();
     private Localizer localizer = Localizer.getInstance();
     private PropertySource propSource = PropertySource.getInstance();
+    private PersistenceService persistenceService = PersistenceService.getInstance();
 
 
     public IccrServiceImpl() {
@@ -31,11 +32,11 @@ public class IccrServiceImpl implements IccrService {
         if(!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("getEventLog");
+        System.out.println("getIccrEventLog");
         Response.ResponseBuilder r = null;
 
         try {
-            List<String> log = PersistenceService.getInstance().getEventLog();
+            List<String> log = persistenceService.getEventLog();
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(log);
         }
@@ -376,6 +377,29 @@ public class IccrServiceImpl implements IccrService {
             System.out.println("getIotaNeighbors exception: ");
             e.printStackTrace();
 
+            r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+        }
+
+        return r.build();
+    }
+
+    @Override
+    public Response getIotaLog(HttpServletRequest request) {
+        if(!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        System.out.println("getIotaLog");
+        Response.ResponseBuilder r = null;
+
+        try {
+            List<String> log = persistenceService.getIotaLog();
+            r = Response.status(HttpURLConnection.HTTP_OK);
+            r.entity(log);
+        }
+        catch(Exception e) {
+            System.out.println("getIotaLog exception: ");
+            e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
                     entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
