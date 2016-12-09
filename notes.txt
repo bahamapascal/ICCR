@@ -524,7 +524,11 @@ cp ~/projects/pki/icc/server/stores/iccr-ks.jks installer/property-files/src/mai
 Enable https in swarm:
 https://developer.jboss.org/thread/266633?_sscc=t
 
-new swarm https port prop in iccr-ctl is port+1, need change in iccj
+HTTPS port prop in iccr-ctl is port+1, need change in iccj
+
+HTTPS can be disabled by passing nossl on commandline when launching iccr
+
+Checked in
 
 todo:
 Discovery of existing IOTA nodes:

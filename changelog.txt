@@ -24,7 +24,9 @@ Added support for disabling TLS (HTTPS). The iccr-ctl script can be passed "noss
 
 Added support for configurable logging levels of the activity of the lower level wildfly swarm framework. The default is now "error", not very  verbose, only log framework errors. The iccr-ctl script can be passed either "info" or "debug" on the command line to cause increased logging output.
 
-Added self signed key store and trust store
+Added self signed key store and trust store: iccr-ks.jks and iccr-ts.jks
+
+
 
 
 
