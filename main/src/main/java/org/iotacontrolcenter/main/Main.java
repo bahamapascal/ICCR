@@ -6,6 +6,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.config.management.SecurityRealm;
 import org.wildfly.swarm.config.management.security_realm.SslServerIdentity;
+import org.wildfly.swarm.config.management.security_realm.TruststoreAuthentication;
 import org.wildfly.swarm.config.undertow.BufferCache;
 import org.wildfly.swarm.config.undertow.HandlerConfiguration;
 import org.wildfly.swarm.config.undertow.Server;
@@ -52,6 +53,10 @@ public class Main {
                                     .keystorePassword("secret")
                                     .alias("iccr")
                                     .keyPassword("secret")
+                            )
+                            .truststoreAuthentication(new TruststoreAuthentication()
+                                    .keystorePath("/opt/iccr/conf/iccr-ts.jks")
+                                    .keystorePassword("secret")
                             )
                     ));
 
