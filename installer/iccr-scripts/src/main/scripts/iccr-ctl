@@ -8,6 +8,7 @@ export JAVA_HOME
 # Get from iccr.properties
 export ICCR_DIR=/opt/iccr
 export ICCR_CONF_DIR=${ICCR_DIR}/conf
+export ICCR_CONF_FILE=${ICCR_CONF_DIR}/iccr.properties
 export ICCR_LIB_DIR=${ICCR_DIR}/lib
 export ICCR_LOG_DIR=${ICCR_DIR}/logs
 export ICCR_TMP_DIR=${ICCR_DIR}/tmp
@@ -17,11 +18,27 @@ export ICCR_JAR_NAME=iccr.jar
 export ICCR_PID_FILE=${ICCR_DIR}/iccr.pid
 export WHAT_APP=ICCR
 export JAR_CHUNK="${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
+export PORTNUM_PROP=iccrPortNumber
 
 cd $ICCR_DIR
 
-# Stopping:
-if [ "${1}" = "stop" ]; then
+# for start:
+loglevel=
+nossl=
+for arg in "$@"; do
+    if [ "${arg}" = "debug" ]; then
+        loglevel=debug
+    fi
+    if [ "${arg}" = "info" ]; then
+        loglevel=info
+    fi
+    if [ "${arg}" = "nossl" ]; then
+        nossl="nossl"
+    fi
+done
+
+stop() {
+    echo Stopping $WHAT_APP
 
     if [ -f $ICCR_PID_FILE ]; then
         iccrPid=`cat $ICCR_PID_FILE`
@@ -32,7 +49,7 @@ if [ "${1}" = "stop" ]; then
 
         rm -f $ICCR_PID_FILE
 
-        exit $statusCode
+        return $statusCode
     else
         rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
 
@@ -41,10 +58,72 @@ if [ "${1}" = "stop" ]; then
         if [ ! -z "${rval}" -a $statusCode -eq 0 ]; then
             echo "$WHAT_APP seemed to be alive, but PID file not found, killing PID $rval"
             kill $rval
+            return $statusCode
         fi
     fi
-    exit 1
-elif [ "${1}" = "status" ]; then
+    return 1
+}
+
+start() {
+    echo Starting $WHAT_APP
+    # Are we already running?
+    if [ -f $ICCR_PID_FILE ]; then
+        iccrPid=`cat $ICCR_PID_FILE`
+
+        rval=`ps fax | grep ${iccrPid} | grep -v grep`
+
+        statusCode=$?
+
+        if [ $statusCode -eq 0 ]; then
+            echo "${WHAT_APP} is already alive, PID ${iccrPid}"
+            return 0
+        fi
+    else
+        rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
+
+        statusCode=$?
+
+        if [ ! -z "${rval}" -a $statusCode -eq 0 ]; then
+            echo "${WHAT_APP} is already alive, but no PID file (PID is $rval ?)"
+            return 0
+        fi
+    fi
+
+    iccrPortNumber=`grep $PORTNUM_PROP $ICCR_CONF_FILE | sed -e s/^iccrPortNumber=//g`
+
+    echo using port $iccrPortNumber
+
+    jvm_env="-DiccrDir=${ICCR_DIR}"
+    if [ -z "${nossl}" ]; then
+        jvm_env="${jvm_env} -Dswarm.https.port=${iccrPortNumber}"
+    else
+        jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
+    fi
+    #jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber} -Dswarm.https.port=${iccrHttpsPortNumber}"
+
+    iccrargs="${nossl} ${loglevel}"
+
+    #ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}  ${iccrargs} "
+    #ICCR_START_CMD="nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &"
+
+    #echo
+    #echo ${ICCR_START_CMD}
+    #echo
+    #${ICCR_START_CMD}
+
+    #java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs}
+    nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
+
+    iccrPid=$!
+
+    echo $iccrPid > ${ICCR_PID_FILE}
+
+    echo PID $iccrPid
+
+    return $statusCode
+}
+
+status() {
     if [ -f $ICCR_PID_FILE ]; then
         iccrPid=`cat $ICCR_PID_FILE`
 
@@ -68,74 +147,28 @@ elif [ "${1}" = "status" ]; then
             echo "${WHAT_APP} is not alive"
         fi
     fi
-    exit $statusCode
-fi
-# Else we're starting:
-# Are we already running?
-if [ -f $ICCR_PID_FILE ]; then
-    iccrPid=`cat $ICCR_PID_FILE`
+    return $statusCode
+}
 
-    rval=`ps fax | grep ${iccrPid} | grep -v grep`
+restart() {
+    stop
+    sleep 5
+    start
+}
 
-    statusCode=$?
 
-    if [ $statusCode -eq 0 ]; then
-        echo "${WHAT_APP} is already alive, PID ${iccrPid}"
-        exit 0
-    fi
+# Stopping:
+if [ "${1}" = "stop" ]; then
+    stop
+elif [ "${1}" = "status" ]; then
+    status
+elif [ "${1}" = "restart" ]; then
+    restart
+elif [ "${1}" = "start" ]; then
+    start
 else
-    rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
-
-    statusCode=$?
-
-    if [ ! -z "${rval}" -a $statusCode -eq 0 ]; then
-        echo "${WHAT_APP} is already alive, but no PID file (PID is $rval ?)"
-        exit 0
-    fi
+    echo Unsupported command
 fi
-
-echo Starting $WHAT_APP
-
-iccrPortNumber=14266
-iccrHttpsPortNumber=14267
-jvm_env="-DiccrDir=${ICCR_DIR}"
-jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber} -Dswarm.https.port=${iccrHttpsPortNumber}"
-
-loglevel=
-nossl=
-
-for arg in "$@"; do
-    if [ "${arg}" = "debug" ]; then
-        loglevel=debug
-    fi
-    if [ "${arg}" = "info" ]; then
-        loglevel=info
-    fi
-    if [ "${arg}" = "nossl" ]; then
-        nossl="nossl"
-    fi
-done
-
-iccrargs="${nossl} ${loglevel}"
-
-
-#ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}  ${iccrargs} "
-#ICCR_START_CMD="nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &"
-
-#echo
-#echo ${ICCR_START_CMD}
-#echo
-#${ICCR_START_CMD}
-
-#java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs}
-nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
-
-iccrPid=$!
-
-echo $iccrPid > ${ICCR_PID_FILE}
-
-echo $iccrPid
-
-exit $statusCode
+# Else what?
 
 

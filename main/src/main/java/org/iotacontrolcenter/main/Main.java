@@ -26,7 +26,8 @@ public class Main {
     public static boolean noSsl = false;
 
     public static void main(String[] args) throws Exception {
-        //PropertySource propertySource  = PropertySource.getInstance();
+        // Must be instantiated after logging fraction:
+        PropertySource propertySource  = null;
         if(args != null) {
             if(args.length > 0) {
                 System.out.println("args[0] -> " + args[0]);
@@ -43,19 +44,31 @@ public class Main {
 
         Swarm swarm = new Swarm();
 
+        if(info) {
+            swarm.fraction(LoggingFraction.createDefaultLoggingFraction());
+        }
+        else if(debug) {
+            swarm.fraction(LoggingFraction.createDebugLoggingFraction());
+        }
+        else{
+            swarm.fraction(LoggingFraction.createErrorLoggingFraction());
+        }
+
         if(!noSsl) {
+            propertySource = PropertySource.getInstance();
             System.out.println("setting up ssl");
             swarm.fraction(new ManagementFraction()
                     .securityRealm(new SecurityRealm("SSLRealm")
                             .sslServerIdentity(new SslServerIdentity<>()
-                                    //.keystorePath(propertySource.getIccrConfDir() + "/iccr-ks.jks")
-                                    .keystorePath("/opt/iccr/conf/iccr-ks.jks")
+                                    .keystorePath(propertySource.getIccrConfDir() + "/iccr-ks.jks")
+                                    //.keystorePath("/opt/iccr/conf/iccr-ks.jks")
                                     .keystorePassword("secret")
                                     .alias("iccr")
                                     .keyPassword("secret")
                             )
                             .truststoreAuthentication(new TruststoreAuthentication()
-                                    .keystorePath("/opt/iccr/conf/iccr-ts.jks")
+                                    .keystorePath(propertySource.getIccrConfDir() + "/iccr-ts.jks")
+                                    //.keystorePath("/opt/iccr/conf/iccr-ts.jks")
                                     .keystorePassword("secret")
                             )
                     ));
@@ -73,16 +86,6 @@ public class Main {
         }
         else {
             System.out.println("no ssl");
-        }
-
-        if(info) {
-            swarm.fraction(LoggingFraction.createDefaultLoggingFraction());
-        }
-        else if(debug) {
-            swarm.fraction(LoggingFraction.createDebugLoggingFraction());
-        }
-        else{
-            swarm.fraction(LoggingFraction.createErrorLoggingFraction());
         }
 
         JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class, "iccr-app.war");
