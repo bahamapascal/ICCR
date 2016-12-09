@@ -97,8 +97,9 @@ fi
 echo Starting $WHAT_APP
 
 iccrPortNumber=14266
+iccrHttpsPortNumber=14267
 jvm_env="-DiccrDir=${ICCR_DIR}"
-jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
+jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber} -Dswarm.https.port=${iccrHttpsPortNumber}"
 
 loglevel=
 nossl=

@@ -1,10 +1,22 @@
 package org.iotacontrolcenter.main;
 
+import org.iotacontrolcenter.properties.source.PropertySource;
 import org.iotacontrolcenter.rest.resource.*;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.wildfly.swarm.Swarm;
+import org.wildfly.swarm.config.management.SecurityRealm;
+import org.wildfly.swarm.config.management.security_realm.SslServerIdentity;
+import org.wildfly.swarm.config.undertow.BufferCache;
+import org.wildfly.swarm.config.undertow.HandlerConfiguration;
+import org.wildfly.swarm.config.undertow.Server;
+import org.wildfly.swarm.config.undertow.ServletContainer;
+import org.wildfly.swarm.config.undertow.server.Host;
+import org.wildfly.swarm.config.undertow.server.HttpsListener;
+import org.wildfly.swarm.config.undertow.servlet_container.WebsocketsSetting;
 import org.wildfly.swarm.jaxrs.JAXRSArchive;
 import org.wildfly.swarm.logging.LoggingFraction;
+import org.wildfly.swarm.management.ManagementFraction;
+import org.wildfly.swarm.undertow.UndertowFraction;
 
 public class Main {
 
@@ -13,7 +25,7 @@ public class Main {
     public static boolean noSsl = false;
 
     public static void main(String[] args) throws Exception {
-
+        //PropertySource propertySource  = PropertySource.getInstance();
         if(args != null) {
             if(args.length > 0) {
                 System.out.println("args[0] -> " + args[0]);
@@ -29,6 +41,34 @@ public class Main {
         }
 
         Swarm swarm = new Swarm();
+
+        if(!noSsl) {
+            System.out.println("setting up ssl");
+            swarm.fraction(new ManagementFraction()
+                    .securityRealm(new SecurityRealm("SSLRealm")
+                            .sslServerIdentity(new SslServerIdentity<>()
+                                    //.keystorePath(propertySource.getIccrConfDir() + "/iccr-ks.jks")
+                                    .keystorePath("/opt/iccr/conf/iccr-ks.jks")
+                                    .keystorePassword("secret")
+                                    .alias("iccr")
+                                    .keyPassword("secret")
+                            )
+                    ));
+
+            swarm.fraction(new UndertowFraction()
+                    .server(new Server("default-server")
+                            .httpsListener(new HttpsListener("default")
+                                    .securityRealm("SSLRealm")
+                                    .socketBinding("https"))
+                            .host(new Host("default-host")))
+                    .bufferCache(new BufferCache("default"))
+                    .servletContainer(new ServletContainer("default")
+                            .websocketsSetting(new WebsocketsSetting()))
+                    .handlerConfiguration(new HandlerConfiguration()));
+        }
+        else {
+            System.out.println("no ssl");
+        }
 
         if(info) {
             swarm.fraction(LoggingFraction.createDefaultLoggingFraction());
