@@ -50,7 +50,7 @@ public class PropertySource {
     public static final String IOTA_START_PROP="iotaStartCmd";
     public static final String IOTA_PORT_NUMBER_PROP="iotaPortNumber";
 
-    public static final String IOTA_NBR_REFRESH_PROP="iotaNeighborRefreshTime";
+    public static final String IOTA_NBR_REFRESH_TIME_PROP="iotaNeighborRefreshTime";
     public static final String IOTA_NEIGHBORS_PROP="iotaNeighbors";
     public static final String IOTA_NEIGHBOR_PROP_PREFIX="iotaNeighbor";
 
@@ -148,6 +148,15 @@ public class PropertySource {
         return jarFile;
     }
 
+    public Integer getIotaNeighborRefreshTime() {
+        try {
+            return getInteger(IOTA_NBR_REFRESH_TIME_PROP);
+        }
+        catch(Exception e) {
+            return 0;
+        }
+    }
+
     public String getLocalIotaUrl() {
         return "http://localhost:" + getString(IOTA_PORT_NUMBER_PROP) + "/";
     }
@@ -216,7 +225,7 @@ public class PropertySource {
         keys.add(IOTA_DLD_FILENAME_PROP);
         keys.add(IOTA_APP_DIR_PROP);
         keys.add(IOTA_START_PROP);
-        keys.add(IOTA_NBR_REFRESH_PROP);
+        keys.add(IOTA_NBR_REFRESH_TIME_PROP);
         return keys;
     }
 

@@ -527,6 +527,8 @@ https://developer.jboss.org/thread/266633?_sscc=t
 HTTPS can be disabled by passing nossl on commandline when launching iccr
 
 Checked in
+--------------
+Fri: 12/9/2016
 
 Do single port
 
@@ -536,7 +538,67 @@ Fix hardcoding of keystore
 
 Added restart to iccr-ctl script
 
+checked in
+
+Release checklist:
+
+mvn clean install
+
+clean deployed dir:
+      /opt$ sudo mv iccr iccr-pre-1.0.1
+
+mkdir new iccr dir:
+      /opt$ sudo mkdir /opt/iccr
+      /opt$ sudo chown dana:dana /opt/iccr
+      /opt$ mkdir /opt/iccr/bak
+      /opt$ mkdir /opt/iccr/bin
+      /opt$ mkdir /opt/iccr/conf
+      /opt$ mkdir /opt/iccr/data
+      /opt$ mkdir /opt/iccr/download
+      /opt$ mkdir /opt/iccr/lib
+      /opt$ mkdir /opt/iccr/logs
+      /opt$ mkdir /opt/iccr/tmp
+
+run deploy script
+      ~/projects/iccr/iccr$ ./deploy-iccr.bash
+
+tar gz at at the /opt level:
+      /opt$ tar -czf ~/projects/dist/iccr-1.0.1.tgz iccr
+
+test:
+    /opt$ sudo mv iccr iccr-1.0.1-dist
+    /opt$ sudo tar -xzf ~/projects/dist/iccr-1.0.1.tgz
+    /opt$ sudo chown -R dana:dana iccr
+
+upload tgz archive:
+
+upload change log:
+       ~/projects/iccj$ cp changelog.txt ~/projects/dist/iccr-1.0.1-changelog.txt
+
+----------
+Sat: 12/10/2016
+
+Bump artifact version to 1.0.2-SNAPSHOT
+
+-------------
+Sun: 12/11/2016
+
+Automatic refresh of IPs to IRI:
+- after startIota: stops, starts nbr refresh
+- after nbrs set, stops, starts nbr refresh
+- on change parameter, stops, starts timer
+- if parameter is <= 0, doesn't run refresh
+
 todo:
+Use async for long poll of iri log
+
+Create a install-icc script:
+cd /opt
+sudo unzip
+ask for user
+ask for group
+chown -R
+
 Discovery of existing IOTA nodes:
 if not in config: add?
 

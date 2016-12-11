@@ -8,6 +8,7 @@ import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.persistence.PersistenceService;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
+import org.iotacontrolcenter.rest.delegate.Delegate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
@@ -21,10 +22,10 @@ public class IccrServiceImpl implements IccrService {
     private Localizer localizer = Localizer.getInstance();
     private PropertySource propSource = PropertySource.getInstance();
     private PersistenceService persistenceService = PersistenceService.getInstance();
-
+    private Delegate delegate = Delegate.getInstance();
 
     public IccrServiceImpl() {
-        //System.out.println("creating new IccrServiceImpl");
+        System.out.println("creating new IccrServiceImpl");
     }
 
     @Override
@@ -151,6 +152,7 @@ public class IccrServiceImpl implements IccrService {
             for(IccrPropertyDto prop : properties.getProperties()) {
                 System.out.println(prop.getKey() + " -> " + prop.getValue());
                 propSource.setProperty(prop.getKey(), prop.getValue());
+                delegate.iccrPropSet(prop.getKey());
             }
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
@@ -183,10 +185,15 @@ public class IccrServiceImpl implements IccrService {
 
         try {
             if(key.equals(PropertySource.IOTA_NEIGHBORS_PROP)) {
-                propSource.setIotaNeighbors((IccrIotaNeighborsPropertyDto)prop);
+                r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                        entity(new SimpleResponse(false,
+                                "To set IOTA neighbors, use the dedicated '/app/config/iota/nbrs' resource"));
+                return r.build();
             }
             else {
                 propSource.setProperty(prop.getKey(), prop.getValue());
+
+                delegate.iccrPropSet(key);
             }
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
@@ -242,6 +249,8 @@ public class IccrServiceImpl implements IccrService {
         try {
             propSource.setIotaNeighbors(prop);
 
+            delegate.iccrPropSet(PropertySource.IOTA_NEIGHBORS_PROP);
+
             r = Response.status(HttpURLConnection.HTTP_OK);
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
         }
@@ -279,6 +288,9 @@ public class IccrServiceImpl implements IccrService {
         try {
             ActionResponse resp = agent.action(action, actionProps);
             r = Response.status(HttpURLConnection.HTTP_OK);
+
+            delegate.iotaActionDone(action);
+
             r.entity(resp);
         }
         catch(IllegalArgumentException iae) {
