@@ -44,7 +44,6 @@ public class PropertySource {
     public static final String ICCR_PORT_NUMBER_PROP = "iccrPortNumber";
 
     public static final String IOTA_DLD_LINK_PROP="iotaDownloadLink";
-    public static final String IOTA_DLD_FILENAME_PROP="iotaDownloadFilename";
 
     public static final String IOTA_APP_DIR_PROP = "iotaDir";
     public static final String IOTA_START_PROP="iotaStartCmd";
@@ -121,11 +120,7 @@ public class PropertySource {
     }
 
     public String getIotaDownloadUrl() {
-        return getString(IOTA_DLD_LINK_PROP) + "/" + getIotaDownloadFilename();
-    }
-
-    public String getIotaDownloadFilename() {
-        return getString(IOTA_DLD_FILENAME_PROP);
+        return getString(IOTA_DLD_LINK_PROP);
     }
 
     public String getIotaStartCmd() {
@@ -222,7 +217,6 @@ public class PropertySource {
         keys.add(ICCR_PORT_NUMBER_PROP);
         keys.add(IOTA_PORT_NUMBER_PROP);
         keys.add(IOTA_DLD_LINK_PROP);
-        keys.add(IOTA_DLD_FILENAME_PROP);
         keys.add(IOTA_APP_DIR_PROP);
         keys.add(IOTA_START_PROP);
         keys.add(IOTA_NBR_REFRESH_TIME_PROP);

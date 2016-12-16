@@ -20,8 +20,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
     private boolean wasIotaActive = false;
 
     public InstallIotaAction() {
-        super(new String[] { PropertySource.IOTA_DLD_LINK_PROP, PropertySource.IOTA_DLD_FILENAME_PROP,
-                PropertySource.IOTA_APP_DIR_PROP });
+        super(new String[] { PropertySource.IOTA_DLD_LINK_PROP, PropertySource.IOTA_APP_DIR_PROP });
     }
 
     @Override
@@ -109,9 +108,11 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                 System.out.println(iotaDld.getName() + " " +
                         localizer.getLocalText("httpRequestSuccess"));
 
+                String dldUrl = propSource.getIotaDownloadUrl();
+                String dldFileName = dldUrl.substring(dldUrl.lastIndexOf("/")+1);
+
                 // Store it in an ICCR download dir with timestamped suffix:
-                dldFilePath = propSource.getIccrDownloadDir() + "/" +
-                        propSource.getIotaDownloadFilename() + "." + propSource.getNowDateTimestamp();
+                dldFilePath = propSource.getIccrDownloadDir() + "/" + dldFileName + "." + propSource.getNowDateTimestamp();
 
                 // And will be copied to the IRI jar file name specified in the iotaDir and iotaStartCmd props:
                 iriJarFilePath = propSource.getIriJarFilePath();

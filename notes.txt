@@ -589,8 +589,29 @@ Automatic refresh of IPs to IRI:
 - on change parameter, stops, starts timer
 - if parameter is <= 0, doesn't run refresh
 
+checkin
+------------
+Thu: 12/15/2016
+
+Bumped version to 1.0.3-SNAPSHOT: ~/bin/changeMavenVersion.bash
+
+Merge iota dld link and filename to just dld link
+
+iccr.properties:
+Dropped iotaDownloadkFilename
+Changed iotaDownloadLink=http://188.138.57.93/IRI-1.1.1.1.jar
+
+checked in
+
+
 todo:
-Use async for long poll of iri log
+Add entry to iccr event log when a nbr is added or changed or removed
+
+There is a small problem with the IOTA log. . It saves all the output from the IRI as long as the IRI runs. ...
+Fix IRI log loading
+
+In future iri start should be "java -jar IRI.jar -p <port>", for now keep default "java -jar IRI.jar -p <port>"
+
 
 Create a install-icc script:
 cd /opt

@@ -30,7 +30,7 @@ Added self signed key store and trust store: iccr-ks.jks and iccr-ts.jks
 
 Fixed hardcoding of port number in iccr-ctl
 
-
+Added support for automatic refresh of configured neighbors to running IOTA application process. That process can be stopped by setting the Time To Refresh IPs paramter to 0 or -1.
 
 
 
