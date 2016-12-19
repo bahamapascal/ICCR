@@ -213,7 +213,7 @@ public class IccrServiceImpl implements IccrService {
         if(!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("updateIotaNbrsConfig");
+        System.out.println("updateIotaNbrsConfig:\n" + prop);
         Response.ResponseBuilder r;
 
         if(prop == null) {
@@ -247,7 +247,7 @@ public class IccrServiceImpl implements IccrService {
 
         boolean ok = true;
         try {
-            propSource.setIotaNeighbors(prop);
+            propSource.setIotaNeighborsConfig(prop);
 
             delegate.iccrPropSet(PropertySource.IOTA_NEIGHBORS_PROP);
 

@@ -66,6 +66,8 @@ public class PropertySource {
     private PropertiesConfiguration propWriter;
     private DateTimeFormatter ymdhmsFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
+    private final Object SET_SYNC_OBJ = new Object();
+
     private PropertySource() {
         System.out.println("new PropertySource");
 
@@ -205,8 +207,19 @@ public class PropertySource {
                 propWriter.save();
             }
             catch(Exception e) {
-                System.out.println("PropertySource exception saving PropertiesConfiguration: " + e.getLocalizedMessage());
+                System.out.println("PropertySource set prop exception saving PropertiesConfiguration: " + e.getLocalizedMessage());
             }
+    }
+
+    public void removeProperty(String key) {
+        props.remove(key);
+        propWriter.clearProperty(key);
+        try {
+            propWriter.save();
+        }
+        catch(Exception e) {
+            System.out.println("PropertySource remove prop exception saving PropertiesConfiguration: " + e.getLocalizedMessage());
+        }
     }
 
     public List<String> getPropertyKeys() {
@@ -293,44 +306,83 @@ public class PropertySource {
         return keys;
     }
 
-    public void setIotaNeighbors(IccrIotaNeighborsPropertyDto nbrs) {
-        String nbrKeys = nbrs.nbrKeys();
-        String id;
-        if(nbrs.getNbrs() != null) {
-            for (NeighborDto nbr : nbrs.getNbrs()) {
-                System.out.println("updated neighbor: " + nbr);
-                id = nbr.getKey();
-                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id, nbr.getKey());
-                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id, nbr.getUri());
-                if (nbr.getName() != null) {
-                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, nbr.getName());
+    public void setIotaNeighborsConfig(IccrIotaNeighborsPropertyDto nbrs) {
+        synchronized(SET_SYNC_OBJ) {
+            // First clear existing neighbors
+            clearNeighbors();
+
+            String nbrKeys = "";
+            String sep = "";
+            Properties seenKeys = new Properties();
+            String id;
+
+            if (nbrs.getNbrs() != null) {
+                for (NeighborDto nbr : nbrs.getNbrs()) {
+                    System.out.println("updated neighbor: " + nbr);
+                    id = nbr.getKey();
+                    if (seenKeys.containsKey(id)) {
+                        System.out.println("setIotaNeighborsConfig, ignoring duplicate nbr key: " + id);
+                        continue;
+                    }
+                    seenKeys.setProperty(id, "true");
+                    nbrKeys += sep + id;
+                    if (sep.isEmpty()) {
+                        sep = ",";
+                    }
+                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id, nbr.getKey());
+                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id, nbr.getUri());
+                    if (nbr.getName() != null) {
+                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, nbr.getName());
+                    }
+                    else {
+                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, "");
+                    }
+                    if (nbr.getDescr() != null) {
+                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescr());
+                    }
+                    else {
+                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, "");
+                    }
+                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id, String.valueOf(nbr.isActive()).toLowerCase());
                 }
-                if (nbr.getDescr() != null) {
-                    setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescr());
-                }
-                setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id, String.valueOf(nbr.isActive()).toLowerCase());
             }
+            System.out.println("Updated nbr keys: " + nbrKeys);
+            setProperty(IOTA_NEIGHBORS_PROP, nbrKeys);
         }
-        System.out.println("Updated nbr keys: " + nbrKeys);
-        setProperty(IOTA_NEIGHBORS_PROP, nbrKeys);
+    }
+
+    private void clearNeighbors() {
+        List<String> nbrKeys = getNeighborKeys();
+        for(String id : nbrKeys) {
+            deleteNeighborById(id);
+        }
+    }
+
+    private void deleteNeighborById(String id) {
+        removeProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id);
+        removeProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id);
+        removeProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id);
+        removeProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id);
+        removeProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id);
     }
 
     public IccrIotaNeighborsPropertyDto getIotaNeighbors() {
-        List<NeighborDto> nbrs = new ArrayList<>();
-        for(String id : getNeighborKeys()) {
-            try {
-                nbrs.add(new NeighborDto(
-                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id),
-                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id),
-                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id),
-                        getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
-                        getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id)));
+        synchronized(SET_SYNC_OBJ) {
+            List<NeighborDto> nbrs = new ArrayList<>();
+            for (String id : getNeighborKeys()) {
+                try {
+                    nbrs.add(new NeighborDto(
+                            getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".key." + id),
+                            getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".uri." + id),
+                            getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id),
+                            getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
+                            getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id)));
+                } catch (Exception e) {
+                    System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());
+                }
             }
-            catch(Exception e) {
-                System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());
-            }
+            return new IccrIotaNeighborsPropertyDto(PropertySource.IOTA_NEIGHBORS_PROP, nbrs);
         }
-        return new IccrIotaNeighborsPropertyDto(PropertySource.IOTA_NEIGHBORS_PROP, nbrs);
     }
 
 }

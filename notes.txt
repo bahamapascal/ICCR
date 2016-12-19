@@ -637,11 +637,18 @@ if lastFilePos < fileLen, immediate GET           fileSeek to lastFilePosition a
 else does wait and then GET?nl&lfp=X              => {lines=<numLines>, lfp=X}
 
 
+-------
+Sun: 12/18/2016
+
+Fixed removal of deleted neighbors.
+
+Add tailing of iccr event log and more from head operations
+
+Released version 1.0.3
+
+checked in
+
 todo:
-Add tailing of iccr event log
-
-Add new ui for show and tail iccr log
-
 Add entry to iccr event log when a nbr is added or changed or removed
 
 
