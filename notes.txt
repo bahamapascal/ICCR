@@ -603,12 +603,47 @@ Changed iotaDownloadLink=http://188.138.57.93/IRI-1.1.1.1.jar
 
 checked in
 
+Fix IRI log loading:
+- what is user's intent
+1) page through log lines from top
+- ui dialog opens, does GET /iota/log?numLines=500
+- svr returns 500 lines from top, lastLine# as header
+- ui does GET /iota/log?numLines=500&lineNum=<lastLineNum>
+2) tail log lines as operation, always getting most recent 
+- ui dialog opens, does POST /iota/log {numLines=500}
+- svr returns {tailId=X, lines=[], fileLen=Y}
+- ui does get /iota/log/{X}
+
+3) tail log lines as GET with query parameters, always getting most recent
+- ui dialog opens, does GET /iota/log?tail=true&numLines=500
+- svr returns lines[], lastPosition as header
+- ui repeats GET /iota/log?tail=true&numLines=500&lastPosition=Y
+
+go with #3:
+qp:
+nl=numLines
+lfp=lastFilePosition
+fd=fileDirection=tail or head, default is tail
+
+svr returns object:
+{
+lines=[],
+lfp=X,
+}
+
+UI:                                               SVR:
+GET?nl&lfp=null on dialog open                    fileSeeek to len-500 or top of file: => {lines=<numLines>, lfp=X}
+if lastFilePos < fileLen, immediate GET           fileSeek to lastFilePosition and return next 500: => {lines=<numLines>, lfp=X}
+else does wait and then GET?nl&lfp=X              => {lines=<numLines>, lfp=X}
+
 
 todo:
+Add tailing of iccr event log
+
+Add new ui for show and tail iccr log
+
 Add entry to iccr event log when a nbr is added or changed or removed
 
-There is a small problem with the IOTA log. . It saves all the output from the IRI as long as the IRI runs. ...
-Fix IRI log loading
 
 In future iri start should be "java -jar IRI.jar -p <port>", for now keep default "java -jar IRI.jar -p <port>"
 

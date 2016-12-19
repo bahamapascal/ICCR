@@ -397,17 +397,30 @@ public class IccrServiceImpl implements IccrService {
     }
 
     @Override
-    public Response getIotaLog(HttpServletRequest request) {
+    public Response getIotaLog(HttpServletRequest request,
+                               String fileDirection,
+                               Long numLines,
+                               Long lastFileLength,
+                               Long lastFilePosition) {
         if(!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("getIotaLog");
+        System.out.println("getIotaLog, fileDirection => " +
+                fileDirection + ", " +
+                "numLines => " + numLines + ", " +
+                "lastFilePosition => " + lastFilePosition);
+
         Response.ResponseBuilder r = null;
 
         try {
-            List<String> log = persistenceService.getIotaLog();
-            r = Response.status(HttpURLConnection.HTTP_OK);
-            r.entity(log);
+            LogLinesResponse resp = persistenceService.getIotaLog(fileDirection, lastFilePosition, lastFileLength, numLines);
+            if(resp.isSuccess()) {
+                r = Response.status(HttpURLConnection.HTTP_OK);
+            }
+            else {
+                r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR);
+            }
+            r.entity(resp);
         }
         catch(Exception e) {
             System.out.println("getIotaLog exception: ");

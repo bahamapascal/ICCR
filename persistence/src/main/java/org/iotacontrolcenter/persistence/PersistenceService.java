@@ -1,11 +1,13 @@
 package org.iotacontrolcenter.persistence;
 
 import org.apache.commons.io.FileUtils;
+import org.iotacontrolcenter.dto.LogLinesResponse;
 import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,8 @@ public class PersistenceService {
 
     private static final String ICCR_IOTA_EVENT_FILE = "iota-event.csv";
     private static final String IOTA_LOG_FILE = "console.log";
+    private static final String HEAD_DIRECTIVE = "head";
+    private static final String TAIL_DIRECTIVE = "tail";
 
     private Localizer localizer;
     private PropertySource propSource;
@@ -57,16 +61,126 @@ public class PersistenceService {
         iotaLogFilepath = propSource.getIotaAppDir() + "/" + IOTA_LOG_FILE;
     }
 
-    public List<String> getIotaLog() throws IOException {
-        File f = new File(iotaLogFilepath);
+    public LogLinesResponse getIotaLog(String fileDirection,
+                                       Long numLines,
+                                       Long lastFileLength,
+                                       Long lastFilePosition) throws IOException {
 
+        if(fileDirection == null || fileDirection.isEmpty()) {
+            return getAllIotaLogLines();
+        }
+        else if(fileDirection.equalsIgnoreCase(HEAD_DIRECTIVE)) {
+            return getIotaLogFromHead(numLines, lastFileLength, lastFilePosition);
+        }
+        else if(fileDirection.equalsIgnoreCase(TAIL_DIRECTIVE)) {
+            return getIotaLogFromTail(numLines, lastFileLength, lastFilePosition);
+        }
+        else {
+            System.out.println("Unrecognized file direction: " + fileDirection);
+            LogLinesResponse resp = new LogLinesResponse(false, "Unsupported fileDirection parameter: '" + fileDirection + "'");
+            return resp;
+        }
+    }
+
+    private LogLinesResponse getIotaLogFromHead(Long numLines,
+                                                Long lastFileLength,
+                                                Long lastFilePosition) throws IOException {
+
+        if(numLines == null) {
+            numLines = 500L;
+        }
+
+        LogLinesResponse resp = new LogLinesResponse();
+
+        File f = new File(iotaLogFilepath);
+        RandomAccessFile raf = new RandomAccessFile(f, "r");
+        long curFileLen = raf.length();
+
+        if(lastFileLength != null && lastFileLength == curFileLen) {
+            resp.setLastFilePosition(curFileLen);
+            resp.setLastFileSize(curFileLen);
+            raf.close();
+            return resp;
+        }
+
+        if(lastFilePosition != null && lastFilePosition > 0) {
+            if(lastFilePosition < curFileLen) {
+                raf.seek(lastFilePosition);
+            }
+        }
+
+        long lineNum = 0;
+        String curLine = null;
+        while(lineNum < numLines && (curLine = raf.readLine()) != null) {
+            lineNum++;
+            resp.addLine(curLine);
+        }
+        System.out.println("getIotaLogFromHead, read " + lineNum + " lines, " +
+                "lastFilePosition: " + raf.getFilePointer());
+        resp.setLastFilePosition(raf.getFilePointer());
+        resp.setLastFileSize(curFileLen);
+
+        raf.close();
+        return resp;
+    }
+
+    private LogLinesResponse getIotaLogFromTail(Long numLines,
+                                                Long lastFileLength,
+                                                Long lastFilePosition) throws IOException {
+        if(numLines == null) {
+            numLines = 500L;
+        }
+
+        LogLinesResponse resp = new LogLinesResponse();
+
+        File f = new File(iotaLogFilepath);
+        RandomAccessFile raf = new RandomAccessFile(f, "r");
+        long curFileLen = raf.length();
+
+        if(lastFileLength != null && lastFileLength == curFileLen) {
+            resp.setLastFilePosition(curFileLen);
+            resp.setLastFileSize(curFileLen);
+            raf.close();
+            return resp;
+        }
+
+        if(lastFilePosition != null && lastFilePosition > 0) {
+            if(lastFilePosition < curFileLen) {
+                raf.seek(lastFilePosition);
+            }
+        }
+
+        long lineNum = 0;
+        String curLine = null;
+        while(lineNum < numLines && (curLine = raf.readLine()) != null) {
+            lineNum++;
+            resp.addLine(curLine);
+        }
+        System.out.println("getIotaLogFromTail, read " + lineNum + " lines, " +
+                "lastFilePosition: " + raf.getFilePointer());
+
+        resp.setLastFilePosition(raf.getFilePointer());
+        resp.setLastFileSize(curFileLen);
+
+        raf.close();
+        return resp;
+    }
+
+    private LogLinesResponse getAllIotaLogLines() {
+        LogLinesResponse resp = new LogLinesResponse();
+
+        File f = new File(iotaLogFilepath);
         //if(f.exists()) {
         try {
-            return FileUtils.readLines(f);
+            resp.setLines(FileUtils.readLines(f));
+            resp.setLastFilePosition(f.length());
+            resp.setLastFileSize(f.length());
+        } catch (Exception e) {
+            resp.setSuccess(false);
+            resp.setMsg(e.getLocalizedMessage());
         }
-        catch(Exception e) {
-            return new ArrayList<>();
-        }
+
+        return resp;
     }
 
     public List<String> getEventLog() throws IOException {

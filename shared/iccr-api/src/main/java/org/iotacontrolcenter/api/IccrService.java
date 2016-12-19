@@ -80,5 +80,9 @@ public interface IccrService {
     @GET
     @Path("/iota/log")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getIotaLog(@Context HttpServletRequest request);
+    Response getIotaLog(@Context HttpServletRequest request,
+                        @QueryParam("fileDirection") String fileDirection,
+                        @QueryParam("numLines") Long numLines,
+                        @QueryParam("lastFileLength") Long lastFileLength,
+                        @QueryParam("lastFilePosition") Long lastFilePosition);
 }
