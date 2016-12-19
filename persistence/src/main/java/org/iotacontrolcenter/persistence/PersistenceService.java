@@ -108,6 +108,9 @@ public class PersistenceService {
                 raf.seek(lastFilePosition);
             }
         }
+        else {
+            raf.seek(0L);
+        }
 
         long lineNum = 0;
         String curLine = null;
@@ -148,6 +151,9 @@ public class PersistenceService {
             if(lastFilePosition < curFileLen) {
                 raf.seek(lastFilePosition);
             }
+        }
+        else {
+            raf.seek(0L);
         }
 
         long lineNum = 0;
