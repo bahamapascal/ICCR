@@ -32,6 +32,9 @@ public class PersistenceService {
     public static final String IOTA_REMOVE_NBRS_FAIL = "removeIotaNeighborsFail";
     public static final String IOTA_REMOVE_NBRS = "removeIotaNeighbors";
 
+    public static final String ICCR_RESTART = "restartIccr";
+    public static final String ICCR_RESTART_FAIL = "restartIccrFail";
+
     private static PersistenceService instance;
     private static Object SYNC_INST = new Object();
     public static PersistenceService getInstance() {

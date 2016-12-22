@@ -61,6 +61,13 @@ public interface IccrService {
     Response updateIotaNbrsConfig(@Context HttpServletRequest request, IccrIotaNeighborsPropertyDto nbrs);
 
     @POST
+    @Path("/iccr/cmd/{action}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    Response doIccrAction(@Context HttpServletRequest request,
+                          @DefaultValue("") @PathParam("action") String action, IccrPropertyListDto actionProps);
+
+    @POST
     @Path("/iota/cmd/{action}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

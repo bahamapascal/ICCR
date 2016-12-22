@@ -2,6 +2,7 @@ package org.iotacontrolcenter.rest.resource;
 
 import org.iotacontrolcenter.api.*;
 import org.iotacontrolcenter.dto.*;
+import org.iotacontrolcenter.iccr.agent.IccrAgent;
 import org.iotacontrolcenter.iota.agent.ActionFactory;
 import org.iotacontrolcenter.iota.agent.Agent;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
@@ -19,6 +20,7 @@ import java.util.List;
 public class IccrServiceImpl implements IccrService {
 
     private Agent agent = Agent.getInstance();
+    private IccrAgent iccrAgent = IccrAgent.getInstance();
     private Localizer localizer = Localizer.getInstance();
     private PropertySource propSource = PropertySource.getInstance();
     private PersistenceService persistenceService = PersistenceService.getInstance();
@@ -272,6 +274,47 @@ public class IccrServiceImpl implements IccrService {
                 System.out.println("updateIotaNbrsConfig add nbrs exception: ");
                 e.printStackTrace();
             }
+        }
+
+        return r.build();
+    }
+
+    @Override
+    public Response doIccrAction(HttpServletRequest request, String action, IccrPropertyListDto actionProps) {
+        if (!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        System.out.println("doIccrAction(" + action + ")");
+        Response.ResponseBuilder r;
+
+        try {
+            ActionResponse resp = iccrAgent.action(action, actionProps);
+            r = Response.status(HttpURLConnection.HTTP_OK);
+
+            delegate.iccrActionDone(action);
+
+            r.entity(resp);
+        }
+        catch(IllegalArgumentException iae) {
+            System.out.println("doIccrAction illegal arg error: " + iae.getMessage());
+            iae.printStackTrace();
+            // Message is already localized
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, iae.getMessage()));
+        }
+        catch(IllegalStateException ise) {
+            System.out.println("doIccrAction illegal state error: " + ise.getMessage());
+            ise.printStackTrace();
+            // Message is already localized
+
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                    entity(new SimpleResponse(false, ise.getMessage()));
+        }
+        catch(Exception e) {
+            System.out.println("doIccrAction server error: " + e.getMessage());
+            e.printStackTrace();
+            r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
 
         return r.build();

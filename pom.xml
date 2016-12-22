@@ -5,7 +5,7 @@
 
     <groupId>org.iotacontrolcenter</groupId>
     <artifactId>iccr-parent</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>ICCR Parent</name>
     <description>ICCR Parent</description>
@@ -15,7 +15,8 @@
 
       <version.gjson>2.3.1</version.gjson>
       <version.junit>4.12</version.junit>
-      <version.wildfly-swarm>2016.11.0</version.wildfly-swarm>
+      <!-- <version.wildfly-swarm>2016.11.0</version.wildfly-swarm>  -->
+      <version.wildfly-swarm>2016.12.1</version.wildfly-swarm>
       <version.apache-httpclient>4.5.2</version.apache-httpclient>
       <version.commons-io>2.4</version.commons-io>
       <version.commons-configuration>1.10</version.commons-configuration>
@@ -72,6 +73,18 @@
               <artifactId>gson</artifactId>
               <version>${version.gjson}</version>
             </dependency>
+            <!--
+            <dependency>
+              <groupId>org.jboss.logging</groupId>
+              <artifactId>jboss-logging</artifactId>
+              <version>3.3.0.Final</version>
+            </dependency>
+            <dependency>
+              <groupId>org.jboss.logmanager</groupId>
+              <artifactId>jboss-logmanager</artifactId>
+              <version>2.0.4.Final</version>
+              </dependency>
+             -->
             <dependency>
               <groupId>${iccr.group.id}</groupId>
               <artifactId>iccr-persistence</artifactId>

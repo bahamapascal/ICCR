@@ -101,6 +101,8 @@ start() {
     fi
     #jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber} -Dswarm.https.port=${iccrHttpsPortNumber}"
 
+    #jvm_env="${jvm_env} -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+
     iccrargs="${nossl} ${loglevel}"
 
     #ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}  ${iccrargs} "
@@ -112,6 +114,7 @@ start() {
     #${ICCR_START_CMD}
 
     #java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs}
+    #CP="-cp ${ICCR_LIB_DIR}"
     nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
 
     iccrPid=$!
@@ -151,6 +154,7 @@ status() {
 }
 
 restart() {
+    sleep 1
     stop
     sleep 5
     start
@@ -167,7 +171,7 @@ elif [ "${1}" = "restart" ]; then
 elif [ "${1}" = "start" ]; then
     start
 else
-    echo Unsupported command
+    echo Unsupported or missing command, supported commands are: stop, start, restart, status
 fi
 # Else what?
 

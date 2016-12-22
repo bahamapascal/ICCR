@@ -30,6 +30,8 @@ public abstract class OsProcess {
         propSource = PropertySource.getInstance();
     }
 
+    public String getCmd() { return getName(); }
+
     public String getName() {
         return name;
     }

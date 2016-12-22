@@ -646,10 +646,73 @@ Add tailing of iccr event log and more from head operations
 
 Released version 1.0.3
 
+mvn clean install
+edit ./release-iccr.bash
+sudo ./release-iccr.bash
+./deploy-iccr.bash
+
+
+
+checked in
+
+uploaded
+
+bumped to 1.0.4-SNAPSHOT
+
+---------------
+Wed: 12/21/2016
+
+4) B2: When changing the IOTA Port to a custom port number, ICCJ will not be able to get the Neighbors and node info any more. This means that the localhost port number the ICCR uses to make the API calls to the IRI needs to be a variable equal to the user defined port number.
+In my last email, regarding version 1.0.2 I sad it would be best if we removed the "IOTA Port" Input field, so that the port number would just be included in the "IOTA Start Command" Input field. But as this issue shows, we probably need the "IOTA Port" Input field to stay, to set the port variable for the API calls...
+What are your thoughts on this?
+
+5) B3 When changing the ICCR port number, it requires the ICCR to restart for changes to take affect. Can the ICCR restart command be invoked on change of the ICCR port number?
+Else, a message notifying the user that a restart of ICCR is required for ICCR port changes to take affect would be good.
+
+
+-----------
+Thu: 12/22/2016
+
+
+done:
+B3 changing iccr port number, requires an iccr restart:
+New REST api: POST /iccr/rs/iccr/cmd/{action}  optional payload: IccrPropertyListDto
+New REST impl: doIccrAction
+New IccrAgent
+New IccrAction interface
+New IccrActionFactory
+New AbstractIccrAction
+New RestartIccrAction, add action log lines
+New IccrRestartProcess
+New restarticcr.bash script, calls iccr-ctl restart in bkground
+New Message localize strings:
+restartIccr=restart ICCR
+restartIccrFail=ICCR restart failed
+
+Test iccr/lib/icc as place to import icc war contents without a web.xml: yes works, web.xml not needed
+
 checked in
 
 todo:
+B2 reinstate iota port number
+
+Add stop iccr action and worker
+
 Add entry to iccr event log when a nbr is added or changed or removed
+
+Setup logging fraction in main with periodic rotating:
+      https://wildfly-swarm.gitbooks.io/wildfly-swarm-users-guide/content/common/logging.html
+      https://wildfly-swarm.github.io/wildfly-swarm-javadocs/2017.1.0-SNAPSHOT/apidocs/org/wildfly/swarm/config/logging/package-summary.html
+      http://stackoverflow.com/questions/40657889/log-levels-configuration-with-wildfly-swarm
+
+Setup swagger fraction:
+      https://github.com/wildfly-swarm/wildfly-swarm-examples/tree/master/jaxrs/swagger
+
+Misc:
+      https://github.com/myfear/WildFlySwarmDockerSample/blob/master/pom.xml
+
+CORS example under here:
+     https://github.com/wildfly-swarm/wildfly-swarm-examples/tree/master/jaxrs/swagger/src/main/java/org/wildfly/swarm/examples/jaxrs/swagger
 
 
 In future iri start should be "java -jar IRI.jar -p <port>", for now keep default "java -jar IRI.jar -p <port>"
@@ -672,13 +735,6 @@ Process for restart iccr
 Shutdown hook
 
 Finish changelog
-
-Set version to 1.0.1
-Create patch pkg
-Create new release  pkg
-Upload to g drive
-Msg Pascal
-
 
 us 6 iccr iota get install info
 rest api: get rs/iota/installinfo

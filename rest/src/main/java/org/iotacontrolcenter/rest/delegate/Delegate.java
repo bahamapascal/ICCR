@@ -1,6 +1,7 @@
 package org.iotacontrolcenter.rest.delegate;
 
 
+import org.iotacontrolcenter.iccr.agent.IccrActionFactory;
 import org.iotacontrolcenter.iota.agent.ActionFactory;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
@@ -34,6 +35,17 @@ public class Delegate {
         else if(action.equals(ActionFactory.START)) {
             startNeighborRefresh();
         }
+    }
+
+    public synchronized  void iccrActionDone(String action) {
+        if(action.equals(IccrActionFactory.RESTART)) {
+            //startNeighborRefresh();
+        }
+        /*
+        else if(action.equals(IccrActionFactory.STOP)) {
+            //stopNeighborRefresh();
+        }
+        */
     }
 
     public synchronized  void iccrPropSet(String prop) {
