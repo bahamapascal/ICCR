@@ -448,9 +448,9 @@ public class IccrServiceImpl implements IccrService {
         if(!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("getIotaLog, fileDirection => " +
-                fileDirection + ", " +
+        System.out.println("getIotaLog, fileDirection => " + fileDirection + ", " +
                 "numLines => " + numLines + ", " +
+                "lastFileLength => " + lastFileLength + ", " +
                 "lastFilePosition => " + lastFilePosition);
 
         Response.ResponseBuilder r = null;

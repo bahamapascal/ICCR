@@ -61,6 +61,7 @@ public class PropertySource {
     private String dataDir;
     private String dldDir;
     private String iccrDir;
+    private String logDir;
     private String osName;
     private String tmpDir;
     private PropertiesConfiguration propWriter;
@@ -87,7 +88,7 @@ public class PropertySource {
         dldDir = iccrDir + "/download";
         dataDir = iccrDir + "/data";
         tmpDir = iccrDir + "/tmp";
-
+        logDir = iccrDir + "/logs";
 
         confFile = confDir + "/" + CONF_FILE;
 
@@ -160,6 +161,10 @@ public class PropertySource {
 
     public String getIccrBinDir() {
         return binDir;
+    }
+
+    public String getIccrLogDir() {
+        return logDir;
     }
 
     public String getIccrConfDir() {

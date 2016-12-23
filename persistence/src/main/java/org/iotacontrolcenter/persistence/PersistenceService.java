@@ -47,6 +47,7 @@ public class PersistenceService {
     }
 
     private static final String ICCR_IOTA_EVENT_FILE = "iota-event.csv";
+    private static final String ICCR_LOG_FILE = "iccr.log";
     private static final String IOTA_LOG_FILE = "console.log";
     private static final String HEAD_DIRECTIVE = "head";
     private static final String TAIL_DIRECTIVE = "tail";
@@ -55,6 +56,7 @@ public class PersistenceService {
     private PropertySource propSource;
     private String iccrEventFilepath;
     private String iotaLogFilepath;
+    private String iccrLogFilepath;
 
     private PersistenceService() {
         System.out.println("new PersistenceService");
@@ -62,21 +64,24 @@ public class PersistenceService {
         localizer = Localizer.getInstance();
         iccrEventFilepath = propSource.getIccrDataDir() + "/" + ICCR_IOTA_EVENT_FILE;
         iotaLogFilepath = propSource.getIotaAppDir() + "/" + IOTA_LOG_FILE;
+        iccrLogFilepath = propSource.getIccrLogDir() + "/" + ICCR_LOG_FILE;
+
+        //iotaLogFilepath = iccrLogFilepath;
     }
 
     public LogLinesResponse getIotaLog(String fileDirection,
-                                       Long numLines,
+                                       Long lastFilePosition,
                                        Long lastFileLength,
-                                       Long lastFilePosition) throws IOException {
+                                       Long numLines) throws IOException {
 
         if(fileDirection == null || fileDirection.isEmpty()) {
             return getAllIotaLogLines();
         }
         else if(fileDirection.equalsIgnoreCase(HEAD_DIRECTIVE)) {
-            return getIotaLogFromHead(numLines, lastFileLength, lastFilePosition);
+            return getIotaLogFromHead(lastFilePosition, lastFileLength, numLines);
         }
         else if(fileDirection.equalsIgnoreCase(TAIL_DIRECTIVE)) {
-            return getIotaLogFromTail(numLines, lastFileLength, lastFilePosition);
+            return getIotaLogFromTail(lastFilePosition, lastFileLength, numLines);
         }
         else {
             System.out.println("Unrecognized file direction: " + fileDirection);
@@ -85,9 +90,11 @@ public class PersistenceService {
         }
     }
 
-    private LogLinesResponse getIotaLogFromHead(Long numLines,
-                                                Long lastFileLength,
-                                                Long lastFilePosition) throws IOException {
+    private LogLinesResponse getIotaLogFromHead(Long lastFilePosition, Long lastFileLength, Long numLines) throws IOException {
+
+        System.out.println("getIotaLogFromHead lastFilePosition: "  + lastFilePosition +
+                ", lastFileLength: "  + lastFileLength +
+                ", numLines: "  + numLines);
 
         if(numLines == null) {
             numLines = 500L;
@@ -99,15 +106,19 @@ public class PersistenceService {
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         long curFileLen = raf.length();
 
+        System.out.println("getIotaLogFromHead curFileLen: " + curFileLen);
+
+        /*
         if(lastFileLength != null && lastFileLength == curFileLen) {
             resp.setLastFilePosition(curFileLen);
             resp.setLastFileSize(curFileLen);
             raf.close();
             return resp;
         }
+        */
 
         if(lastFilePosition != null && lastFilePosition > 0) {
-            if(lastFilePosition < curFileLen) {
+            if(lastFilePosition <= curFileLen) {
                 raf.seek(lastFilePosition);
             }
         }
@@ -121,8 +132,9 @@ public class PersistenceService {
             lineNum++;
             resp.addLine(curLine);
         }
-        System.out.println("getIotaLogFromHead, read " + lineNum + " lines, " +
-                "lastFilePosition: " + raf.getFilePointer());
+        System.out.println("getIotaLogFromHead, read " + lineNum + " lines" +
+                ", curFileLength: " + curFileLen +
+                ", lastFilePosition: " + raf.getFilePointer());
         resp.setLastFilePosition(raf.getFilePointer());
         resp.setLastFileSize(curFileLen);
 
@@ -130,9 +142,12 @@ public class PersistenceService {
         return resp;
     }
 
-    private LogLinesResponse getIotaLogFromTail(Long numLines,
-                                                Long lastFileLength,
-                                                Long lastFilePosition) throws IOException {
+    private LogLinesResponse getIotaLogFromTail(Long lastFilePosition, Long lastFileLength, Long numLines) throws IOException {
+
+        System.out.println("getIotaLogFromTail lastFilePosition: "  + lastFilePosition +
+                ", lastFileLength: "  + lastFileLength +
+                ", numLines: "  + numLines);
+
         if(numLines == null) {
             numLines = 500L;
         }
@@ -143,20 +158,35 @@ public class PersistenceService {
         RandomAccessFile raf = new RandomAccessFile(f, "r");
         long curFileLen = raf.length();
 
+        System.out.println("getIotaLogFromTail curFileLen: " + curFileLen);
+
+        /*
         if(lastFileLength != null && lastFileLength == curFileLen) {
             resp.setLastFilePosition(curFileLen);
             resp.setLastFileSize(curFileLen);
             raf.close();
             return resp;
         }
+        */
 
-        if(lastFilePosition != null && lastFilePosition > 0) {
-            if(lastFilePosition < curFileLen) {
+
+        // On first query lastFilePosition will be null, but no easy way to determine the desired number
+        // of lines backward from bottom of file:
+        long firstSeekPosition = 0L;
+        long firstSeekOffset = 0L;
+        if(lastFilePosition == null) {
+            firstSeekOffset = numLines * 132;
+            firstSeekPosition = curFileLen - firstSeekOffset;
+            if(firstSeekPosition < 0) {
+                firstSeekPosition = 0L;
+            }
+            System.out.println("first seek offset: " + firstSeekOffset + ", first seek position: " + firstSeekPosition);
+            raf.seek(firstSeekPosition);
+        }
+        else if(lastFilePosition != null && lastFilePosition > 0) {
+            if(lastFilePosition <= curFileLen) {
                 raf.seek(lastFilePosition);
             }
-        }
-        else {
-            raf.seek(0L);
         }
 
         long lineNum = 0;
@@ -165,8 +195,36 @@ public class PersistenceService {
             lineNum++;
             resp.addLine(curLine);
         }
-        System.out.println("getIotaLogFromTail, read " + lineNum + " lines, " +
-                "lastFilePosition: " + raf.getFilePointer());
+
+        // On first time through, try to correct if we got it badly wrong:
+        if(lastFilePosition ==  null) {
+
+            System.out.println("getIotaLogFromTail, first tail query, read " + lineNum + " lines, " +
+                    ", fileLength: " + curFileLen +
+                    ", lastFilePosition: " + raf.getFilePointer());
+
+            if(lineNum != numLines && firstSeekPosition > 0) {
+                System.out.println("getIotaLogFromTail, first tail query, correcting seek offset");
+                firstSeekOffset =  (firstSeekOffset / lineNum) * numLines;
+                firstSeekPosition = curFileLen - firstSeekOffset;
+                if(firstSeekPosition < 0) {
+                    firstSeekPosition = 0L;
+                }
+                System.out.println("corrected first seek offset: " + firstSeekOffset + ", first seek position: " + firstSeekPosition);
+                raf.seek(firstSeekPosition);
+                lineNum = 0;
+                curLine = null;
+                resp.getLines().clear();
+                while(lineNum < numLines && (curLine = raf.readLine()) != null) {
+                    lineNum++;
+                    resp.addLine(curLine);
+                }
+            }
+        }
+
+        System.out.println("getIotaLogFromTail, read " + lineNum + " lines" +
+                ", fileLength: " + curFileLen +
+                ", lastFilePosition: " + raf.getFilePointer());
 
         resp.setLastFilePosition(raf.getFilePointer());
         resp.setLastFileSize(curFileLen);

@@ -692,10 +692,19 @@ restartIccrFail=ICCR restart failed
 Test iccr/lib/icc as place to import icc war contents without a web.xml: yes works, web.xml not needed
 
 checked in
+-----------
+Fri: 12/23/2016
+
+Fixed iota log file reader
+
+working
+Fixed log file reader head, keeps returning same block on each add
+
+Fixed log file reader tail on first query, it will seek to and try to get right number of lines
+
+checked in
 
 todo:
-B2 reinstate iota port number
-
 Add stop iccr action and worker
 
 Add entry to iccr event log when a nbr is added or changed or removed
