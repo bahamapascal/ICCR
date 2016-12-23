@@ -5,7 +5,7 @@
 
     <groupId>org.iotacontrolcenter</groupId>
     <artifactId>iccr-parent</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>pom</packaging>
     <name>ICCR Parent</name>
     <description>ICCR Parent</description>

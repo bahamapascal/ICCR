@@ -704,6 +704,10 @@ Fixed log file reader tail on first query, it will seek to and try to get right 
 
 checked in
 
+Bumped version to 1.0.4
+
+checked in
+
 todo:
 Add stop iccr action and worker
 
