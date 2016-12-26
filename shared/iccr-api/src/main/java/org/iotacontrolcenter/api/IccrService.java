@@ -15,6 +15,17 @@ import org.iotacontrolcenter.dto.*;
 public interface IccrService {
 
     @GET
+    @Path("/icc/languages")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getIccLanguageChoices(@Context HttpServletRequest request);
+
+    @GET
+    @Path("/icc/languages/{key}")
+    @Produces(MediaType.APPLICATION_JSON)
+    Response getIccLanguageProperties(@Context HttpServletRequest request,
+                                      @DefaultValue("") @PathParam("key") String key);
+
+    @GET
     @Path("/app/eventlog")
     @Produces(MediaType.APPLICATION_JSON)
     Response getIccrEventLog(@Context HttpServletRequest request);

@@ -33,5 +33,14 @@ Fixed hardcoding of port number in iccr-ctl
 Added support for automatic refresh of configured neighbors to running IOTA application process. That process can be stopped by setting the Time To Refresh IPs paramter to 0 or -1.
 
 
+-----------------------------
+Version 1.0.4
+Delivered Friday 12/23/2016
 
+Added support for an ICCR restart command:
+      New REST api: POST /iccr/rs/iccr/cmd/restart
+
+Fixed iota log file reader operations.
+
+Fixed issue where the iota neighbors were sometimes not being added to IRI when iccr was told to start IOTA. The workaround would be to do a save of neighbors from the ICC UI to add neighbors. The problem was that sometimes the IRI would take a longer time than expected to spin up.
 

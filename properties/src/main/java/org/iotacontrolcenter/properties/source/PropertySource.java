@@ -46,12 +46,17 @@ public class PropertySource {
     public static final String IOTA_DLD_LINK_PROP="iotaDownloadLink";
 
     public static final String IOTA_APP_DIR_PROP = "iotaDir";
-    public static final String IOTA_START_PROP="iotaStartCmd";
-    public static final String IOTA_PORT_NUMBER_PROP="iotaPortNumber";
+    public static final String IOTA_START_PROP = "iotaStartCmd";
+    public static final String IOTA_PORT_NUMBER_PROP = "iotaPortNumber";
 
-    public static final String IOTA_NBR_REFRESH_TIME_PROP="iotaNeighborRefreshTime";
-    public static final String IOTA_NEIGHBORS_PROP="iotaNeighbors";
-    public static final String IOTA_NEIGHBOR_PROP_PREFIX="iotaNeighbor";
+    public static final String IOTA_NBR_REFRESH_TIME_PROP = "iotaNeighborRefreshTime";
+    public static final String IOTA_NEIGHBORS_PROP = "iotaNeighbors";
+    public static final String IOTA_NEIGHBOR_PROP_PREFIX = "iotaNeighbor";
+
+    public static final String ICCW_LANGUAGES_PROP = "iccwlanguages";
+    public static final String ICCW_LANG_PREFIX = "iccwlanguage.";
+    // The iccw localization properties are in files named: iccw_MessagesBundle_en.properties
+    public static final String ICCW_LANG_FILE_PREFIX="iccw_MessagesBundle_";
 
     private Properties props;
     private String bakDir;
@@ -259,6 +264,39 @@ public class PropertySource {
 
     public List<String> getNeighborKeys() {
         return getList(IOTA_NEIGHBORS_PROP);
+    }
+
+    public List<String> getIccwLanguageKeys() {
+        return getList(ICCW_LANGUAGES_PROP);
+    }
+
+    public String getIccwLanguageProperty(String k) {
+        return getString(ICCW_LANG_PREFIX + k);
+    }
+
+    public Properties getIccwLanguageChoices() {
+        Properties props = new Properties();
+        for(String k : getIccwLanguageKeys()) {
+            props.setProperty(k, getString(ICCW_LANG_PREFIX + k));
+        }
+        return props;
+    }
+
+    public Properties getIccwLanguageProperties(String key) {
+        String langFile = confDir + "/" + ICCW_LANG_FILE_PREFIX + key + ".properties";
+        System.out.println("getIccwLanguageProperties: loading langFile: " + langFile);
+
+        Properties props = new Properties();
+        try {
+            InputStream is = new FileInputStream(langFile);
+            props.load(is);
+        }
+        catch(Exception e) {
+            System.out.println("getIccwLanguageProperties: failed to load language localization properties from " + langFile);
+            e.printStackTrace();
+            throw new IllegalStateException("Failed to load " + key + " language localization properties");
+        }
+        return props;
     }
 
     public String getString(String key) {

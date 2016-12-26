@@ -77,7 +77,6 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         }
 
         if(rval) {
-
             // Pause for a sec to let it spin up
             try {
                 Thread.sleep(2000);
@@ -85,8 +84,16 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
             catch(Exception e) {
             }
 
-            if(!addNeighbors()) {
-                System.out.println("Failed to add neighbors");
+            boolean ok = addNeighbors();
+            int nbrTry = 0;
+            while(!ok && nbrTry++ < 5) {
+                System.out.println("Failed to add neighbors, trying again...");
+                try {
+                    Thread.sleep(2000);
+                }
+                catch(Exception e) {
+                }
+                ok = addNeighbors();
             }
         }
 

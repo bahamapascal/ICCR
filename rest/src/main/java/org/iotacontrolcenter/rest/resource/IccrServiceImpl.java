@@ -16,6 +16,7 @@ import javax.swing.*;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.util.List;
+import java.util.Properties;
 
 public class IccrServiceImpl implements IccrService {
 
@@ -31,11 +32,48 @@ public class IccrServiceImpl implements IccrService {
     }
 
     @Override
+    public Response getIccLanguageChoices(HttpServletRequest request) {
+        if(!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        Response.ResponseBuilder r = null;
+        IccrPropertyListDto propList = new IccrPropertyListDto();
+        for(String k : propSource.getIccwLanguageKeys()) {
+            propList.addProperty(new IccrPropertyDto(k, propSource.getIccwLanguageProperty(k)));
+        }
+        r = Response.status(HttpURLConnection.HTTP_OK);
+        r.entity(propList);
+        return r.build();
+    }
+
+    @Override
+    public Response getIccLanguageProperties(HttpServletRequest request, String key) {
+        if(!authorizedRequest(request)) {
+            return unauthorizedResponse(request);
+        }
+        Response.ResponseBuilder r = null;
+
+        if(key == null || key.isEmpty()) {
+            r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
+                entity(new SimpleResponse(false, localizer.getLocalText("invalidRequestNoKey")));
+            return r.build();
+        }
+
+        IccrPropertyListDto propList = new IccrPropertyListDto();
+        Properties props = propSource.getIccwLanguageProperties(key);
+        for(Object k : props.keySet()) {
+            propList.addProperty(new IccrPropertyDto((String)k, props.getProperty((String)k)));
+        }
+        r = Response.status(HttpURLConnection.HTTP_OK);
+        r.entity(propList);
+        return r.build();
+    }
+
+    @Override
     public Response getIccrEventLog(HttpServletRequest request) {
         if(!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("getIccrEventLog");
         Response.ResponseBuilder r = null;
 
         try {
@@ -88,7 +126,6 @@ public class IccrServiceImpl implements IccrService {
         for(String key : propSource.getPropertyKeys()) {
             propList.addProperty(new IccrPropertyDto(key, propSource.getString(key)));
         }
-        //propList.addProperty(propSource.getIotaNeighbors());
         r.entity(propList);
         return r.build();
     }
