@@ -1,32 +1,80 @@
 #!/bin/bash
 
-#version=1.0.3
+if [ -z "${1}" ]; then
+    echo "Pass version user  and group on command line"
+    echo You are:
+    id
+    exit
+fi
+
+if [ -z "${2}" ]; then
+    echo "Pass version user  and group on command line"
+    echo You are:
+    id
+    exit
+fi
+
+if [ -z "${3}" ]; then
+    echo "Pass version user  and group on command line"
+    echo You are:
+    id
+    exit
+fi
+
 version=$1
+user=$2
+group=$3
+dir=/opt
+iccrdir=$dir/iccr
+dist=~/projects/dist
 
-rm -rf /opt/iccr-pre-${version} > /dev/null 2>&1 
+if [ -d $dir/iccr-pre-${version} ]; then
+    rm -rf $dir/iccr-pre-${version} > /dev/null 2>&1
+fi
 
-mv /opt/iccr /opt/iccr-pre-${version}
-mkdir /opt/iccr
-mkdir /opt/iccr/bak
-mkdir /opt/iccr/bin
-mkdir /opt/iccr/conf
-mkdir /opt/iccr/data
-mkdir /opt/iccr/download
-mkdir /opt/iccr/lib
-mkdir /opt/iccr/logs
-mkdir /opt/iccr/tmp
-chown -R dana:dana /opt/iccr
+if [ ! -d $dir ]; then
+    sudo mkdir $dir
+    sudo chown $user:$group $dir
+fi
+
+if [ -d $iccrdir ]; then
+    mv $iccrdir $dir/iccr-pre-${version}
+fi
+
+
+if [ ! -d $iccrdir ]; then
+    sudo mkdir $iccrdir
+    sudo chown $user:$group $iccrdir
+    mkdir $iccrdir/bak
+    mkdir $iccrdir/bin
+    mkdir $iccrdir/conf
+    mkdir $iccrdir/data
+    mkdir $iccrdir/download
+    mkdir $iccrdir/lib
+    mkdir $iccrdir/logs
+    mkdir $iccrdir/tmp
+fi
+
 ./deploy-iccr.bash
 
-#cp changelog.txt ~/projects/dist/icc-${version}-changelog.txt
+if [ ! -d $dist ]; then
+    mkdir $dist
+fi
 
-cd /opt
-rm -f ~/projects/dist/iccr-${version}.tgz  > /dev/null 2>&1
-tar -czf ~/projects/dist/iccr-${version}.tgz iccr
+#cp changelog.txt $dist/icc-${version}-changelog.txt
 
+cd $dir
+
+rm -f $dist/iccr-${version}.tgz  > /dev/null 2>&1
+
+tar -czf $dist/iccr-${version}.tgz iccr
 
 # for immediate testing:
-rm -rf iccr-${version}-dist > /dev/null 2>&1 
+rm -rf iccr-${version}-dist > /dev/null 2>&1
+
 mv iccr iccr-${version}-dist
-tar -xzf ~/projects/dist/iccr-${version}.tgz
-chown -R dana:dana iccr
+
+tar -xzf $dist/iccr-${version}.tgz
+
+sudo chown -R $user:$group iccr
+

@@ -718,6 +718,13 @@ Bumped to 1.0.5-SNAPSHOT
 
 checked in
 
+-------------
+Tue: 12/27/2016
+
+Adjusted deploy and install scripts for sudo and user and group
+
+Fix the iccr-ctl script to run on mac (ps fails)
+Fix the iota start/stop script to run on mac (ps fails)
 
 todo:
 Add stop iccr action and worker
