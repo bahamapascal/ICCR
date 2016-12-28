@@ -10,7 +10,7 @@ public class NeighborDto {
     private String uri;
     private int numAt = 0;
     private int numIt = 0;
-    private int numNt =0;
+    private int numNt = 0;
 
     public NeighborDto() {
     }

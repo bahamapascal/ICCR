@@ -20,11 +20,11 @@ export WHAT_APP=ICCR
 export JAR_CHUNK="${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
 export PORTNUM_PROP=iccrPortNumber
 
-mac=false
-darwin=`uname | grep -i darwin`
-if [ $darwin = "Darwin" ]; then
-    mac=true
-fi
+#mac=false
+#darwin=`uname | grep -i darwin`
+#if [ $darwin = "Darwin" ]; then
+#    mac=true
+#fi
 
 cd $ICCR_DIR
 
@@ -57,11 +57,7 @@ stop() {
 
         return $statusCode
     else
-	if $mac; then
-            rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
-	else
-            rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
-	fi
+        rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
 
         statusCode=$?
 
@@ -80,11 +76,7 @@ start() {
     if [ -f $ICCR_PID_FILE ]; then
         iccrPid=`cat $ICCR_PID_FILE`
 
-	if $mac; then
-            rval=`ps -fax | grep ${iccrPid} | grep -v grep`
-	else
-	    rval=`ps fax | grep ${iccrPid} | grep -v grep`
-	fi
+        rval=`ps -fax | grep ${iccrPid} | grep -v grep`
 
         statusCode=$?
 
@@ -93,11 +85,7 @@ start() {
             return 0
         fi
     else
-	if $mac; then
-            rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
-	else
-	    rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
-	fi
+        rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
 
         statusCode=$?
 
@@ -148,11 +136,7 @@ status() {
     if [ -f $ICCR_PID_FILE ]; then
         iccrPid=`cat $ICCR_PID_FILE`
 
-	if $mac; then
-            rval=`ps -fax | grep ${iccrPid} | grep -v grep`
-	else
-	    rval=`ps fax | grep ${iccrPid} | grep -v grep`
-	fi
+        rval=`ps -fax | grep ${iccrPid} | grep -v grep`
 
         statusCode=$?
 
@@ -162,11 +146,7 @@ status() {
             echo "${WHAT_APP} is not alive, PID was ${iccrPid}"
         fi
     else
-	if $mac; then
-            rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
-	else
-	    rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
-	fi
+        rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
 
         statusCode=$?
 
