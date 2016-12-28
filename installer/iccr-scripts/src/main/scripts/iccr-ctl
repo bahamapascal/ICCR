@@ -20,6 +20,12 @@ export WHAT_APP=ICCR
 export JAR_CHUNK="${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
 export PORTNUM_PROP=iccrPortNumber
 
+mac=false
+darwin=`uname | grep -i darwin`
+if [ $darwin = "Darwin" ]; then
+    mac=true
+fi
+
 cd $ICCR_DIR
 
 # for start:
@@ -51,7 +57,11 @@ stop() {
 
         return $statusCode
     else
-        rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+	if $mac; then
+            rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+	else
+            rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+	fi
 
         statusCode=$?
 
@@ -70,7 +80,11 @@ start() {
     if [ -f $ICCR_PID_FILE ]; then
         iccrPid=`cat $ICCR_PID_FILE`
 
-        rval=`ps fax | grep ${iccrPid} | grep -v grep`
+	if $mac; then
+            rval=`ps -fax | grep ${iccrPid} | grep -v grep`
+	else
+	    rval=`ps fax | grep ${iccrPid} | grep -v grep`
+	fi
 
         statusCode=$?
 
@@ -79,7 +93,11 @@ start() {
             return 0
         fi
     else
-        rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
+	if $mac; then
+            rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
+	else
+	    rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep | cut -f1 -d' '`
+	fi
 
         statusCode=$?
 
@@ -130,7 +148,11 @@ status() {
     if [ -f $ICCR_PID_FILE ]; then
         iccrPid=`cat $ICCR_PID_FILE`
 
-        rval=`ps fax | grep ${iccrPid} | grep -v grep`
+	if $mac; then
+            rval=`ps -fax | grep ${iccrPid} | grep -v grep`
+	else
+	    rval=`ps fax | grep ${iccrPid} | grep -v grep`
+	fi
 
         statusCode=$?
 
@@ -140,7 +162,11 @@ status() {
             echo "${WHAT_APP} is not alive, PID was ${iccrPid}"
         fi
     else
-        rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+	if $mac; then
+            rval=`ps -fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+	else
+	    rval=`ps fax | grep ${JAR_CHUNK} | grep -v grep  | cut -f1 -d' '`
+	fi
 
         statusCode=$?
 
