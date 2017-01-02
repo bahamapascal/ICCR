@@ -111,10 +111,13 @@ public class Main {
         swarm.deploy(iccrWar);
 
         //logger.info("Deploying ICC WAR...");
-        WARArchive iccWar = ShrinkWrap.create(WARArchive.class);
-        iccWar.as(ExplodedImporter.class).importDirectory(new File(propertySource.getIccrDir() + "/lib/icc"));
-        iccWar.setContextRoot("icc");
-        swarm.deploy(iccWar);
+        File iccSrcdir = new File(propertySource.getIccrDir() + "/lib/icc");
+        if(iccSrcdir.exists()) {
+            WARArchive iccWar = ShrinkWrap.create(WARArchive.class);
+            iccWar.as(ExplodedImporter.class).importDirectory(iccSrcdir);
+            iccWar.setContextRoot("icc");
+            swarm.deploy(iccWar);
+        }
 
         //logger.info("Done...");
     }
