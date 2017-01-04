@@ -2,18 +2,20 @@
 
 ICC_PROD_DIR=~/projects/extjs/iccw/build/production/icc
 
-if [ -z "${1}" ]; then
-    echo "Pass user and group on command line"
-    echo You are:
-    id
-    exit
-fi
+if [ ! -d $dir ]; then
+    if [ -z "${1}" ]; then
+        echo "For initial deploy, pass user and group on command line"
+        echo You are:
+        id
+        exit
+    fi
 
-if [ -z "${2}" ]; then
-    echo "Pass user and group on command line"
-    echo You are:
-    id
-    exit
+    if [ -z "${2}" ]; then
+        echo "For initial deploy, pass user and group on command line"
+        echo You are:
+        id
+        exit
+    fi
 fi
 
 user=$1

@@ -726,6 +726,13 @@ Adjusted deploy and install scripts for sudo and user and group
 Fix the iccr-ctl script to run on mac (ps fails)
 Fix the iota start/stop script to run on mac (ps fails)
 
+----------------------
+Tue: 1/3/2013
+
+Changed version to 1.0.5
+
+checked in
+
 todo:
 Add stop iccr action and worker
 
