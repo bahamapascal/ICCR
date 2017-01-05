@@ -12,8 +12,8 @@ curDir=`pwd`
 what=ICCR
 doesYum=0
 doesApt=0
-hasJava=0
-hasRightJava=0
+hasJava=1
+hasRightJava=1
 requiredJavaVersion=1.8
 doWhat=install
 
@@ -47,13 +47,13 @@ fi
 if [ "${hasJava}" = "1" ]; then
     set -- $(java -fullversion 2>&1 | sed -e 's/\"//g')
     curJavaVersion=$4
-    todo
-    echo $1 $2 $3 $4
-    if [ "${curJavaVersion}" != "${requiredJavaVersion}" ]; then
-        hasRightJava=0
-    else
-        hasRightJava=1
-    fi
+    echo
+    echo Found java version $curJavaVersion
+    echo
+
+    hasRightJava=0
+
+    [[ ${curJavaVersion} == ${requiredJavaVersion}* ]] && hasRightJava=1
 fi
 
 which=`which yum`
@@ -67,6 +67,8 @@ else
         doesApt=1
     fi
 fi
+
+echo "hasJava $hasJava, hasRightJava $hasRightJava"
 
 if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
     if [ "${hasJava}" = "0" ]; then
@@ -121,21 +123,28 @@ if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
         doWhat=upgrade
     fi
 
-    if [ "${installJava}" = "Y" -o "${upgradeJava}" = "Y" ]; then
+    if [ "${installJava}" != "n" -a "${upgradeJava}" != "n" ]; then
        echo
        echo "Ok, attempting to $doWhat java..."
        echo
        if [ "${doesApt}" = "1" ]; then
-           if [ "${installJava}" = "Y" ]; then
+           if [ "${doWhat}" = "install" ]; then
                echo "sudo apt-get install java"
            else
                echo "sudo apt-get upgrade java"
            fi
        else
            if [ "${doesYum}" = "1" ]; then
-               echo "sudo yum install java"
+               if [ "${doWhat}" = "install" ]; then
+                   echo "sudo yum install java"
+               else
+                   echo "sudo yum upgrade java"
+               fi
            fi
        fi
+       echo
+       echo "Ok, java $doWhat attempt finished"
+       echo
    fi
 fi
 
@@ -148,6 +157,7 @@ echo "Does your login account have permission to create the new directory $iccrD
 havePerm=Y
 read havePerm
 
+todo
 echo alrighty then...
 exit
 
