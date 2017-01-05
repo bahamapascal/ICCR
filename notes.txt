@@ -737,20 +737,29 @@ checked in
 ----------------------
 Wed: 1/4/2017
 
+Changed version to 1.0.6-SNAPSHOT
+
 d 1.) In the ICCR config, changing the default IOTA Start Command from "java -jar IRI.jar" to "java -jar IRI.jar -p"
 
 d 2.) In the ICCJ config, changing the default IOTA Client Download Link to "http://85.93.93.110/iri-1.1.2.3.jar"
 
 d 3.) In the ICCJ config, changing the default Neighbor Status refresh time to "10"  and the NodeInfo refresh time to "60" (I personally found that its more practicable with this settings, then the initial values I had put in the PoC)
 
-4) check for java being installed:   good idea, I'll add that;
-5) prompt for and attempt to install java: I'll investigate that and let you know;
-6) check for and create /opt/iota if needed:  I'll add that;
-7) prompt for and set ICCR password: great idea, I'll add that;
+d 4) check for java being installed:   good idea, I'll add that;
+
+d 5) prompt for and attempt to install java: I'll investigate that and let you know;
+
+d 6) check for and create /opt/iota if needed:  I'll add that;
+
+d 7) prompt for and set ICCR password: great idea, I'll add that;
+
+checked in
+
+Finish java version check
+
+test install java on ubuntu and rhel...
 
 todo:
-Change version to 1.0.6-SNAPSHOT
-
 Add stop iccr action and worker
 
 Add entry to iccr event log when a nbr is added or changed or removed
