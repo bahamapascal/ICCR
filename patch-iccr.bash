@@ -104,6 +104,5 @@ if [ "${curVal}" != "${val}" ]; then
     fi
 fi
 
-
 echo
 echo "Done"

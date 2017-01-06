@@ -137,19 +137,30 @@ if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
     if [ "${installJava}" != "n" -a "${upgradeJava}" != "n" ]; then
        echo
        echo "Ok, attempting to $doWhat java..."
+       echo "You will need 'sudo' permission to do this"
        echo
        if [ "${doesApt}" = "1" ]; then
            if [ "${doWhat}" = "install" ]; then
-               echo "sudo apt-get install java"
+               echo "sudo apt-get -y install default-jre"
+               sudo apt-get -y install default-jre
            else
-               echo "sudo apt-get upgrade java"
+               echo "sudo apt-get -y update"
+               sudo apt-get -y update
+               echo
+               echo "sudo apt-get -y install default-jre"
+               sudo apt-get -y install default-jre
            fi
        else
            if [ "${doesYum}" = "1" ]; then
+               echo
+               echo "Sorry, you'll have to download the right java version before installing $what"
+               exit
                if [ "${doWhat}" = "install" ]; then
-                   echo "sudo yum install java"
+                   echo "sudo yum install openjdk"
+                   sudo yum install openjdk
                else
-                   echo "sudo yum upgrade java"
+                   echo "sudo yum install openjdk"
+                   sudo yum install openjdk
                fi
            fi
        fi
@@ -212,20 +223,15 @@ if [ ! -d $iotaDir ]; then
 	    echo "Your account is not authorized, you may need 'sudo' permission to create that directory."
 	    exit
 	fi
-
-
     fi
 fi
-
 
 echo
 echo "cd $dir"
 cd $dir
 
 echo
-echo "tar -xzvf $curDir/$pkg"
-echo
-
+echo "tar xzvf $curDir/$pkg"
 tar xzvf $curDir/$pkg
 
 echo
