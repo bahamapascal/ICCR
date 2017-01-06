@@ -757,7 +757,16 @@ checked in
 
 Finish java version check
 
+--------------------
+Thu: 1/5/2017
+
+Finished updates to install script
+
 test install java on ubuntu and rhel...
+
+8) Updated patch-iccr script to insert new default values
+
+checked in
 
 todo:
 Add stop iccr action and worker

@@ -16,6 +16,11 @@ hasJava=1
 hasRightJava=1
 requiredJavaVersion=1.8
 doWhat=install
+mac=false
+darwin=`uname | grep -i darwin`
+if [ $darwin = "Darwin" ]; then
+    mac=true
+fi
 
 if [ ! -f $pkg ]; then
     echo "Failed to find the required ICCR archive file ($pkg) in the local directory!"
@@ -26,12 +31,18 @@ fi
 echo
 echo "This script will install the $what into $iccrDir"
 echo
-echo "If that directory does not exist, it will be created"
-echo
-echo "Does your login account have permission to create the new directory $iccrDir if needed? [Y/n]"
+if [ ! -d $iccrDir ]; then
+    echo "That directory does not exist, it will have to be created"
+    echo
+    echo "Do you need 'sudo' permission to create the new directory $iccrDir if needed? [Y/n]"
 
-havePerm=Y
-read havePerm
+    needPerm=Y
+    read needPerm
+
+    if [ -z "${needPerm}" ]; then
+	needPerm=Y
+    fi
+fi
 
 echo
 echo "Checking for required version of java..."
@@ -68,7 +79,7 @@ else
     fi
 fi
 
-echo "hasJava $hasJava, hasRightJava $hasRightJava"
+# echo "hasJava $hasJava, hasRightJava $hasRightJava"
 
 if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
     if [ "${hasJava}" = "0" ]; then
@@ -148,52 +159,61 @@ if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
    fi
 fi
 
-echo "This script will install the ICCR software into $iccrDir"
-echo
-echo "If that directory does not exist, it will be created"
-echo
-echo "Does your login account have permission to create the new directory $iccrDir if needed? [Y/n]"
-
-havePerm=Y
-read havePerm
-
-todo
-echo alrighty then...
-exit
-
 if [ ! -d $dir ]; then
     echo "Creating $dir"
-    if [ "${havePerm}" = "n" ]; then
+    if [ "${needPerm}" = "Y" ]; then
         sudo mkdir $dir
         sudo chmod a+x $dir
         sudo chmod a+r $dir
         sudo chmod a+w $dir
     else
         mkdir $dir
+	rval=$?
+	if [ "${rval}" = "1" ]; then
+            echo "It appears that the 'mkdir $dir' command failed!"
+	    echo "Your account is not authorized, you may need 'sudo' permission to create that directory."
+	    exit
+	fi
+
     fi
 fi
 
 if [ ! -d $iccrDir ]; then
     echo "Creating $iccrDir"
-    if [ "${havePerm}" = "n" ]; then
+    if [ "${needPerm}" = "Y" ]; then
         sudo mkdir $iccrDir
         sudo chmod a+x $iccrDir
         sudo chmod a+r $iccrDir
         sudo chmod a+w $iccrDir
     else
         mkdir $iccrDir
+	rval=$?
+	if [ "${rval}" = "1" ]; then
+            echo "It appears that the 'mkdir $iccrDir' command failed!"
+	    echo "Your account is not authorized, you may need 'sudo' permission to create that directory."
+	    exit
+	fi
+
     fi
 fi
 
 if [ ! -d $iotaDir ]; then
     echo "Creating $iotaDir"
-    if [ "${havePerm}" = "n" ]; then
+    if [ "${needPerm}" = "Y" ]; then
         sudo mkdir $iotaDir
         sudo chmod a+x $iotaDir
         sudo chmod a+r $iotaDir
         sudo chmod a+w $iotaDir
     else
         mkdir $iotaDir
+	rval=$?
+	if [ "${rval}" = "1" ]; then
+            echo "It appears that the 'mkdir $iotaDir' command failed!"
+	    echo "Your account is not authorized, you may need 'sudo' permission to create that directory."
+	    exit
+	fi
+
+
     fi
 fi
 
@@ -206,7 +226,7 @@ echo
 echo "tar -xzvf $curDir/$pkg"
 echo
 
-tar -xzvf $curDir/$pkg
+tar xzvf $curDir/$pkg
 
 echo
 echo "Would you like to set the $what API access key (password)? [Y/n]"
@@ -222,8 +242,21 @@ else
     echo "Ok, enter a new value for the $what API access key, then press 'enter':"
     read apiKey
     echo
+    if [ -z "${apiKey}" ]; then
+	echo "Please try again, enter a new value for the $what API access key:"
+	read apiKey
+	echo
+    fi
+    if [ -z "${apiKey}" ]; then
+	echo "Sorry, nothing entered, goodbye"
+	exit
+    fi
     echo "Ok, using $apiKey as the $what API access key..."
-    `sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`
+    if [ $mac ]; then
+	`sed -i '' "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`
+    else
+	`sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`
+    fi
 fi
 
 echo
