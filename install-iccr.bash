@@ -141,6 +141,9 @@ if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
        echo
        if [ "${doesApt}" = "1" ]; then
            if [ "${doWhat}" = "install" ]; then
+               echo "sudo apt-get -y update"
+               sudo apt-get -y update
+               echo
                echo "sudo apt-get -y install default-jre"
                sudo apt-get -y install default-jre
            else
