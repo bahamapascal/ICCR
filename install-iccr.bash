@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=1.0.6
+ver=1.0.7
 pkg=iccr-${ver}.tgz
 dir=/opt
 iccrDir=$dir/iccr
@@ -16,10 +16,10 @@ hasJava=1
 hasRightJava=1
 requiredJavaVersion=1.8
 doWhat=install
-mac=false
+mac=0
 darwin=`uname | grep -i darwin`
 if [ $darwin = "Darwin" ]; then
-    mac=true
+    mac=1
 fi
 
 if [ ! -f $pkg ]; then
@@ -258,7 +258,7 @@ else
 	exit
     fi
     echo "Ok, using $apiKey as the $what API access key..."
-    if [ $mac ]; then
+    if [ "${mac}" = "1" ]; then
 	`sed -i '' "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`
     else
 	`sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`

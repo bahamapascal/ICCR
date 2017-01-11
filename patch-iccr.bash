@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=1.0.6
+ver=1.0.7
 pkg=iccr-${ver}.tgz
 dir=/opt
 iccrDir=$dir/iccr
@@ -9,10 +9,10 @@ iccrPropFile=$iccrPropDir/iccr.properties
 iccrBinDir=$dir/iccr/bin
 iccrLibDir=$dir/iccr/lib
 what=ICCR
-mac=false
+mac=0
 darwin=`uname | grep -i darwin`
 if [ $darwin = "Darwin" ]; then
-    mac=true
+    mac=1
 fi
 
 archDir=`pwd`
@@ -57,52 +57,8 @@ cd -
 rm -rf $tmpDir
 
 ###
-# Prompt for permission to install new defaults:
+# No new defaults in 1.0.7
 ###
-prop=iotaDownloadLink
-sVal="http:\/\/85.93.93.110\/IRI-1.1.2.3.jar"
-val="http://85.93.93.110/IRI-1.1.2.3.jar"
-curVal=`grep $prop $iccrPropFile | sed -e "s/${prop}=//g"`
-if [ "${curVal}" != "${val}" ]; then
-    echo
-    echo There is a new default value for the $prop $what configuration property: $val
-    echo Do you want that value to be inserted? [Y/n]
-    read yN
-    if [ -z "${yN}" ]; then
-	yN=Y
-    fi
-    if [ "${yN}" = "Y" ]; then
-	if [ $mac ]; then
-	    `sed -i '' "s/^${prop}=.*$/${prop}=${sVal}/g" $iccrPropFile`
-	else
-	    `sed -i "s/^${prop}=.*$/${prop}=${sVal}/g" $iccrPropFile`
-	fi
-    else
-	echo Ok, leaving existing value: $curVal
-    fi
-fi
-
-prop=iotaStartCmd
-val="java -jar IRI.jar -p"
-curVal=`grep $prop $iccrPropFile | sed -e "s/${prop}=//g"`
-if [ "${curVal}" != "${val}" ]; then
-    echo
-    echo There is a new default value for the $prop $what configuration property: $val
-    echo Do you want that value to be inserted? [Y/n]
-    read yN
-    if [ -z "${yN}" ]; then
-	yN=Y
-    fi
-    if [ "${yN}" = "Y" ]; then
-	if [ $mac ]; then
-	    `sed -i '' "s/^${prop}=.*$/${prop}=${val}/g" $iccrPropFile`
-	else
-	    `sed -i "s/^${prop}=.*$/${prop}=${val}/g" $iccrPropFile`
-	fi
-    else
-	echo Ok, leaving existing value: $curVal
-    fi
-fi
 
 echo
 echo "Done"

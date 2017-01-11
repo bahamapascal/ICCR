@@ -768,6 +768,11 @@ test install java on ubuntu and rhel...
 
 checked in
 
+------------------
+Tue: 1/10/2017
+
+Fix ps call in checkiotastatus script to run on mac
+
 todo:
 Add stop iccr action and worker
 

@@ -63,25 +63,43 @@ fi
 
 #cp changelog.txt $dist/icc-${version}-changelog.txt
 
+echo "cd $dir"
 cd $dir
 
 rm -f $dist/iccr-${version}.tgz  > /dev/null 2>&1
 
+echo "tar -czf $dist/iccr-${version}.tgz iccr"
 tar -czf $dist/iccr-${version}.tgz iccr
 
+echo "cd -"
+cd -
+
+echo "cp patch-iccr.bash $dist"
 cp patch-iccr.bash $dist
+
+echo "cp install-iccr.bash $dist"
 cp install-iccr.bash $dist
 
+echo "cd $dist"
 cd $dist
+
+echo "tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash"
 tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash
 
+echo "cd $dir"
+cd $dir
+
 # for immediate testing:
+echo "rm -rf iccr-${version}-dist > /dev/null 2>&1"
 rm -rf iccr-${version}-dist > /dev/null 2>&1
 
+echo "mv iccr iccr-${version}-dist"
 mv iccr iccr-${version}-dist
 
+echo "tar -xzf $dist/iccr-${version}.tgz"
 tar -xzf $dist/iccr-${version}.tgz
 
+echo "sudo chown -R $user:$group iccr"
 sudo chown -R $user:$group iccr
 
 

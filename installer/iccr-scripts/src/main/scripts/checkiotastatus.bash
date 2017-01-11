@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ps fax | grep IRI | grep -v grep
+ps -fax | grep -i iri | grep -v grep
