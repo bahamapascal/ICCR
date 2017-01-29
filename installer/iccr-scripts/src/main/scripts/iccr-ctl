@@ -20,12 +20,6 @@ export WHAT_APP=ICCR
 export JAR_CHUNK="${ICCR_LIB_DIR}/${ICCR_JAR_NAME}"
 export PORTNUM_PROP=iccrPortNumber
 
-#mac=false
-#darwin=`uname | grep -i darwin`
-#if [ $darwin = "Darwin" ]; then
-#    mac=true
-#fi
-
 cd $ICCR_DIR
 
 # for start:
@@ -105,22 +99,27 @@ start() {
     else
         jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber}"
     fi
-    #jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber} -Dswarm.https.port=${iccrHttpsPortNumber}"
 
+    # Practice values:
+    #jvm_env="${jvm_env} -Dswarm.http.port=${iccrPortNumber} -Dswarm.https.port=${iccrHttpsPortNumber}"
     #jvm_env="${jvm_env} -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
 
     iccrargs="${nossl} ${loglevel}"
 
+    # Practice:
     #ICCR_START_CMD="java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME}  ${iccrargs} "
     #ICCR_START_CMD="nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &"
 
+    # Practice:
     #echo
     #echo ${ICCR_START_CMD}
     #echo
     #${ICCR_START_CMD}
 
+    # Practice:
     #java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs}
     #CP="-cp ${ICCR_LIB_DIR}"
+    
     nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
 
     iccrPid=$!
