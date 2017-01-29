@@ -204,7 +204,7 @@ public class PropertySource {
         return (osName.indexOf("win") >= 0);
     }
 
-    public boolean osIsMax() {
+    public boolean osIsMac() {
         return (osName.indexOf("mac") >= 0);
     }
 

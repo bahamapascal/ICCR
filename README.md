@@ -7,7 +7,7 @@ IOTA Control Center Receiver
 The ICCR is a server process that functions as a microservice.  It provides a relaxed ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine.
 
 As a microservice, it:
-i sa java based application that must have a java VM installed in order to run;
+is a java based application that must have a java version VM (1.8 or greater) installed in order to run;
 is a lightweight standalone executable that does not require any other framework to execute;
 provides a well-defined API for client applications to target;
 exposes a ReST API using provides standard HTTP operations based as the basis for control of an IOTA instance;
@@ -24,6 +24,48 @@ writes server output to a log file contained in /opt/iccr/logs
 writes event data in CSV format to an audit file contained in /opt/iccr/data
 copies downloaded IOTA IRI files into /opt/iccr/download
 maintains backup copies of previous IOTA IRI file version in /opt/iccr/bak
+
+The following ICCR subdirectories are used:
+
+/opt/iccr/data
+The /opt/iccr/data directory contains a comma separted value (CSV) formattted file: iota-event.csv
+
+The iota-event.csv file contains a record of the events that the ICCR executed when controlling and configuring the IOTA IRI process.
+
+For example:
+2017-01-11T07:19:49.926,download,http://85.93.93.110/iri-1.1.2.3.jar,/opt/iccr/download/iri-1.1.2.3.jar.20170111071940 (5475212 b
+ytes)
+2017-01-11T07:19:50.046,install,/opt/iccr/download/iri-1.1.2.3.jar.20170111071940,/opt/iota/IRI.jar
+2017-01-11T07:19:52.225,IOTA addNeighbors,,Neighbors configuration is empty
+2017-01-11T07:19:52.225,start,java -jar IRI.jar -p
+2017-01-11T07:22:35.061,stop,
+2017-01-11T07:23:19.239,IOTA addNeighbors,,Neighbors configuration is empty
+2017-01-11T07:23:19.239,start,java -jar IRI.jar -p
+2017-01-11T07:24:34.422,stop,
+
+
+/opt/iccr/conf
+The /opt/iccr/conf direcory contains the iccr.properties file and the ICCR PKI files that enable secure HTTPS transport (see below).
+
+
+/opt/iccr/logs
+The /opt/iccr/logs directory is the location where the ICCR log file (iccr.log) is written to.
+
+/opt/iccr/lib
+The /opt/iccr/lib directory is the location containing the single ICCR uber-JAR (java archive) file that is executed when the iccr-ctl script is used to start ICCR
+
+/opt/iccr/bin
+The /opt/iccr/bin directory contains scripts used by ICCR, see below for details.
+
+/opt/iccr/tmp
+The /opt/iccr/tmp directory is used by ICCR when downloading new versions of the ICCR IRI. Newly downloaded IRI files are first written to this temporary directory before being copied to the final /opt/iota.
+
+
+/opt/iccr/bak
+The /opt/iccr/bak directory contains backup copies of previous versions of the IOTA IRI file. After downloading a new version of the IOTA IRI file, ICCR will copy the previous (i.e. the current IRI in use) version into /opt/iccr/bak to provide for a disaster recovery possibility. ICCR will not automatically restore any previous IRI version, it only makes copies of previous versions to allwo the system administrator to manually execute a previous version if needed.
+
+/opt/iccr/download
+The /opt/iccr/download directory contains the newly downloaded copy of the IOTA IRI file while ICCR is downloading and installing a new version of the IOTA IRI. The newly downloaded IRI will be written into this directory, then copied into the configured IOTA directory.
 
 
 2.a) Utility Scripts
@@ -82,18 +124,7 @@ iccrApiKey
 This specifies the value of ICCR API access key. If this exact value is not in each client request HTTP header, then that client request will be refused. Each client request should have a header with this name: ICCR-API-KEY with its value being the value specified by this "iccrApiKey" property.
 
 iccrDir
-This specifies the base ICCR installation directory, by default it is set to /opt/iccr
-
-All of the following ICCR subdirectories are use:
-iccrDataDir=/opt/iccr/data
-iccrConfDir=/opt/iccr/conf
-iccrLogDir=/opt/iccr/logs
-iccrLibDir=/opt/iccr/lib
-iccrBinDir=/opt/iccr/bin
-iccrTmpDir=/opt/iccr/tmp
-iccrBakDir=/opt/iccr/bak
-iccrDldDir=/opt/iccr/download
-
+This specifies the base ICCR installation directory. By default it is set to /opt/iccr
 
 iccrLogLevel
 This property specifies the logging level used by the ICCR process. When set to DEBUG (iccrLogLevel=DEBUG), then ICCR will write more verbose output to the log file (the log file location is /opt/iccr/logs/iccr.log). The default value is DEBUG
@@ -174,8 +205,8 @@ The ICCR truststore contains the public PKI certificate of the certificate autho
 As a client of the ICCR API, the ICC GUI application needs to communicate with the ICCR over secure HTTPS transport. The ICC itself has a keystore and truststore that enables that secure HTTPS layer with the ICCR. The ICC has a mirrored view of the ICCR. The ICC has a keystore and trusttore. The ICC's keystore contains a PKI key, issued by the same CA as the ICCR PKI key. The ICC's truststore contains the same CA as the ICCR's truststore. Thus the ICCR is able to trust the identity of the ICC (the ICC's key was issued by the CA that is in the ICCR truststore) and the ICC is able to trust the ICCR (the ICCR's key was issued by the CA that is in the ICC truststore).
 
 
-
 5) API
+
 
 
 
