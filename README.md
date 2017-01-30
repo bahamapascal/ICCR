@@ -204,8 +204,360 @@ The ICCR truststore contains the public PKI certificate of the certificate autho
 
 As a client of the ICCR API, the ICC GUI application needs to communicate with the ICCR over secure HTTPS transport. The ICC itself has a keystore and truststore that enables that secure HTTPS layer with the ICCR. The ICC has a mirrored view of the ICCR. The ICC has a keystore and trusttore. The ICC's keystore contains a PKI key, issued by the same CA as the ICCR PKI key. The ICC's truststore contains the same CA as the ICCR's truststore. Thus the ICCR is able to trust the identity of the ICC (the ICC's key was issued by the CA that is in the ICCR truststore) and the ICC is able to trust the ICCR (the ICCR's key was issued by the CA that is in the ICC truststore).
 
-
 5) API
+
+Root: /iccr/rs
+
+
+GET /iccr/rs/app/config
+{
+    "properties":
+     [
+        {"key":"iccrPortNumber","value":"14266"},
+        {"key":"iotaPortNumber","value":"14265"},
+        {"key":"iotaDownloadLink","value":"http://85.93.93.110/iri-1.1.2.3.jar"},
+        {"key":"iotaDir","value":"/opt/iota"},
+        {"key":"iotaStartCmd","value":"java -jar IRI.jar -p"},
+        {"key":"iotaNeighborRefreshTime","value":"10"}
+    ]
+}
+
+
+GET /iccr/rs/app/config/{key}
+
+/iccr/rs/app/config/iccrPortNumber
+{"key":"iccrPortNumber","value":"14266"}
+
+/iccr/rs/app/config/iotaPortNumber
+{"key":"iotaPortNumber","value":"14265"}
+
+/iccr/rs/app/config/iotaDownloadLink
+{"key":"iotaDownloadLink","value":"http://85.93.93.110/iri-1.1.2.3.jar"}
+
+/iccr/rs/app/config/iotaDir
+{"key":"iotaDir","value":"/opt/iota"}
+
+/iccr/rs/app/config/iotaStartCmd
+{"key":"iotaStartCmd","value":"java -jar IRI.jar -p"}
+
+/iccr/rs/app/config/iotaNeighborRefreshTime
+{"key":"iotaNeighborRefreshTime","value":"10"}
+
+
+PUT /iccr/rs/iccr/rs/app/config/{key}
+
+Payload is JSON object with two properties:
+key
+value
+example;
+{"key":"iccrPortNumber","value":14266}
+
+Response is JSON object with two properties:
+success
+msg
+{"success":true,"msg":"properties updated successfully"}
+
+Example payloads:
+/iccr/rs/app/config/iccrPortNumber
+{"key":"iccrPortNumber","value":14266}
+
+/iccr/rs/app/config/iotaPortNumber
+{"key":"iotaPortNumber","value":14265}
+
+/iccr/rs/app/config/iotaDownloadLink
+{"key":"iotaDownloadLink","value":"http://85.93.93.110/iri-1.1.2.3.jar"}'
+
+/iccr/rs/app/config/iotaDir
+{"key":"iotaDir","value":"/opt/iota"}
+
+/iccr/rs/app/config/iotaStartCmd
+{"key":"iotaStartCmd","value":"java -jar IRI.jar -p"}
+
+/iccr/rs/app/config/iotaNeighborRefreshTime
+{"key":"iotaNeighborRefreshTime","value":"10"}
+
+GET /iccr/rs/iccr/rs/app/config/iota/nbrs
+{
+"key":"iotaNeighbors",
+"value":null,
+"nbrs":[
+    {"active":true,"descr":"David Neighbor Node","key":"david","name":"nbr-David","uri":"udp://192.168.0.0.1:14265","numAt":0,"numIt":0,"numNt":0},
+    {"active":true,"descr":"Johan Neighbor Node","key":"johan","name":"nbr-Johan","uri":"udp://192.168.0.0.2:14265","numAt":0,"numIt":0,"numNt":0},
+    {"active":true,"descr":"Sebastian Neighbor Node","key":"sebastian","name":"nbr-sebastian","uri":"udp://192.168.0.0.3:14265","numAt":0,"numIt":0,"numNt":0}
+    ]
+}
+
+
+PUT /iccr/rs/iccr/rs/app/config/iota/nbrs
+{"key":"iotaNeighbors","nbrs":[{"key":"do1","name":"do1","descr":"do1","uri":"udp://104.236.239.166:14265","active":true},{"key":"do2","name":"do2","descr":"do2","uri":"udp://45.55.171.97:14265","active":true}]}
+
+
+POST /iccr/rs/iccr/cmd/{action}
+     /iccr/rs/iccr/cmd/restart
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"restartIccr","value":"true"}]}
+
+     /iccr/rs/iccr/cmd/stop
+{"success":false,"msg":"IccrAgent (stop): command is not supported"}
+
+
+POST /iccr/rs/iota/cmd/{action}
+     /iccr/rs/iota/cmd/stop
+     /iccr/rs/iota/cmd/status
+     /iccr/rs/iota/cmd/start
+     /iccr/rs/iota/cmd/restart
+     /iccr/rs/iota/cmd/deletedb
+     /iccr/rs/iota/cmd/delete
+     /iccr/rs/iota/cmd/install
+     /iccr/rs/iota/cmd/removeNeighbors
+     /iccr/rs/iota/cmd/addNeighbors
+
+Returns JSON object, with the final operation name indicating the result of the operation: statusIota is true, IOTA is running.
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"statusIota","value":"true"}]}
+
+Returns JSON object, with the final operation name indicating the result of the operation: stopIota is true, IOTA was stopped.
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"stopIota","value":"true"}]}
+
+Returns JSON object, with the final operation name indicating the result of the operation: statusIota is false, IOTA is not running
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"1"},{"key":"statusIota","value":"false"}]}dana@optiPlex-780-1-ubuntu:/tmp/curl-examples$ 
+
+GET /iccr/rs/iccr/rs/app/eventlog
+Returns list of CSV lines: event date, event type, event arguments, event details
+[
+"2017-01-29T20:54:38.956,restart ICCR,/opt/iccr/bin/restarticcr.bash",
+"2017-01-29T21:09:58.515,stop,",
+"2017-01-29T21:09:58.515,delete IOTA,",
+"2017-01-29T21:54:56.885,download,http://85.93.93.110/iri-1.1.2.3.jar,/opt/iccr/download/iri-1.1.2.3.jar.20170129215453 (5476643 bytes)",
+"2017-01-29T21:54:56.945,install,/opt/iccr/download/iri-1.1.2.3.jar.20170129215453,/opt/iota/IRI.jar",
+"2017-01-29T21:54:59.06,IOTA addNeighbors,",
+]
+
+DELETE /iccr/rs/iccr/rs/app/eventlog
+Returns JSON object:
+{"success":true,"msg":"Event log deleted"}
+
+GET /iccr/rs/iota/neighbors
+Returns JSON object, when IOTA is not active, success is false:
+{"success":false,
+"msg":"IOTA application is not running",
+"content":null,
+"properties":[{"key":"getIotaNeighbors","value":"false"}]}
+
+Returns JSON object, when IOTA is active, success is true, content property contains the response from IRI:
+{"success":true,
+"msg":"success",
+"content":"{\"neighbors\":[{\"address\":\"104.236.239.166:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0},{\"address\":\"45.55.171.97:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0}],\"duration\":1}",
+"properties":[{"key":"getIotaNeighbors","value":"true"}]}
+
+
+GET /iccr/rs/iota/nodeinfo
+Returns JSON object, when IOTA is not active, success is true, content property contains the response from IRI:
+{"success":true,
+"msg":"success",
+"content":"{\"appName\":\"IRI\",\"appVersion\":\"1.1.2.3\",\"jreAvailableProcessors\":2,\"jreFreeMemory\":51286960,\"jreVersion\":\"1.8.0_111\",\"jreMaxMemory\":883949568,\"jreTotalMemory\":60293120,\"latestMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestMilestoneIndex\":13250,\"latestSolidSubtangleMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestSolidSubtangleMilestoneIndex\":13250,\"neighbors\":2,\"packetsQueueSize\":0,\"time\":1485749319938,\"tips\":1,\"transactionsToRequest\":0,\"duration\":2}",
+"properties":[{"key":"getIotaNodeInfo","value":"true"}]
+}
+
+
+GET /iccr/rs/iota/log?fileDirection&numLines&lastFileLength&lastFilePosition
+
+Supports following query parameters:
+fileDirection
+numLines
+lastFileLength
+lastFilePosition
+
+
+HEAD:
+{"success":true,
+"msg":"",
+"lines":
+[
+"22:07:36.467 [main] INFO  com.iota.iri.IRI - Welcome to IRI 1.1.2.3",
+"22:07:36.530 [main] ERROR com.iota.iri.IRI - Impossible to display logo. Charset UTF8 not supported by terminal.",
+"22:07:36.558 [pool-2-thread-1] INFO  com.iota.iri.service.Node - Spawning Receiver Thread",
+"22:07:36.564 [pool-2-thread-2] INFO  com.iota.iri.service.Node - Spawning Broadcaster Thread",
+"22:07:36.567 [pool-2-thread-3] INFO  com.iota.iri.service.Node - Spawning Tips Requester Thread",
+"22:07:36.569 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Spawning Neighbor DNS Refresher Thread",
+"22:07:36.569 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Checking Neighbors' Ip...",
+"22:07:36.816 [main] INFO  com.iota.iri.IRI - IOTA Node initialised correctly.",
+"22:07:38.311 [XNIO-1 task-1] INFO  com.iota.iri.service.API - # 1 -> Requesting command 'addNeighbors'",
+"22:08:13.389 [XNIO-1 task-2] INFO  com.iota.iri.service.API - # 2 -> Requesting command 'getNeighbors'"
+]
+"lastFilePosition":939,
+"lastFileSize":2340}
+
+TAIL:
+{"success":true,
+"msg":"",
+"lines":
+[
+"22:37:36.570 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Checking Neighbors' Ip...",
+"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do1' with '104.236.239.166'",
+"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do2' with '45.55.171.97'",
+"22:46:11.619 [XNIO-1 task-6] INFO  com.iota.iri.service.API - # 6 -> Requesting command 'removeNeighbors'",
+"22:46:11.645 [XNIO-1 task-7] INFO  com.iota.iri.service.API - # 7 -> Requesting command 'addNeighbors'",
+"22:48:22.536 [XNIO-1 task-8] INFO  com.iota.iri.service.API - # 8 -> Requesting command 'removeNeighbors'",
+"22:49:10.021 [XNIO-1 task-9] INFO  com.iota.iri.service.API - # 9 -> Requesting command 'addNeighbors'",
+"22:56:11.622 [XNIO-1 task-10] INFO  com.iota.iri.service.API - # 10 -> Requesting command 'removeNeighbors'",
+"22:56:11.647 [XNIO-1 task-11] INFO  com.iota.iri.service.API - # 11 -> Requesting command 'addNeighbors'"
+],
+"lastFilePosition":2235,
+"lastFileSize":2553}
+
+
+6) Command examples:
+GET /iccr/rs/app/config
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config
+
+GET /iccr/rs/app/config/{key}
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iccrPortNumber
+
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaPortNumber
+
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaDownloadLink
+
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaDir
+
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaStartCmd
+
+curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaNeighborRefreshTime
+
+
+PUT /app/config/{key}:
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iccrPortNumber","value":14266}' https://localhost:14266/iccr/rs/app/config/iccrPortNumber
+{"success":true,"msg":"properties updated successfully"}
+
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaPortNumber","value":14265}' https://localhost:14266/iccr/rs/app/config/iotaPortNumber
+{"success":true,"msg":"properties updated successfully"}
+
+
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaDownloadLink","value":"http://85.93.93.110/iri-1.1.2.3.jar"}' https://localhost:14266/iccr/rs/app/config/iotaDownloadLink
+{"success":true,"msg":"properties updated successfully"}
+
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaDir","value":"/opt/iota"}' https://localhost:14266/iccr/rs/app/config/iotaDir
+{"success":true,"msg":"properties updated successfully"}
+
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaStartCmd","value":"java -jar IRI.jar -p"}' https://localhost:14266/iccr/rs/app/config/iotaStartCmd
+{"success":true,"msg":"properties updated successfully"}
+
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaNeighborRefreshTime","value":10}' https://localhost:14266/iccr/rs/app/config/iotaNeighborRefreshTime
+{"success":true,"msg":"properties updated successfully"}
+
+GET /iccr/rs/iccr/rs/app/config/iota/nbrs:
+
+
+PUT /iccr/rs/iccr/rs/app/config/iota/nbrs
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaNeighbors","nbrs":[{"key":"do1","name":"do1","descr":"do1","uri":"udp://104.236.239.166:14265","active":true},{"key":"do2","name":"do2","descr":"do2","uri":"udp://45.55.171.97:14265","active":true}]}' https://localhost:14266/iccr/rs/app/config/iota/nbrs
+{"success":true,"msg":"properties updated successfully"}
+
+POST /iccr/rs/iccr/cmd/{action}
+
+/iccr/rs/iccr/cmd/restart
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iccr/cmd/restart
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"restartIccr","value":"true"}]}
+
+/iccr/rs/iccr/cmd/stop
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iccr/cmd/stop
+{"success":false,"msg":"IccrAgent (stop): command is not supported"}
+
+
+POST /iccr/rs/iota/cmd/{action}
+/iccr/rs/iota/cmd/stop
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/stop
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"stopIota","value":"true"}]}
+
+/iccr/rs/iota/cmd/status
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/status
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"statusIota","value":"true"}]}
+
+/iccr/rs/iota/cmd/start
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/start
+{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"startIota","value":"true"}]}
+
+/iccr/rs/iota/cmd/restart
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/restart
+{"success":true,"msg":null,"content":null,"properties":[{"key":"restartIota","value":"true"}]}
+
+/iccr/rs/iota/cmd/nodeinfo
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/nodeinfo
+{"success":true,"msg":"success","content":"{\"appName\":\"IRI\",\"appVersion\":\"1.1.2.3\",\"jreAvailableProcessors\":2,\"jreFreeMemory\":51286960,\"jreVersion\":\"1.8.0_111\",\"jreMaxMemory\":883949568,\"jreTotalMemory\":60293120,\"latestMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestMilestoneIndex\":13250,\"latestSolidSubtangleMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestSolidSubtangleMilestoneIndex\":13250,\"neighbors\":2,\"packetsQueueSize\":0,\"time\":1485749319938,\"tips\":1,\"transactionsToRequest\":0,\"duration\":2}","properties":[{"key":"getIotaNodeInfo","value":"true"}]}
+
+/iccr/rs/iota/cmd/neighbors
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json"  -X POST https://localhost:14266/iccr/rs/iota/cmd/neighbors
+{"success":true,"msg":"success","content":"{\"neighbors\":[{\"address\":\"104.236.239.166:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0},{\"address\":\"45.55.171.97:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0}],\"duration\":1}","properties":[{"key":"getIotaNeighbors","value":"true"}]}
+
+/iccr/rs/iota/cmd/deletedb
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/deletedb
+{"success":true,"msg":"","content":null,"properties":[{"key":"deleteIotaDb","value":"true"}]}
+
+/iccr/rs/iota/cmd/delete
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/delete
+{"success":true,"msg":"","content":null,"properties":[{"key":"deleteIota","value":"true"}]}
+
+/iccr/rs/iota/cmd/install
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/install
+{"success":true,"msg":"success","content":null,"properties":[{"key":"installIota","value":"true"}]}
+
+/iccr/rs/iota/cmd/removeNeighbors
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/removeNeighbors
+{"success":true,"msg":"success","content":"{\"removedNeighbors\":2,\"duration\":1}","properties":[{"key":"removeIotaNeighbors","value":"true"}]}
+
+
+/iccr/rs/iota/cmd/addNeighbors
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/addNeighbors
+{"success":true,"msg":"success","content":"{\"addedNeighbors\":2,\"duration\":0}","properties":[{"key":"addIotaNeighbors","value":"true"}]}
+
+GET /iccr/rs/iota/nodeinfo
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/nodeinfo
+{"success":true,
+"msg":"success",
+"content":"{\"appName\":\"IRI\",\"appVersion\":\"1.1.2.3\",\"jreAvailableProcessors\":2,\"jreFreeMemory\":51286960,\"jreVersion\":\"1.8.0_111\",\"jreMaxMemory\":883949568,\"jreTotalMemory\":60293120,\"latestMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestMilestoneIndex\":13250,\"latestSolidSubtangleMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestSolidSubtangleMilestoneIndex\":13250,\"neighbors\":2,\"packetsQueueSize\":0,\"time\":1485749319938,\"tips\":1,\"transactionsToRequest\":0,\"duration\":2}",
+"properties":[{"key":"getIotaNodeInfo","value":"true"}]
+}
+
+
+
+GET /iccr/rs/iota/log?fileDirection&numLines&lastFileLength&lastFilePosition
+
+HEAD:
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://localhost:14266/iccr/rs/iota/log?fileDirection=head&numLines=10"
+{"success":true,
+"msg":"",
+"lines":
+[
+"22:07:36.467 [main] INFO  com.iota.iri.IRI - Welcome to IRI 1.1.2.3",
+"22:07:36.530 [main] ERROR com.iota.iri.IRI - Impossible to display logo. Charset UTF8 not supported by terminal.",
+"22:07:36.558 [pool-2-thread-1] INFO  com.iota.iri.service.Node - Spawning Receiver Thread",
+"22:07:36.564 [pool-2-thread-2] INFO  com.iota.iri.service.Node - Spawning Broadcaster Thread",
+"22:07:36.567 [pool-2-thread-3] INFO  com.iota.iri.service.Node - Spawning Tips Requester Thread",
+"22:07:36.569 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Spawning Neighbor DNS Refresher Thread",
+"22:07:36.569 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Checking Neighbors' Ip...",
+"22:07:36.816 [main] INFO  com.iota.iri.IRI - IOTA Node initialised correctly.",
+"22:07:38.311 [XNIO-1 task-1] INFO  com.iota.iri.service.API - # 1 -> Requesting command 'addNeighbors'",
+"22:08:13.389 [XNIO-1 task-2] INFO  com.iota.iri.service.API - # 2 -> Requesting command 'getNeighbors'"
+]
+"lastFilePosition":939,
+"lastFileSize":2340}
+
+TAIL:
+curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://localhost:14266/iccr/rs/iota/log?fileDirection=tail&numLines=10"
+{"success":true,
+"msg":"",
+"lines":
+[
+"22:37:36.570 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Checking Neighbors' Ip...",
+"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do1' with '104.236.239.166'",
+"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do2' with '45.55.171.97'",
+"22:46:11.619 [XNIO-1 task-6] INFO  com.iota.iri.service.API - # 6 -> Requesting command 'removeNeighbors'",
+"22:46:11.645 [XNIO-1 task-7] INFO  com.iota.iri.service.API - # 7 -> Requesting command 'addNeighbors'",
+"22:48:22.536 [XNIO-1 task-8] INFO  com.iota.iri.service.API - # 8 -> Requesting command 'removeNeighbors'",
+"22:49:10.021 [XNIO-1 task-9] INFO  com.iota.iri.service.API - # 9 -> Requesting command 'addNeighbors'",
+"22:56:11.622 [XNIO-1 task-10] INFO  com.iota.iri.service.API - # 10 -> Requesting command 'removeNeighbors'",
+"22:56:11.647 [XNIO-1 task-11] INFO  com.iota.iri.service.API - # 11 -> Requesting command 'addNeighbors'"
+],
+"lastFilePosition":2235,
+"lastFileSize":2553}
+
 
 
 

@@ -6,14 +6,18 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiOperation;
 import org.iotacontrolcenter.dto.*;
 
 /**
  * Service for ICCR public ReST API
  **/
 @Path("/iccr/rs")
+//@Api(value="ICCR", description="ICCR ReST API")
 public interface IccrService {
 
+    //@ApiOperation(value="Get Supported Languages")
     @GET
     @Path("/icc/languages")
     @Produces(MediaType.APPLICATION_JSON)

@@ -1,6 +1,26 @@
 #!/bin/bash
 
-ver=1.0.7
+# Support for API access key complexity:
+r1='^.*[A-Z].*$'
+r2='^.*[a-z].*$'
+r3='^.*[0-9].*$'
+r4='^.*[!@#$&_].*$'
+r5='^.{6,}'
+
+function checkApiKeyComplexity {
+    [[ $1 =~ $r1 ]] && [[ $1 =~ $r2 ]] && [[ $1 =~ $r3 ]] && [[ $1 =~ $r4 ]] && [[ $1 =~ $r5 ]]
+}
+
+function printApiKeyHelp {
+    echo "Enter an API access key with this complexity:"
+    echo "- at least 6 characters in length"
+    echo "- at least one upper case character"
+    echo "- at least one lower case character"
+    echo "- at least one numeric digit"
+    echo '- at least one special case character from this set of characters: !@#$_'
+}
+
+ver=0.9.0
 pkg=iccr-${ver}.tgz
 dir=/opt
 iccrDir=$dir/iccr
@@ -18,7 +38,7 @@ requiredJavaVersion=1.8
 doWhat=install
 mac=0
 darwin=`uname | grep -i darwin`
-if [ $darwin = "Darwin" ]; then
+if [ "${darwin}" = "Darwin" ]; then
     mac=1
 fi
 
@@ -237,40 +257,46 @@ echo
 echo "tar xzvf $curDir/$pkg"
 tar xzvf $curDir/$pkg
 
-echo
-echo "Would you like to set the $what API access key (password)? [Y/n]"
-setPwd=Y
-read setPwd
+origApiKey=`grep $iccrApiKeyProp $iccrPropFile | sed -e "s/${iccrApiKeyProp}=//g"`
 
-if [ "${setPwd}" = "n" ]; then
-    apiKey=`grep $iccrApiKeyProp $iccrPropFile | sed -e "s/${iccrApiKeyProp}=//g"`
-    echo "Ok, using the default $what API access key value: $apiKey"
-    echo
-else
-    echo
-    echo "Ok, enter a new value for the $what API access key, then press 'enter':"
-    read apiKey
-    echo
-    if [ -z "${apiKey}" ]; then
-	echo "Please try again, enter a new value for the $what API access key:"
-	read apiKey
-	echo
-    fi
-    if [ -z "${apiKey}" ]; then
-	echo "Sorry, nothing entered, goodbye"
-	exit
-    fi
-    echo "Ok, using $apiKey as the $what API access key..."
-    if [ "${mac}" = "1" ]; then
-	`sed -i '' "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`
+echo
+echo "You need to set the $what API access key (password) now."
+echo
+printApiKeyHelp
+echo
+echo -n "Enter an API access key:  "
+read pwd
+if [ -z "${pwd}" ]; then
+    echo -n "Enter an API access key:  "
+    read pwd
+fi
+
+let try=0
+checkApiKeyComplexity $pwd
+while [ $? -eq 1 ]; do
+    let try=$try+1
+    if [ $try -gt 5 ]; then
+	echo "Ok, we'll let you use the default API access key value: \"$origApiKey\""
+        pwd=$origApiKey
     else
-	`sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${apiKey}/g" $iccrPropFile`
+        printApiKeyHelp
+        echo
+        echo -n "Enter a stronger API access key:  "
+        read pwd
+        checkApiKeyComplexity $pwd
     fi
+done
+
+echo "Ok, using $pwd as the $what API access key..."
+if [ "${mac}" = "1" ]; then
+    `sed -i '' "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile`
+else
+    `sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile`
 fi
 
 echo
-echo "Done"
-echo 
+echo Done
+echo
 
 
 

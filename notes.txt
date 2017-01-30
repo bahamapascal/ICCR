@@ -771,7 +771,32 @@ checked in
 ------------------
 Tue: 1/10/2017
 
-Fix ps call in checkiotastatus script to run on mac
+d Fix ps call in checkiotastatus script to run on mac
+
+released 1.0.7
+
+------------------------
+Sun: 1/29/2017
+
+
+d checkin pki keys, scripts:
+d  ~/projects/pki/icc$ cp icc-pki-1.0.1-zip  ~/projects/iccr/iccr/
+    d no delete if from git
+  add to gdrive:
+  d  cp ~/projects/pki/icc/icc-pki-1.0.1-zip ~/projects/dist/
+     upload
+d delete unused props from iccr.properties
+d delete iccr installiri.bash
+d set versions to 0.9.0-SNAPSHOT
+d add api key complexity to install-iccr.bash
+add swagger dep
+add swagger annotations
+
+checkin iccr artifacts to allow standalone iccj build
+manage log file size
+add curl examples:
+    
+    mkdir /tmp/curl-examples
 
 todo:
 Add stop iccr action and worker

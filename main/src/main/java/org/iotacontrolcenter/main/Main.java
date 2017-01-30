@@ -32,6 +32,7 @@ public class Main {
     public static boolean debug = false;
     public static boolean info = false;
     public static boolean noSsl = false;
+    private static boolean doSwagger = true;
 
     //private static final Logger logger = Logger.getLogger(Main.class.getName());
 
@@ -103,21 +104,36 @@ public class Main {
 
         swarm.start();
 
-        //logger.info("Deploying ICCR WAR...");
+        System.out.println("Deploying ICCR...");
         JAXRSArchive iccrWar = ShrinkWrap.create(JAXRSArchive.class, "iccr-app.war");
         iccrWar.addClass(IccrServiceImpl.class);
         iccrWar.addClass(NotFoundExceptionMapper.class);
         iccrWar.addAllDependencies();
         swarm.deploy(iccrWar);
 
+        /*
+        if(Main.doSwagger) {
+            System.out.println("Deploying swagger...");
+            SwaggerArchive archive = ShrinkWrap.create(SwaggerArchive.class, "iccr-swagger.war");
+            JAXRSArchive deployment = archive.as(JAXRSArchive.class).addPackage(IccrService.class.getPackage());
+            archive.setResourcePackages("org.iotacontrolcenter.api.IccrService");
+            archive.setContextRoot("apidocs");
+            deployment.addAllDependencies();
+            swarm.deploy(deployment);
+        }
+        */
+
         //logger.info("Deploying ICC WAR...");
         File iccSrcdir = new File(propertySource.getIccrDir() + "/lib/icc");
         if(iccSrcdir.exists()) {
+            System.out.println("Deploying ICC...");
             WARArchive iccWar = ShrinkWrap.create(WARArchive.class);
             iccWar.as(ExplodedImporter.class).importDirectory(iccSrcdir);
             iccWar.setContextRoot("icc");
             swarm.deploy(iccWar);
         }
+
+
 
         //logger.info("Done...");
     }

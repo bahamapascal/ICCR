@@ -234,9 +234,9 @@ public class PropertySource {
 
     public List<String> getPropertyKeys() {
         List<String> keys = new ArrayList<>();
-        keys.add(ICCR_START_AT_START_PROP);
-        keys.add(ICCR_START_IOTA_AT_START_PROP);
-        keys.add(ICCR_STOP_IOTA_AT_SHUTDOWN_PROP);
+        //keys.add(ICCR_START_AT_START_PROP);
+        //keys.add(ICCR_START_IOTA_AT_START_PROP);
+        //keys.add(ICCR_STOP_IOTA_AT_SHUTDOWN_PROP);
         keys.add(ICCR_PORT_NUMBER_PROP);
         keys.add(IOTA_PORT_NUMBER_PROP);
         keys.add(IOTA_DLD_LINK_PROP);
