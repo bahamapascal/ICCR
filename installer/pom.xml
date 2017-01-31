@@ -6,7 +6,7 @@
     <parent>
       <groupId>org.iotacontrolcenter</groupId>
       <artifactId>iccr-parent</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.9.0</version>
     </parent>
 
     <artifactId>installer</artifactId>

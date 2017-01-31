@@ -77,6 +77,9 @@ cd -
 echo "cp patch-iccr.bash $dist"
 cp patch-iccr.bash $dist
 
+echo -n "Did you put the desired release version into install-iccr.bash? [Y/n] "
+read yNo
+
 echo "cp install-iccr.bash $dist"
 cp install-iccr.bash $dist
 

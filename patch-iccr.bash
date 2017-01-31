@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=1.0.7
+ver=0.9.0
 pkg=iccr-${ver}.tgz
 dir=/opt
 iccrDir=$dir/iccr
@@ -57,7 +57,7 @@ cd -
 rm -rf $tmpDir
 
 ###
-# No new defaults in 1.0.7
+# No new defaults in 0.9.0
 ###
 
 echo
