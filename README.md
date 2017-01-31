@@ -4,14 +4,16 @@ IOTA Control Center Receiver
 
 1) Overview
 
-The ICCR is a server process that functions as a microservice.  It provides a relaxed ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine.
+The ICCR is a java based server process that functions as a microservice.  It provides a relaxed ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine. It functions as micro-service by using the Wildfly Swarm framework to generate a single "fat" JAR file. It is a java based application that must have a java version VM (1.8 or greater) installed in order to run.
 
-As a microservice, it:
-is a java based application that must have a java version VM (1.8 or greater) installed in order to run;
-is a lightweight standalone executable that does not require any other framework to execute;
-provides a well-defined API for client applications to target;
-exposes a ReST API using provides standard HTTP operations based as the basis for control of an IOTA instance;
-is a relaxed ReST server in that it does not fully adhere to the most stringent ReST guidelines;
+The ICCR:
+* is a single JAR file destributed in an archive with scripts to control its life-cycle (start, stop, etc);
+* is a lightweight standalone executable that does not require any other framework to execute;
+* provides a well-defined API for client applications to target;
+* exposes a ReST API using standard HTTP operations based as the basis for control of an IOTA instance;
+* supports HTTPS using self-signed PKI certificates;
+* supports authorized client usage only by means of an API access key;
+
 
 2) Functionality
 
