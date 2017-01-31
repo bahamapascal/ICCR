@@ -4,30 +4,31 @@ IOTA Control Center Receiver
 
 1) Overview
 
-The ICCR is a java based server process that functions as a microservice.  It provides a relaxed ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine. It functions as micro-service by using the Wildfly Swarm framework to generate a single "fat" JAR file. It is a java based application that must have a java version VM (1.8 or greater) installed in order to run.
+The ICCR is a java based microservice server process.  It provides a ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine. It functions as microservice by using the Wildfly Swarm framework to generate a single "fat" JAR file. It requires that java version 1.8 or greater be installed on the target machine.
 
 The ICCR:
-* is a single JAR file destributed in an archive with scripts to control its life-cycle (start, stop, etc);
-* is a lightweight standalone executable that does not require any other framework to execute;
-* provides a well-defined API for client applications to target;
-* exposes a ReST API using standard HTTP operations based as the basis for control of an IOTA instance;
-* supports HTTPS using self-signed PKI certificates;
-* supports authorized client usage only by means of an API access key;
+* is a single JAR file destributed in an TAR gzipped archive
+* is distributed with control scripts to that manage its life-cycle (start, stop, status)
+* is a lightweight standalone executable that does not require any other framework to execute
+* exposes a ReST API using standard HTTP operations based as the basis for control of an IOTA instance
+* supports HTTPS using self-signed PKI certificates
+* supports authorized client usage only by means of an API access key
 
 
 2) Functionality
 
 The ICCR:
-is installed in /opt/iccr
-is controlled by the execution of the script /opt/iccr/bin/iccr-ctl
-executes library code contained in the JAR file /opt/iccr/lib/iccr.jar
-is configured by properties defined in /opt/iccr/conf/iccr.properties
-writes server output to a log file contained in /opt/iccr/logs
-writes event data in CSV format to an audit file contained in /opt/iccr/data
-copies downloaded IOTA IRI files into /opt/iccr/download
-maintains backup copies of previous IOTA IRI file version in /opt/iccr/bak
+* is installed in /opt/iccr
+* is controlled by the execution of the script /opt/iccr/bin/iccr-ctl
+* executes library code contained in the JAR file /opt/iccr/lib/iccr.jar
+* is configured by properties defined in /opt/iccr/conf/iccr.properties
+* writes server output to a log file contained in /opt/iccr/logs
+* writes event data in CSV format to an audit file contained in /opt/iccr/data
+* copies downloaded IOTA IRI files into /opt/iccr/download
+* maintains backup copies of previous IOTA IRI file version in /opt/iccr/bak
 
-The following ICCR subdirectories are used:
+
+2.a) Directory Structure
 
 /opt/iccr/data
 The /opt/iccr/data directory contains a comma separted value (CSV) formattted file: iota-event.csv
@@ -70,7 +71,7 @@ The /opt/iccr/bak directory contains backup copies of previous versions of the I
 The /opt/iccr/download directory contains the newly downloaded copy of the IOTA IRI file while ICCR is downloading and installing a new version of the IOTA IRI. The newly downloaded IRI will be written into this directory, then copied into the configured IOTA directory.
 
 
-2.a) Utility Scripts
+2.b) Utility Scripts
 
 /opt/iccr/bin/iccr-ctl:
 is used to control the ICCR process
@@ -79,10 +80,10 @@ supports the following command line arguments to control the ICCR process:
 stop
 start
 restart
-status 
+status
+
 also supports following command line arguments when start is being done:
 nossl
-info
 debug
 
 /opt/iccr/bin/checkiotastatus.bash:
@@ -109,17 +110,19 @@ sends a kill signal to the IOTA IRI process ID to allow for orderly shutdown
 
 3) Configuration
 
-The ICCR process reads configuration settings from the file /opt/iccr/conf/iccr.properties.
+ICCR reads configuration settings from the file /opt/iccr/conf/iccr.properties.
 
-In addition, ICCR will also read language specific settings (i.e. language localization translation strings) from a file whose name starts with "MessagesBundle".
+In addition, ICCR will also read language specific settings (i.e. language localization translation strings) from a file whose name starts with "MessagesBundle" (see Language Localization below).
 
-Both iccr.properties and the MessagesBundle files follow the Java properties file format, i.e. key=value
+The iccr.properties file follows the Java properties file format, i.e. key=value
 
 The following properties are available in the /opt/iccr/conf/iccr.properties:
 
 iccrLanguageLocale
+See the Language Localization section below.
 
 iccrCountryLocale
+See the Language Localization section below.
 
 
 iccrApiKey
@@ -127,9 +130,6 @@ This specifies the value of ICCR API access key. If this exact value is not in e
 
 iccrDir
 This specifies the base ICCR installation directory. By default it is set to /opt/iccr
-
-iccrLogLevel
-This property specifies the logging level used by the ICCR process. When set to DEBUG (iccrLogLevel=DEBUG), then ICCR will write more verbose output to the log file (the log file location is /opt/iccr/logs/iccr.log). The default value is DEBUG
 
 iccrPortNumber
 This property specifies the port number that ICCR will listen for incoming client API requests. It can be changed by a client application through the ICCR API. The default value is 14266 (iccrPortNumber=14266)
@@ -179,11 +179,12 @@ iotaNeighbor.active.johan=true
 
 4) Language Localization
 
-The ICCR supports the generation of localized (i.e. English or German) text strings.
+The ICCR supports the ability to emit localized (i.e. English, German, Spanish) text.
 
 For the ICCR to emit messages in a desired language, two settings in iccr.properties must be set: a language code and a country code.
 
 To have ICCR emit text in the desired language (German for example), you must:
+
 a) set the desired language code as the value of the iccrLanguageLocale property in iccr.properties, for example: iccrLanguageLocale=de
 b) set the iccrCountryLocale value in iccr.properties, for example:  iccrCountryLocale=DE
 c) populate a MessagesBundle property file containing all the desired language text
@@ -193,7 +194,11 @@ f) in the target language property file (i.e. MessagesBundle_de_DE.properties) r
 
 
 Possible values for language code (i.e. English, French, German, Spanish, Italian) are: en, fr, de, sp, it
-See http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+For details, see http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+
+Possible values for country code for English speaking countries (i.e. US, GreatBritain) are: US, GB, etc
+Possible values for country code for German speaking countries (i.e. Germany, Austria, Switzerland) are: DE, AT, CH
+For details, see http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
 
 5) Secure Transport
@@ -206,12 +211,27 @@ The ICCR truststore contains the public PKI certificate of the certificate autho
 
 As a client of the ICCR API, the ICC GUI application needs to communicate with the ICCR over secure HTTPS transport. The ICC itself has a keystore and truststore that enables that secure HTTPS layer with the ICCR. The ICC has a mirrored view of the ICCR. The ICC has a keystore and trusttore. The ICC's keystore contains a PKI key, issued by the same CA as the ICCR PKI key. The ICC's truststore contains the same CA as the ICCR's truststore. Thus the ICCR is able to trust the identity of the ICC (the ICC's key was issued by the CA that is in the ICCR truststore) and the ICC is able to trust the ICCR (the ICCR's key was issued by the CA that is in the ICC truststore).
 
+
 5) API
 
-Root: /iccr/rs
+5.a) Overview
 
+The root context path for all the ICCR ReST API resources is /iccr/rs.  All responses to HTTP GET operations return JSON objects. All HTTP PUT operations that update server side properties require the payload in JSON format. There are no HTTP POST operations that create new server side objects. The ICCR ReST API only uses HTTP POST operations as a means to initiate a longer running action that has intended side effects such as stopping or starting the IOTA IRI or downloading a new IOTA IRI version.
+
+All access of the ICCR ReST API is subject to authorization. Each request to the API must have an HTTP header entry ICCR-API-KEY with the value set to the value of the iccrApiKey property in the iccr.properties file. If a given HTTP request does not have an ICCR-API-KEY or if the ICCR-API-KEY header value does not match the configured value of the iccr.properties iccrApiKey, the request will be refused with an HTTP unauthorized status code.
+
+Usage notes:
+* when the ICCR neighbors configuration property is updated, the updated neighbors will be automatically added to the IOTA IRI process;
+* when the IOTA download operation is done, the IOTA IRI process will be automatically started after download completes;
+
+
+The ICCR's ReST API is defined by the following resource paths:
+
+5.a) Read ICCR configuration properties in bulk:
 
 GET /iccr/rs/app/config
+
+Example response:
 {
     "properties":
      [
@@ -225,41 +245,61 @@ GET /iccr/rs/app/config
 }
 
 
-GET /iccr/rs/app/config/{key}
+5.b) Read individual ICCR configuration property values:
 
-/iccr/rs/app/config/iccrPortNumber
+Single ICCR configuration property values can be read by adding the property name to the "app/config" ReST path when doing the GET operation.
+
+GET /iccr/rs/app/config/iccrPortNumber
+
+Example response:
 {"key":"iccrPortNumber","value":"14266"}
 
 /iccr/rs/app/config/iotaPortNumber
+
+Example response:
 {"key":"iotaPortNumber","value":"14265"}
 
 /iccr/rs/app/config/iotaDownloadLink
+
+Example response:
 {"key":"iotaDownloadLink","value":"http://85.93.93.110/iri-1.1.2.3.jar"}
 
 /iccr/rs/app/config/iotaDir
+
+Example response:
 {"key":"iotaDir","value":"/opt/iota"}
 
 /iccr/rs/app/config/iotaStartCmd
+
+Example response:
 {"key":"iotaStartCmd","value":"java -jar IRI.jar -p"}
 
 /iccr/rs/app/config/iotaNeighborRefreshTime
+
+Example response:
 {"key":"iotaNeighborRefreshTime","value":"10"}
 
 
-PUT /iccr/rs/iccr/rs/app/config/{key}
+5.c) Update individual ICCR configuration property values
 
-Payload is JSON object with two properties:
+Single ICCR configuration property values can be changed by doing an HTTP PUT operation to the app/config/{key} path: /iccr/rs/iccr/rs/app/config/{key}
+
+The required payload for the PUT operation is a JSON object with two properties:
 key
 value
-example;
+
+For example:
 {"key":"iccrPortNumber","value":14266}
 
-Response is JSON object with two properties:
+The response to the PUT operation is a JSON object indicating the success of the operation with two properties:
 success
 msg
+
+For example:
 {"success":true,"msg":"properties updated successfully"}
 
-Example payloads:
+Example PUT operations and corresponding payloads:
+
 /iccr/rs/app/config/iccrPortNumber
 {"key":"iccrPortNumber","value":14266}
 
@@ -278,10 +318,16 @@ Example payloads:
 /iccr/rs/app/config/iotaNeighborRefreshTime
 {"key":"iotaNeighborRefreshTime","value":"10"}
 
+
+5.d) Read ICCR IOTA neighbor configuration properties in bulk:
+
+The IOTA neighbors that are configured in the ICCR can be read in bulk by a dedicated ReST resource:
+
 GET /iccr/rs/iccr/rs/app/config/iota/nbrs
+
+Example response:
 {
 "key":"iotaNeighbors",
-"value":null,
 "nbrs":[
     {"active":true,"descr":"David Neighbor Node","key":"david","name":"nbr-David","uri":"udp://192.168.0.0.1:14265","numAt":0,"numIt":0,"numNt":0},
     {"active":true,"descr":"Johan Neighbor Node","key":"johan","name":"nbr-Johan","uri":"udp://192.168.0.0.2:14265","numAt":0,"numIt":0,"numNt":0},
@@ -289,41 +335,190 @@ GET /iccr/rs/iccr/rs/app/config/iota/nbrs
     ]
 }
 
+5.e) Update the ICCR IOTA neighbor configuration
+
+The ICCR IOTA neighbors property be updated in bulk by issuing a PUT to the app/config/iota/nbrs path:
 
 PUT /iccr/rs/iccr/rs/app/config/iota/nbrs
-{"key":"iotaNeighbors","nbrs":[{"key":"do1","name":"do1","descr":"do1","uri":"udp://104.236.239.166:14265","active":true},{"key":"do2","name":"do2","descr":"do2","uri":"udp://45.55.171.97:14265","active":true}]}
+
+The JSON object payload contains a nbrs property that is a list of IOTA neighbor objects. Each neighbor object has the following properties:
+name
+key
+name
+descr
+uri
+active
+
+Example payload:
+{
+"key":"iotaNeighbors",
+"nbrs":[
+	{"key":"do1","name":"do1","descr":"do1","uri":"udp://123.237.239.166:14265","active":true},
+	{"key":"do2","name":"do2","descr":"do2","uri":"udp://44.56.171.97:14265","active":true}
+	]
+}
+
+5.e) Execute ICCR control commands
+
+The ICCR ReST API supports a single operation that triggers the ICCR process to restart:
+
+POST /iccr/rs/iccr/cmd/restart
+
+Example response:
+{
+"success":true,
+"msg":"process executed successfully",
+"properties":[
+		{ "key":"resultCode", "value":"0"},
+		{ "key":"restartIccr","value":"true"}
+	     ]
+}
+
+The ICCR ReST API does not currently support an operation to stop the ICCR process.
+
+Here's an example of an attempt to do unsupported operation:
+POST /iccr/rs/iccr/cmd/stop
+
+Example response:
+{
+"success":false,
+"msg":"IccrAgent (stop): command is not supported"
+}
 
 
-POST /iccr/rs/iccr/cmd/{action}
-     /iccr/rs/iccr/cmd/restart
-{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"restartIccr","value":"true"}]}
+5.f) Execute IOTA IRI control commands
 
-     /iccr/rs/iccr/cmd/stop
-{"success":false,"msg":"IccrAgent (stop): command is not supported"}
+The ICCR ReST API supports operations that manage the IOTA IRI process running on the server.
 
+Each IOTA control operation is executed by issuing an HTTP POST to a path of the form: /iccr/rs/iota/cmd/{action}
 
-POST /iccr/rs/iota/cmd/{action}
-     /iccr/rs/iota/cmd/stop
-     /iccr/rs/iota/cmd/status
-     /iccr/rs/iota/cmd/start
-     /iccr/rs/iota/cmd/restart
-     /iccr/rs/iota/cmd/deletedb
-     /iccr/rs/iota/cmd/delete
-     /iccr/rs/iota/cmd/install
-     /iccr/rs/iota/cmd/removeNeighbors
-     /iccr/rs/iota/cmd/addNeighbors
+Supported actions are:
+/iccr/rs/iota/cmd/start
+/iccr/rs/iota/cmd/status
+/iccr/rs/iota/cmd/stop
+/iccr/rs/iota/cmd/restart
+/iccr/rs/iota/cmd/deletedb
+/iccr/rs/iota/cmd/delete
+/iccr/rs/iota/cmd/install
+/iccr/rs/iota/cmd/removeNeighbors
+/iccr/rs/iota/cmd/addNeighbors
 
-Returns JSON object, with the final operation name indicating the result of the operation: statusIota is true, IOTA is running.
-{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"statusIota","value":"true"}]}
+Each POST operation will return a JSON object that indicates the result of the operation (success) and a list of properties with additional details.
 
-Returns JSON object, with the final operation name indicating the result of the operation: stopIota is true, IOTA was stopped.
-{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"stopIota","value":"true"}]}
+Examples:
 
-Returns JSON object, with the final operation name indicating the result of the operation: statusIota is false, IOTA is not running
-{"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"1"},{"key":"statusIota","value":"false"}]}dana@optiPlex-780-1-ubuntu:/tmp/curl-examples$ 
+POST /iccr/rs/iota/cmd/status
+The response is a  JSON object, with the final operation name indicating the result of the operation: statusIota is true, IOTA is running:
+{
+"success":true,
+"msg":"process executed successfully",
+"properties":[
+		{"key":"resultCode","value":"0"},
+		{"key":"statusIota","value":"true"}
+	     ]
+}
+
+POST /iccr/rs/iota/cmd/stop
+In the JSON object response, the final operation name indicates the result of the operation: stopIota is true, IOTA was stopped:
+{
+"success":true,
+"msg":"process executed successfully",
+"properties": [
+		{"key":"resultCode","value":"0"},
+		{"key":"stopIota","value":"true"}
+	      ]
+}
+
+POST /iccr/rs/iota/cmd/status
+When IOTA is not running, the iota/cmd/status JSON response object will have the final "statusIota" operation name property indicating the result of the operation: statusIota is false, IOTA is not running:
+{
+"success":true,
+"msg":"process executed successfully",
+"properties":[
+		{"key":"resultCode","value":"1"},
+		{"key":"statusIota","value":"false"}
+	     ]
+}
+
+See the command line examples section below for examples of the other iota/cmd operations.
+
+5.g) Read IOTA IRI properties.
+
+The ICCR ReST API supports two operations that read data from the IOTA IRI process without causing any side effects: nodeinfo and neighbors
+
+The operation response is a JSON object whose "content" property contains the value received from the IOTA IRI process.
+
+GET /iccr/rs/iota/cmd/nodeinfo
+
+Example response:
+{
+"success":true,
+"msg":"success",
+"content": {
+	"appName":"IRI",
+	"appVersion":"1.1.2.3",
+	"jreAvailableProcessors":2,
+	"jreFreeMemory":51286960,
+	"jreVersion":"1.8.0_111",
+	"jreMaxMemory":883949568,
+	"jreTotalMemory":60293120,
+	"latestMilestone":"999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+	"latestMilestoneIndex":13250,
+	"latestSolidSubtangleMilestone":"999999999999999999999999999999999999999999999999999999999999999999999999999999999",
+	"latestSolidSubtangleMilestoneIndex":13250,
+	"neighbors":2,
+	"packetsQueueSize":0,
+	"time":1485749319938,
+	"tips":1,
+	"transactionsToRequest":0,
+	"duration":2
+	}",
+"properties":[
+		{"key":"getIotaNodeInfo","value":"true"}
+	     ]
+}
+	
+
+GET /iccr/rs/iota/cmd/neighbors
+Example response:
+{
+"success":true,
+"msg":"success",
+"content":"
+	{"neighbors":
+		[
+		{"address":"234.237.239.166:14265","numberOfAllTransactions":0,"numberOfNewTransactions":0,"numberOfInvalidTransactions":0},
+		{"address":"44.56.171.97:14265","numberOfAllTransactions":0,"numberOfNewTransactions":0,"numberOfInvalidTransactions":0}
+		],
+	"duration":1}",
+"properties":[
+		{"key":"getIotaNeighbors","value":"true"}
+	     ]
+}
+
+If the iota/cmd/neighbors GET operation is done when IOTA is not active, the "success" property will be false in the JSON response.
+Example response:
+{
+"success":false,
+"msg":"IOTA application is not running",
+"properties":[
+		{"key":"getIotaNeighbors","value":"false"}
+ 	     ]
+}
+
+5.h) ICCR event log
+
+The ICCR ReST API provides an operation to view the ICCR event log. The ICCR event log is a file in comma separated value (CSV) format that records the time of significant operations performed by the ICCR.
+
+Each line contains:
+event date
+event type
+event arguments
+event details
+
 
 GET /iccr/rs/iccr/rs/app/eventlog
-Returns list of CSV lines: event date, event type, event arguments, event details
+Example response: n
 [
 "2017-01-29T20:54:38.956,restart ICCR,/opt/iccr/bin/restarticcr.bash",
 "2017-01-29T21:09:58.515,stop,",
@@ -333,44 +528,31 @@ Returns list of CSV lines: event date, event type, event arguments, event detail
 "2017-01-29T21:54:59.06,IOTA addNeighbors,",
 ]
 
+The ICCR ReST API also provides a DELETE operation delete the current ICCR event log:
+
 DELETE /iccr/rs/iccr/rs/app/eventlog
-Returns JSON object:
-{"success":true,"msg":"Event log deleted"}
-
-GET /iccr/rs/iota/neighbors
-Returns JSON object, when IOTA is not active, success is false:
-{"success":false,
-"msg":"IOTA application is not running",
-"content":null,
-"properties":[{"key":"getIotaNeighbors","value":"false"}]}
-
-Returns JSON object, when IOTA is active, success is true, content property contains the response from IRI:
-{"success":true,
-"msg":"success",
-"content":"{\"neighbors\":[{\"address\":\"104.236.239.166:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0},{\"address\":\"45.55.171.97:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0}],\"duration\":1}",
-"properties":[{"key":"getIotaNeighbors","value":"true"}]}
-
-
-GET /iccr/rs/iota/nodeinfo
-Returns JSON object, when IOTA is not active, success is true, content property contains the response from IRI:
-{"success":true,
-"msg":"success",
-"content":"{\"appName\":\"IRI\",\"appVersion\":\"1.1.2.3\",\"jreAvailableProcessors\":2,\"jreFreeMemory\":51286960,\"jreVersion\":\"1.8.0_111\",\"jreMaxMemory\":883949568,\"jreTotalMemory\":60293120,\"latestMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestMilestoneIndex\":13250,\"latestSolidSubtangleMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestSolidSubtangleMilestoneIndex\":13250,\"neighbors\":2,\"packetsQueueSize\":0,\"time\":1485749319938,\"tips\":1,\"transactionsToRequest\":0,\"duration\":2}",
-"properties":[{"key":"getIotaNodeInfo","value":"true"}]
+Example response:
+{
+"success":true,
+"msg":"Event log deleted"
 }
 
+5.i) IOTA IRI console log
 
-GET /iccr/rs/iota/log?fileDirection&numLines&lastFileLength&lastFilePosition
-
-Supports following query parameters:
-fileDirection
-numLines
-lastFileLength
-lastFilePosition
+The ICCR ReST API provides an operation to view the contents of the IOTA IRI console log file. This operation includes query parameters that may alter the behavior. The ReST resource path to view the IOTA IRI log file is: /iccr/rs/iota/log
 
 
-HEAD:
-{"success":true,
+The iota/log operation supports following query parameters:
+fileDirection: either "head" (read from top or beginning) or "tail" (read from the end of the log file)
+numLines: number of log file lines to return, default value is 500
+lastFileLength: length of the log file as received in the previous iota/log response
+lastFilePosition: position in the log file to begin returning content
+
+GET /iccr/rs/iota/log?fileDirection=head
+
+Example response:
+{
+"success":true,
 "msg":"",
 "lines":
 [
@@ -388,8 +570,12 @@ HEAD:
 "lastFilePosition":939,
 "lastFileSize":2340}
 
-TAIL:
-{"success":true,
+
+GET /iccr/rs/iota/log?fileDirection=tail
+
+Example response:
+{
+"success":true,
 "msg":"",
 "lines":
 [
@@ -407,7 +593,19 @@ TAIL:
 "lastFileSize":2553}
 
 
-6) Command examples:
+6) Command line examples using curl
+
+The ICCR ReST API may be queried using the command line utility program "curl". The following sections are examples of individual curl commands that access the various ICCR ReST resources.
+
+Note the following usage of the curl command line options:
+-k: tells curl not to perform validation of the server PKI certifiate (helpful when the server PKI certificate is self-signed)
+-H: add the specified string (in key=value format) to the request's HTTP header 
+-X PUT:  issue an HTTP PUT method
+-X POST:  issue an HTTP POST method
+-d <payload>: specifies the JSON object that will be the HTTP PUT payload
+
+6.a) Examples of requests to GET the app/config properties:
+
 GET /iccr/rs/app/config
 curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config
 
@@ -424,6 +622,8 @@ curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iota
 
 curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaNeighborRefreshTime
 
+
+6.b) Example of operations to update the various ICCR properties:
 
 PUT /app/config/{key}:
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iccrPortNumber","value":14266}' https://localhost:14266/iccr/rs/app/config/iccrPortNumber
@@ -445,12 +645,19 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaNeighborRefreshTime","value":10}' https://localhost:14266/iccr/rs/app/config/iotaNeighborRefreshTime
 {"success":true,"msg":"properties updated successfully"}
 
+Example of operations to query and update the ICCRI neighbor configuration.
+
 GET /iccr/rs/iccr/rs/app/config/iota/nbrs:
+{"key":"iotaNeighbors","nbrs":[{"active":true,"descr":"David Neighbor Node","key":"david","name":"nbr-David","uri":"udp://192.168.0.0.1:14265","numAt":0,"numIt":0,"numNt":0},{"active":true,"descr":"Johan Neighbor Node","key":"johan","name":"nbr-Johan","uri":"udp://192.168.0.0.2:14265","numAt":0,"numIt":0,"numNt":0},{"active":true,"descr":"Sebastian Neighbor Node","key":"sebastian","name":"nbr-sebastian","uri":"udp://192.168.0.0.3:14265","numAt":0,"numIt":0,"numNt":0}]}
 
 
 PUT /iccr/rs/iccr/rs/app/config/iota/nbrs
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iotaNeighbors","nbrs":[{"key":"do1","name":"do1","descr":"do1","uri":"udp://104.236.239.166:14265","active":true},{"key":"do2","name":"do2","descr":"do2","uri":"udp://45.55.171.97:14265","active":true}]}' https://localhost:14266/iccr/rs/app/config/iota/nbrs
+
 {"success":true,"msg":"properties updated successfully"}
+
+
+6.c) Example of operations to execute the various IOTA command
 
 POST /iccr/rs/iccr/cmd/{action}
 
@@ -463,65 +670,70 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST http
 {"success":false,"msg":"IccrAgent (stop): command is not supported"}
 
 
+6.d) Example of operations to execute the various IOTA command actions:
+
 POST /iccr/rs/iota/cmd/{action}
-/iccr/rs/iota/cmd/stop
+
+/iccr/rs/iota/cmd/stop:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/stop
 {"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"stopIota","value":"true"}]}
 
-/iccr/rs/iota/cmd/status
+/iccr/rs/iota/cmd/status:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/status
 {"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"statusIota","value":"true"}]}
 
-/iccr/rs/iota/cmd/start
+/iccr/rs/iota/cmd/start:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/start
 {"success":true,"msg":"process executed successfully","content":null,"properties":[{"key":"resultCode","value":"0"},{"key":"startIota","value":"true"}]}
 
-/iccr/rs/iota/cmd/restart
+/iccr/rs/iota/cmd/restart:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/restart
 {"success":true,"msg":null,"content":null,"properties":[{"key":"restartIota","value":"true"}]}
 
-/iccr/rs/iota/cmd/nodeinfo
-curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/nodeinfo
-{"success":true,"msg":"success","content":"{\"appName\":\"IRI\",\"appVersion\":\"1.1.2.3\",\"jreAvailableProcessors\":2,\"jreFreeMemory\":51286960,\"jreVersion\":\"1.8.0_111\",\"jreMaxMemory\":883949568,\"jreTotalMemory\":60293120,\"latestMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestMilestoneIndex\":13250,\"latestSolidSubtangleMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestSolidSubtangleMilestoneIndex\":13250,\"neighbors\":2,\"packetsQueueSize\":0,\"time\":1485749319938,\"tips\":1,\"transactionsToRequest\":0,\"duration\":2}","properties":[{"key":"getIotaNodeInfo","value":"true"}]}
 
-/iccr/rs/iota/cmd/neighbors
-curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json"  -X POST https://localhost:14266/iccr/rs/iota/cmd/neighbors
-{"success":true,"msg":"success","content":"{\"neighbors\":[{\"address\":\"104.236.239.166:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0},{\"address\":\"45.55.171.97:14265\",\"numberOfAllTransactions\":0,\"numberOfNewTransactions\":0,\"numberOfInvalidTransactions\":0}],\"duration\":1}","properties":[{"key":"getIotaNeighbors","value":"true"}]}
+/iccr/rs/iota/cmd/deletedb:
 
-/iccr/rs/iota/cmd/deletedb
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/deletedb
 {"success":true,"msg":"","content":null,"properties":[{"key":"deleteIotaDb","value":"true"}]}
 
-/iccr/rs/iota/cmd/delete
+/iccr/rs/iota/cmd/delete:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/delete
 {"success":true,"msg":"","content":null,"properties":[{"key":"deleteIota","value":"true"}]}
 
-/iccr/rs/iota/cmd/install
+
+/iccr/rs/iota/cmd/install:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/install
 {"success":true,"msg":"success","content":null,"properties":[{"key":"installIota","value":"true"}]}
 
-/iccr/rs/iota/cmd/removeNeighbors
+
+/iccr/rs/iota/cmd/removeNeighbors:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/removeNeighbors
-{"success":true,"msg":"success","content":"{\"removedNeighbors\":2,\"duration\":1}","properties":[{"key":"removeIotaNeighbors","value":"true"}]}
+{"success":true,"msg":"success","content":"{"removedNeighbors":2,"duration":1}","properties":[{"key":"removeIotaNeighbors","value":"true"}]}
 
 
-/iccr/rs/iota/cmd/addNeighbors
+/iccr/rs/iota/cmd/addNeighbors:
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/addNeighbors
-{"success":true,"msg":"success","content":"{\"addedNeighbors\":2,\"duration\":0}","properties":[{"key":"addIotaNeighbors","value":"true"}]}
+{"success":true,"msg":"success","content":"{"addedNeighbors":2,"duration":0}","properties":[{"key":"addIotaNeighbors","value":"true"}]}
 
-GET /iccr/rs/iota/nodeinfo
+
+6.e) Example of operation to query the IOTA service for nodeinfo:
+
+GET /iccr/rs/iota/cmd/nodeinfo
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST https://localhost:14266/iccr/rs/iota/cmd/nodeinfo
-{"success":true,
-"msg":"success",
-"content":"{\"appName\":\"IRI\",\"appVersion\":\"1.1.2.3\",\"jreAvailableProcessors\":2,\"jreFreeMemory\":51286960,\"jreVersion\":\"1.8.0_111\",\"jreMaxMemory\":883949568,\"jreTotalMemory\":60293120,\"latestMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestMilestoneIndex\":13250,\"latestSolidSubtangleMilestone\":\"999999999999999999999999999999999999999999999999999999999999999999999999999999999\",\"latestSolidSubtangleMilestoneIndex\":13250,\"neighbors\":2,\"packetsQueueSize\":0,\"time\":1485749319938,\"tips\":1,\"transactionsToRequest\":0,\"duration\":2}",
-"properties":[{"key":"getIotaNodeInfo","value":"true"}]
-}
+{"success":true,"msg":"success","content":"{"appName":"IRI","appVersion":"1.1.2.3","jreAvailableProcessors":2,"jreFreeMemory":51286960,"jreVersion":"1.8.0_111","jreMaxMemory":883949568,"jreTotalMemory":60293120,"latestMilestone":"999999999999999999999999999999999999999999999999999999999999999999999999999999999","latestMilestoneIndex":13250,"latestSolidSubtangleMilestone":"999999999999999999999999999999999999999999999999999999999999999999999999999999999","latestSolidSubtangleMilestoneIndex":13250,"neighbors":2,"packetsQueueSize":0,"time":1485749319938,"tips":1,"transactionsToRequest":0,"duration":2}","properties":[{"key":"getIotaNodeInfo","value":"true"}]}
 
 
+6.f) Example of operation to view the IOTA log file with fileDirection=head
 
-GET /iccr/rs/iota/log?fileDirection&numLines&lastFileLength&lastFilePosition
-
-HEAD:
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://localhost:14266/iccr/rs/iota/log?fileDirection=head&numLines=10"
 {"success":true,
 "msg":"",
@@ -539,17 +751,20 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://loc
 "22:08:13.389 [XNIO-1 task-2] INFO  com.iota.iri.service.API - # 2 -> Requesting command 'getNeighbors'"
 ]
 "lastFilePosition":939,
-"lastFileSize":2340}
+"lastFileSize":2340
+}
 
-TAIL:
+
+6.f) Example of operation to view the IOTA log file with fileDirection=tail and numLines=10
+
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://localhost:14266/iccr/rs/iota/log?fileDirection=tail&numLines=10"
 {"success":true,
 "msg":"",
 "lines":
 [
 "22:37:36.570 [pool-2-thread-4] INFO  com.iota.iri.service.Node - Checking Neighbors' Ip...",
-"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do1' with '104.236.239.166'",
-"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do2' with '45.55.171.97'",
+"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do1' with '106.237.239.166'",
+"22:37:36.575 [pool-2-thread-4] INFO  com.iota.iri.service.Node - DNS Checker: Validating DNS Address 'sw-do2' with '44.57.171.97'",
 "22:46:11.619 [XNIO-1 task-6] INFO  com.iota.iri.service.API - # 6 -> Requesting command 'removeNeighbors'",
 "22:46:11.645 [XNIO-1 task-7] INFO  com.iota.iri.service.API - # 7 -> Requesting command 'addNeighbors'",
 "22:48:22.536 [XNIO-1 task-8] INFO  com.iota.iri.service.API - # 8 -> Requesting command 'removeNeighbors'",
@@ -558,7 +773,8 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://loc
 "22:56:11.647 [XNIO-1 task-11] INFO  com.iota.iri.service.API - # 11 -> Requesting command 'addNeighbors'"
 ],
 "lastFilePosition":2235,
-"lastFileSize":2553}
+"lastFileSize":2553
+}
 
 
 

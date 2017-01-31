@@ -289,9 +289,9 @@ done
 
 echo "Ok, using $pwd as the $what API access key..."
 if [ "${mac}" = "1" ]; then
-    `sed -i '' "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile`
+    sed -i '' "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile
 else
-    `sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile`
+    sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile
 fi
 
 echo
