@@ -1,8 +1,8 @@
-# iccr
-IOTA Control Center Receiver
+# ICCR - IOTA Control Center Receiver
 
 
-1) Overview
+
+## 1) Overview
 
 The ICCR is a java based microservice server process.  It provides a ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine. It functions as microservice by using the Wildfly Swarm framework to generate a single "fat" JAR file. It requires that java version 1.8 or greater be installed on the target machine.
 
@@ -15,7 +15,7 @@ The ICCR:
 * supports authorized client usage only by means of an API access key
 
 
-2) Functionality
+## 2) Functionality
 
 The ICCR:
 * is installed in /opt/iccr
@@ -28,7 +28,7 @@ The ICCR:
 * maintains backup copies of previous IOTA IRI file version in /opt/iccr/bak
 
 
-2.a) Directory Structure
+### 2.a) Directory Structure
 
 /opt/iccr/data
 The /opt/iccr/data directory contains a comma separted value (CSV) formattted file: iota-event.csv
@@ -71,7 +71,7 @@ The /opt/iccr/bak directory contains backup copies of previous versions of the I
 The /opt/iccr/download directory contains the newly downloaded copy of the IOTA IRI file while ICCR is downloading and installing a new version of the IOTA IRI. The newly downloaded IRI will be written into this directory, then copied into the configured IOTA directory.
 
 
-2.b) Utility Scripts
+### 2.b) Utility Scripts
 
 /opt/iccr/bin/iccr-ctl:
 is used to control the ICCR process
@@ -108,7 +108,7 @@ uses the process ID in /opt/iota/iota.pid
 sends a kill signal to the IOTA IRI process ID to allow for orderly shutdown
 
 
-3) Configuration
+## 3) Configuration
 
 ICCR reads configuration settings from the file /opt/iccr/conf/iccr.properties.
 
@@ -160,16 +160,17 @@ The value of the iotaNeighbors property is just a comma separated list of neighb
 
 Each neighbor ID value in the iotaNeighbors property list is a unique identifier of that neighbor. The ID is used to specify a block of configuration properties for that neighbor. There will be one block of configuration properties for each neighbor. Each neighbor configuration block has five properties: key, name, descr, active, and uri. Each neighbor configuration property block specifies those five properties using a mechanism that embeds the neighbor ID in the property name. The pattern for the individual neighbor property name is iotaNeighbor.<propertyname>.<ID>=<propertyvalue>
 
-# Example:
+Example:
+
 iotaNeighbors=david,johan
-# The block of properties for neighbor "david":
+The block of properties for neighbor "david":
 iotaNeighbor.key.david=david
 iotaNeighbor.uri.david=udp://192.0.0.1:14265
 iotaNeighbor.name.david=David
 iotaNeighbor.descr.david=David node
 iotaNeighbor.active.david=true
 
-# The block of properties for neighbor "johan":
+The block of properties for neighbor "johan":
 iotaNeighbor.key.johan=johan
 iotaNeighbor.uri.johan=udp://192.0.0.2:14265
 iotaNeighbor.name.johan=Johan
@@ -177,7 +178,7 @@ iotaNeighbor.descr.johan=Johan Node
 iotaNeighbor.active.johan=true
 
 
-4) Language Localization
+## 4) Language Localization
 
 The ICCR supports the ability to emit localized (i.e. English, German, Spanish) text.
 
@@ -201,7 +202,7 @@ Possible values for country code for German speaking countries (i.e. Germany, Au
 For details, see http://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
 
-5) Secure Transport
+## 5) Secure Transport
 
 The ICCR supports secure encrypted traffic between ICCR and client applications over HTTPS. ICCR uses two PKI (Public Key Infrastructure) keystore files that are included with the ICCR distribution. PKI based security mechanisms depend on the idea of identity and trust. The first PKI file used by ICCR is a java formatted keystore (jks format) that establishes the identity of the ICCR server: /opt/iccr/conf/iccr-ks.jks. The iccr-ks.jks file is the "keystore" used by the ICCR.  The second PKI file used by ICCR is another java formatted keystore (jks format) file that establishes what clients the ICCR should trust:  /opt/iccr/iccr-ts.jks. The iccr-ts.jks file is the "truststore" used by ICCR.
 
@@ -212,9 +213,9 @@ The ICCR truststore contains the public PKI certificate of the certificate autho
 As a client of the ICCR API, the ICC GUI application needs to communicate with the ICCR over secure HTTPS transport. The ICC itself has a keystore and truststore that enables that secure HTTPS layer with the ICCR. The ICC has a mirrored view of the ICCR. The ICC has a keystore and trusttore. The ICC's keystore contains a PKI key, issued by the same CA as the ICCR PKI key. The ICC's truststore contains the same CA as the ICCR's truststore. Thus the ICCR is able to trust the identity of the ICC (the ICC's key was issued by the CA that is in the ICCR truststore) and the ICC is able to trust the ICCR (the ICCR's key was issued by the CA that is in the ICC truststore).
 
 
-5) API
+## 5) API
 
-5.a) Overview
+### Overview
 
 The root context path for all the ICCR ReST API resources is /iccr/rs.  All responses to HTTP GET operations return JSON objects. All HTTP PUT operations that update server side properties require the payload in JSON format. There are no HTTP POST operations that create new server side objects. The ICCR ReST API only uses HTTP POST operations as a means to initiate a longer running action that has intended side effects such as stopping or starting the IOTA IRI or downloading a new IOTA IRI version.
 
@@ -227,7 +228,7 @@ Usage notes:
 
 The ICCR's ReST API is defined by the following resource paths:
 
-5.a) Read ICCR configuration properties in bulk:
+### 5.a) Read ICCR configuration properties in bulk:
 
 GET /iccr/rs/app/config
 
@@ -245,7 +246,7 @@ Example response:
 }
 
 
-5.b) Read individual ICCR configuration property values:
+### 5.b) Read individual ICCR configuration property values:
 
 Single ICCR configuration property values can be read by adding the property name to the "app/config" ReST path when doing the GET operation.
 
@@ -280,7 +281,7 @@ Example response:
 {"key":"iotaNeighborRefreshTime","value":"10"}
 
 
-5.c) Update individual ICCR configuration property values
+### 5.c) Update individual ICCR configuration property values
 
 Single ICCR configuration property values can be changed by doing an HTTP PUT operation to the app/config/{key} path: /iccr/rs/iccr/rs/app/config/{key}
 
@@ -319,7 +320,7 @@ Example PUT operations and corresponding payloads:
 {"key":"iotaNeighborRefreshTime","value":"10"}
 
 
-5.d) Read ICCR IOTA neighbor configuration properties in bulk:
+### 5.d) Read ICCR IOTA neighbor configuration properties in bulk:
 
 The IOTA neighbors that are configured in the ICCR can be read in bulk by a dedicated ReST resource:
 
@@ -335,7 +336,7 @@ Example response:
     ]
 }
 
-5.e) Update the ICCR IOTA neighbor configuration
+### 5.e) Update the ICCR IOTA neighbor configuration
 
 The ICCR IOTA neighbors property be updated in bulk by issuing a PUT to the app/config/iota/nbrs path:
 
@@ -386,7 +387,7 @@ Example response:
 }
 
 
-5.f) Execute IOTA IRI control commands
+### 5.f) Execute IOTA IRI control commands
 
 The ICCR ReST API supports operations that manage the IOTA IRI process running on the server.
 
@@ -442,7 +443,7 @@ When IOTA is not running, the iota/cmd/status JSON response object will have the
 
 See the command line examples section below for examples of the other iota/cmd operations.
 
-5.g) Read IOTA IRI properties.
+### 5.g) Read IOTA IRI properties.
 
 The ICCR ReST API supports two operations that read data from the IOTA IRI process without causing any side effects: nodeinfo and neighbors
 
@@ -506,7 +507,7 @@ Example response:
  	     ]
 }
 
-5.h) ICCR event log
+### 5.h) ICCR event log
 
 The ICCR ReST API provides an operation to view the ICCR event log. The ICCR event log is a file in comma separated value (CSV) format that records the time of significant operations performed by the ICCR.
 
@@ -537,7 +538,7 @@ Example response:
 "msg":"Event log deleted"
 }
 
-5.i) IOTA IRI console log
+### 5.i) IOTA IRI console log
 
 The ICCR ReST API provides an operation to view the contents of the IOTA IRI console log file. This operation includes query parameters that may alter the behavior. The ReST resource path to view the IOTA IRI log file is: /iccr/rs/iota/log
 
@@ -593,7 +594,7 @@ Example response:
 "lastFileSize":2553}
 
 
-6) Command line examples using curl
+## 6) Command line examples using curl
 
 The ICCR ReST API may be queried using the command line utility program "curl". The following sections are examples of individual curl commands that access the various ICCR ReST resources.
 
@@ -604,7 +605,7 @@ Note the following usage of the curl command line options:
 -X POST:  issue an HTTP POST method
 -d <payload>: specifies the JSON object that will be the HTTP PUT payload
 
-6.a) Examples of requests to GET the app/config properties:
+### 6.a) Examples of requests to GET the app/config properties:
 
 GET /iccr/rs/app/config
 curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config
@@ -623,7 +624,7 @@ curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iota
 curl -k -H "ICCR-API-KEY:secret" https://localhost:14266/iccr/rs/app/config/iotaNeighborRefreshTime
 
 
-6.b) Example of operations to update the various ICCR properties:
+### 6.b) Example of operations to update the various ICCR properties:
 
 PUT /app/config/{key}:
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{"key":"iccrPortNumber","value":14266}' https://localhost:14266/iccr/rs/app/config/iccrPortNumber
@@ -657,7 +658,7 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X PUT -d '{
 {"success":true,"msg":"properties updated successfully"}
 
 
-6.c) Example of operations to execute the various IOTA command
+### 6.c) Example of operations to execute the various IOTA command
 
 POST /iccr/rs/iccr/cmd/{action}
 
@@ -724,7 +725,7 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST http
 {"success":true,"msg":"success","content":"{"addedNeighbors":2,"duration":0}","properties":[{"key":"addIotaNeighbors","value":"true"}]}
 
 
-6.e) Example of operation to query the IOTA service for nodeinfo:
+### 6.e) Example of operation to query the IOTA service for nodeinfo:
 
 GET /iccr/rs/iota/cmd/nodeinfo
 
@@ -732,7 +733,7 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" -X POST http
 {"success":true,"msg":"success","content":"{"appName":"IRI","appVersion":"1.1.2.3","jreAvailableProcessors":2,"jreFreeMemory":51286960,"jreVersion":"1.8.0_111","jreMaxMemory":883949568,"jreTotalMemory":60293120,"latestMilestone":"999999999999999999999999999999999999999999999999999999999999999999999999999999999","latestMilestoneIndex":13250,"latestSolidSubtangleMilestone":"999999999999999999999999999999999999999999999999999999999999999999999999999999999","latestSolidSubtangleMilestoneIndex":13250,"neighbors":2,"packetsQueueSize":0,"time":1485749319938,"tips":1,"transactionsToRequest":0,"duration":2}","properties":[{"key":"getIotaNodeInfo","value":"true"}]}
 
 
-6.f) Example of operation to view the IOTA log file with fileDirection=head
+### 6.f) Example of operation to view the IOTA log file with fileDirection=head
 
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://localhost:14266/iccr/rs/iota/log?fileDirection=head&numLines=10"
 {"success":true,
@@ -755,7 +756,7 @@ curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://loc
 }
 
 
-6.f) Example of operation to view the IOTA log file with fileDirection=tail and numLines=10
+### 6.g) Example of operation to view the IOTA log file with fileDirection=tail and numLines=10
 
 curl -k -H "ICCR-API-KEY:secret" -H "Content-Type:application/json" "https://localhost:14266/iccr/rs/iota/log?fileDirection=tail&numLines=10"
 {"success":true,
