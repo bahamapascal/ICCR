@@ -6,7 +6,7 @@ import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.iota.agent.http.GetIotaLibrary;
-import org.iotacontrolcenter.iota.agent.process.IotaBakupAndInstallProcess;
+import org.iotacontrolcenter.iota.agent.process.IotaBackupAndInstallProcess;
 import org.iotacontrolcenter.iota.agent.process.OsProcess;
 import org.iotacontrolcenter.persistence.PersistenceService;
 import org.iotacontrolcenter.properties.source.PropertySource;
@@ -17,7 +17,6 @@ import java.io.IOException;
 public class InstallIotaAction extends AbstractAction implements IotaAction {
 
     public static final String ACTION_PROP = "installIota";
-    private boolean wasIotaActive = false;
 
     public InstallIotaAction() {
         super(new String[] { PropertySource.IOTA_DLD_LINK_PROP, PropertySource.IOTA_APP_DIR_PROP });
@@ -26,20 +25,20 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
     @Override
     protected void validatePreconditions() {
 
-        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
+        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
         }
 
-        if (!AgentUtil.dirExists(propSource.getIccrBakDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIccrBakDir());
+        if (AgentUtil.dirDoesNotExist(propSource.getIccrBakDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") + ": " + propSource.getIccrBakDir());
         }
 
-        if (!AgentUtil.dirExists(propSource.getIccrBakDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIccrBakDir());
+        if (AgentUtil.dirDoesNotExist(propSource.getIccrBakDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") + ": " + propSource.getIccrBakDir());
         }
 
-        if (!AgentUtil.dirExists(propSource.getIccrDownloadDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIccrDownloadDir());
+        if (AgentUtil.dirDoesNotExist(propSource.getIccrDownloadDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") + ": " + propSource.getIccrDownloadDir());
         }
     }
 
@@ -48,11 +47,11 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         System.out.println("installIota,  props: " + actionProps);
         preExecute();
 
-        wasIotaActive = AgentUtil.isIotaActive();
+        boolean wasIotaActive = AgentUtil.isIotaActive();
 
         ActionResponse resp = new ActionResponse();
-        boolean rval = true;
-        String msg = null;
+        boolean success = true;
+        String msg = "";
 
         // client may have provided the desired download link and filename:
         if(actionProps != null && actionProps.getProperties() != null && !actionProps.getProperties().isEmpty()) {
@@ -66,31 +65,31 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
 
         // Download new IRI.jar:
         GetIotaLibrary iotaDld = new GetIotaLibrary(propSource.getIotaDownloadUrl());
-        String dldFilePath = null;
-        String iriJarFilePath = null;
-        String iriJarFile= null;
+        String dldFilePath;
+        String iriJarFilePath;
+        String iriJarFile;
         try {
 
             // First stop active in order to restart with new version just downloaded:
             if(wasIotaActive) {
                 System.out.println(ACTION_PROP + " " +
-                        localizer.getLocalText("stoppingIota"));
+                        localization.getLocalText("stoppingIota"));
 
                 boolean stopped = AgentUtil.stopIota();
                 if(stopped) {
-                    persister.logIotaAction(PersistenceService.IOTA_STOP,
+                    persistenceService.logIotaAction(PersistenceService.IOTA_STOP,
                             "",
                             "");
                 }
                 else {
                     System.out.println(ACTION_PROP + " " +
-                            localizer.getLocalText("stopIotaFail"));
+                            localization.getLocalText("stopIotaFail"));
 
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                     resp.setSuccess(false);
-                    resp.setMsg(localizer.getLocalText("stopIotaFail"));
+                    resp.setMsg(localization.getLocalText("stopIotaFail"));
 
-                    persister.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
+                    persistenceService.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
                             "",
                             resp.getMsg());
 
@@ -106,7 +105,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
 
                 System.out.println(iotaDld.getName() + " " +
-                        localizer.getLocalText("httpRequestSuccess"));
+                        localization.getLocalText("httpRequestSuccess"));
 
                 String dldUrl = propSource.getIotaDownloadUrl();
                 String dldFileName = dldUrl.substring(dldUrl.lastIndexOf("/")+1);
@@ -124,15 +123,15 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                 if(!storeJar(dldFilePath, jarBytes)) {
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                     resp.setSuccess(false);
-                    resp.setMsg(localizer.getLocalText("storeIotaFail"));
+                    resp.setMsg(localization.getLocalText("storeIotaFail"));
 
-                    persister.logIotaAction(PersistenceService.IOTA_DLD_FAIL, dldFilePath,
-                            localizer.getLocalText("storeIotaFail"));
+                    persistenceService.logIotaAction(PersistenceService.IOTA_DLD_FAIL, dldFilePath,
+                            localization.getLocalText("storeIotaFail"));
 
                     return resp;
                 }
 
-                persister.logIotaAction(PersistenceService.IOTA_DLD,
+                persistenceService.logIotaAction(PersistenceService.IOTA_DLD,
                         propSource.getIotaDownloadUrl(),
                         dldFilePath + " (" + jarBytes.length + " bytes)");
 
@@ -142,19 +141,19 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                 // that was specified in the start iota cmd:
                 boolean installed = installNewIota(dldFilePath, iriJarFilePath, iriJarFile);
                 if(installed) {
-                    persister.logIotaAction(PersistenceService.IOTA_INSTALL,
+                    persistenceService.logIotaAction(PersistenceService.IOTA_INSTALL,
                             dldFilePath,
                             iriJarFilePath);
                 }
                 else {
                     System.out.println(ACTION_PROP + " " +
-                            localizer.getLocalText("installIotaFail"));
+                            localization.getLocalText("installIotaFail"));
 
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                     resp.setSuccess(false);
-                    resp.setMsg(localizer.getLocalText("installIotaFail"));
+                    resp.setMsg(localization.getLocalText("installIotaFail"));
 
-                    persister.logIotaAction(PersistenceService.IOTA_INSTALL_FAIL,
+                    persistenceService.logIotaAction(PersistenceService.IOTA_INSTALL_FAIL,
                             dldFilePath,
                             resp.getMsg());
 
@@ -162,29 +161,30 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
                 }
 
                 boolean started = AgentUtil.startIotaBoolean();
+                //noinspection StatementWithEmptyBody
                 if(started) {
                     // The start action is logging this event
                 }
                 else {
                     System.out.println(ACTION_PROP + " " +
-                            localizer.getLocalText("startIotaFail"));
+                            localization.getLocalText("startIotaFail"));
 
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                     resp.setSuccess(false);
-                    resp.setMsg(localizer.getLocalText("startIotaFail"));
+                    resp.setMsg(localization.getLocalText("startIotaFail"));
 
                     return resp;
                 }
             }
             else {
-                rval = false;
+                success = false;
                 msg = iotaDld.getResponseReason();
                 if(msg == null || msg.isEmpty()) {
                     msg = iotaDld.getStartError();
                 }
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
 
-                persister.logIotaAction(PersistenceService.IOTA_DLD_FAIL, propSource.getIotaDownloadUrl(), msg);
+                persistenceService.logIotaAction(PersistenceService.IOTA_DLD_FAIL, propSource.getIotaDownloadUrl(), msg);
 
                 // Adding url to msg to send back to client after the action was logged
                 msg = propSource.getIotaDownloadUrl() + " " + msg;
@@ -192,24 +192,25 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         }
         catch(IllegalStateException ise) {
 
-            persister.logIotaAction(PersistenceService.IOTA_DLD_FAIL, propSource.getIotaDownloadUrl(), ise.getMessage());
+            persistenceService.logIotaAction(PersistenceService.IOTA_DLD_FAIL, propSource.getIotaDownloadUrl(), ise.getMessage());
 
             // Message is already localized
             System.out.println(iotaDld.getName() + " " +
-                    localizer.getLocalTextWithFixed("startHttpException", ise.getMessage()));
-            rval = false;
+                    localization.getLocalTextWithFixed("startHttpException", ise.getMessage()));
+            success = false;
             msg = ise.getMessage();
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        resp.setSuccess(rval);
+        resp.setSuccess(success);
         resp.setMsg(msg);
 
         return resp;
     }
 
     private boolean installNewIota(String dldFilePath, String iriJarFilePath, String iriJarFile) {
-        boolean rval = true;
 
         System.out.println("installing new iri jar from " + dldFilePath +
                 ", copying to " + iriJarFilePath);
@@ -217,9 +218,9 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         // General preconditions were already validated (i.e. iotaDir exists)
         if(!AgentUtil.fileExists(dldFilePath)) {
             System.out.println(ACTION_PROP + " " +
-                    localizer.getLocalText("storeIotaFail") +
+                    localization.getLocalText("storeIotaFail") +
                     ": (" + dldFilePath + "), " +
-                    localizer.getLocalText("missingFile"));
+                    localization.getLocalText("missingFile"));
             return false;
         }
 
@@ -235,7 +236,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
             }
             catch(IOException ioe) {
                 System.out.println(ACTION_PROP + " " +
-                        localizer.getLocalText("backupIotaFail") +
+                        localization.getLocalText("backupIotaFail") +
                         ": (" + iriJarFilePath + ")");
                 return false;
             }
@@ -249,7 +250,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         }
         catch(IOException ioe) {
             System.out.println(ACTION_PROP + " " +
-                    localizer.getLocalText("installIotaFail") +
+                    localization.getLocalText("installIotaFail") +
                     ": (" + dldFilePath + " -> " + iriJarFilePath + ")");
             return false;
         }
@@ -257,7 +258,7 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
     }
 
     private boolean installNewIotaByScript(String dldFilePath, String iriJarFile) {
-        boolean rval = true;
+        boolean success;
 
         System.out.println("installing new iri jar from " + dldFilePath +
                 ", copying to " + iriJarFile);
@@ -265,38 +266,37 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         // run script to: install-new-iri <dldFilepath> <iriJarFile>
         //      make existing iri backup
         //      mv dld to iri
-        OsProcess proc = new IotaBakupAndInstallProcess(dldFilePath, iriJarFile);
-        rval = proc.start();
-        String msg = localizer.getLocalText("processSuccess");
+        OsProcess proc = new IotaBackupAndInstallProcess(dldFilePath, iriJarFile);
+        success = proc.start();
+        String msg = localization.getLocalText("processSuccess");
         int rc = 0;
-        if (!rval) {
+        if (!success) {
             if (proc.isStartError()) {
                 System.out.println(proc.getStartError());
-                msg = proc.getStartError();
             }
         } else {
             rc = proc.getResultCode();
             System.out.println(proc.getName() + " " +
-                    localizer.getLocalText("processSuccess") + ", " +
-                    localizer.getLocalText("resultCode") + ": " + rc);
+                    localization.getLocalText("processSuccess") + ", " +
+                    localization.getLocalText("resultCode") + ": " + rc);
         }
 
         /*
-        resp.setSuccess(rval);
+        resp.setSuccess(success);
         resp.setMsg(msg);
 
-        if(rval) {
+        if(success) {
             resp.addProperty(new IccrPropertyDto("resultCode", Integer.toString(rc)));
         }
         resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));
         */
-        rval = rval && rc == 0;
+        success = success && rc == 0;
 
-        return rval;
+        return success;
     }
 
     private boolean storeJar(String filePath, byte[] jarBytes) {
-        boolean rval = true;
+        boolean success = true;
 
         System.out.println("storing downloaded iri jar bytes in " + filePath);
 
@@ -305,11 +305,11 @@ public class InstallIotaAction extends AbstractAction implements IotaAction {
         }
         catch(IOException ioe) {
             System.out.println(ACTION_PROP + " " +
-                    localizer.getLocalText("storeIotaFail") +
+                    localization.getLocalText("storeIotaFail") +
                     ": " + ioe.getLocalizedMessage());
-            rval = false;
+            success = false;
         }
-        return rval;
+        return success;
     }
 
 }

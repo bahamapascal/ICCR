@@ -8,9 +8,9 @@ import java.util.TimerTask;
 
 public class RefreshIotaNeighborTimerTask extends TimerTask {
 
-    private Agent agent = Agent.getInstance();
+    private final Agent agent = Agent.getInstance();
     private boolean isRunning = false;
-    private Object syncObj = new Object();
+    private final Object syncObj = new Object();
 
     @Override
     public void run() {
@@ -19,14 +19,14 @@ public class RefreshIotaNeighborTimerTask extends TimerTask {
         }
         setIsRunning(true);
         try {
-            ActionResponse resp = runIotaAction(ActionFactory.REMOVENEIGHBORS);
+            ActionResponse resp = runIotaAction(ActionFactory.REMOVE_NEIGHBORS);
             if (resp.isSuccess()) {
-                resp = runIotaAction(ActionFactory.ADDNEIGHBORS);
+                //noinspection UnusedAssignment
+                resp = runIotaAction(ActionFactory.ADD_NEIGHBORS);
             }
-        }
-        catch(Exception e) {
-        }
-        finally {
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
             setIsRunning(false);
         }
     }
@@ -43,12 +43,10 @@ public class RefreshIotaNeighborTimerTask extends TimerTask {
         }
     }
 
-    private ActionResponse runIotaAction(String action) {
+    private ActionResponse runIotaAction(String action) throws InterruptedException {
         System.out.println("delegate running Iota action: " + action);
-        ActionResponse resp = null;
-        try {
-            resp = agent.action(action, null);
-        }
+        return agent.action(action, null);
+        /*
         catch(IllegalArgumentException iae) {
             System.out.println("delegate runIotaAction illegal arg error: " + iae.getMessage());
             iae.printStackTrace();
@@ -67,7 +65,7 @@ public class RefreshIotaNeighborTimerTask extends TimerTask {
             resp.setSuccess(false);
             resp.setMsg(e.getLocalizedMessage());
         }
-        return resp;
+        */
     }
 
 }

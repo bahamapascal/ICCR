@@ -10,7 +10,7 @@ public class Delegate {
 
 
     private static Delegate instance;
-    private static Object SYNC_INST = new Object();
+    private static final Object SYNC_INST = new Object();
     public static Delegate getInstance() {
         synchronized (SYNC_INST) {
             if(Delegate.instance == null) {
@@ -22,7 +22,7 @@ public class Delegate {
 
     private java.util.Timer iotaNeighborRefreshTimer;
     private Integer refreshTimeMin = null;
-    private PropertySource propertySource = PropertySource.getInstance();
+    private final PropertySource propertySource = PropertySource.getInstance();
 
     private Delegate() {
         System.out.println("new Delegate");
@@ -38,6 +38,7 @@ public class Delegate {
     }
 
     public synchronized  void iccrActionDone(String action) {
+        //noinspection StatementWithEmptyBody
         if(action.equals(IccrActionFactory.RESTART)) {
             //startNeighborRefresh();
         }
@@ -55,7 +56,7 @@ public class Delegate {
         }
         else if(prop.equals(PropertySource.IOTA_NBR_REFRESH_TIME_PROP)) {
             Integer prevRefreshTimeMin = refreshTimeMin;
-            if(propertySource.getIotaNeighborRefreshTime() == prevRefreshTimeMin) {
+            if(propertySource.getIotaNeighborRefreshTime().equals(prevRefreshTimeMin)) {
                 return;
             }
             stopNeighborRefresh();
@@ -81,7 +82,7 @@ public class Delegate {
             }
         }
         catch(Exception e) {
-            System.out.println("startTimers iota nbrs refresh exception: " + e);
+            System.out.println("startTimers iota neighbors refresh exception: " + e);
         }
     }
 

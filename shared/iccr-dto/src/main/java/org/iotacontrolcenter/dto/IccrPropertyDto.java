@@ -38,8 +38,7 @@ public class IccrPropertyDto {
 
         IccrPropertyDto that = (IccrPropertyDto) o;
 
-        if (!getKey().equals(that.getKey())) return false;
-        return getValue().equals(that.getValue());
+        return getKey().equals(that.getKey()) && getValue().equals(that.getValue());
 
     }
 

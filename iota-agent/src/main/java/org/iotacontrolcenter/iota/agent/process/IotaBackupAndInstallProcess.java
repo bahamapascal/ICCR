@@ -2,13 +2,12 @@ package org.iotacontrolcenter.iota.agent.process;
 
 import java.io.File;
 
-public class IotaBakupAndInstallProcess extends OsProcess {
+public class IotaBackupAndInstallProcess extends OsProcess {
 
-    private String runScript = "installiri";
-
-    public IotaBakupAndInstallProcess(String dldFilePath, String iriFile) {
+    public IotaBackupAndInstallProcess(String dldFilePath, String iriFile) {
         super("installiri");
 
+        String runScript = "installiri";
         runScript += propSource.osIsWindows() ? ".bat" : ".bash";
 
         setArgs(new String[] { propSource.getIccrBinDir() + "/" + runScript, dldFilePath, iriFile });

@@ -1,7 +1,6 @@
 package org.iotacontrolcenter.iota.agent.action;
 
 import org.iotacontrolcenter.dto.ActionResponse;
-import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
@@ -25,25 +24,27 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
     @Override
     protected void validatePreconditions() {
 
-        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
+        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
         }
 
         if (!AgentUtil.fileExists(propSource.getIriJarFilePath())) {
-            throw new IllegalStateException(localizer.getLocalText("missingFile") + ": " + propSource.getIriJarFilePath());
+            throw new IllegalStateException(localization.getLocalText("missingFile") + ": " + propSource.getIriJarFilePath());
         }
 
         // Do we need to have neighbors in order to start?
+        /*
         if(false) {
-            IccrIotaNeighborsPropertyDto nbrs = propSource.getIotaNeighbors();
-            if (nbrs == null || nbrs.getNbrs().isEmpty()) {
-                throw new IllegalStateException(localizer.getLocalText("missingProperty") + ": " + PropertySource.IOTA_NEIGHBORS_PROP);
+            IccrIotaNeighborsPropertyDto iotaNeighbors = propSource.getIotaNeighbors();
+            if (iotaNeighbors == null || iotaNeighbors.getNeighbors().isEmpty()) {
+                throw new IllegalStateException(localization.getLocalText("missingProperty") + ": " + PropertySource.IOTA_NEIGHBORS_PROP);
             }
         }
+        */
     }
 
     @Override
-    public ActionResponse execute(IccrPropertyListDto actionProps) {
+    public ActionResponse execute(IccrPropertyListDto actionProps) throws InterruptedException {
         this.actionProps = actionProps;
         preExecute();
 
@@ -52,55 +53,47 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         if(AgentUtil.isIotaActive()) {
             System.out.println("startIota: already active");
             resp.setSuccess(true);
-            resp.setMsg(localizer.getLocalText("startIotaAlreadyActive"));
+            resp.setMsg(localization.getLocalText("startIotaAlreadyActive"));
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
             return resp;
         }
 
         OsProcess proc = new IotaStartProcess();
-        boolean rval = proc.start();
-        String msg = localizer.getLocalText("processSuccess");
+        boolean success = proc.start();
+        String msg = localization.getLocalText("processSuccess");
         int rc = 0;
-        if (!rval) {
+        if (!success) {
             if (proc.isStartError()) {
                 System.out.println(proc.getStartError());
                 msg = proc.getStartError();
             }
             else {
-                msg = localizer.getLocalText("processFail");
+                msg = localization.getLocalText("processFail");
             }
         } else {
             rc = proc.getResultCode();
             System.out.println(proc.getName() + " " +
-                    localizer.getLocalText("processSuccess") + ", " +
-                    localizer.getLocalText("resultCode") + ": " + rc);
+                    localization.getLocalText("processSuccess") + ", " +
+                    localization.getLocalText("resultCode") + ": " + rc);
         }
 
-        if(rval) {
+        if(success) {
             // Pause for a sec to let it spin up
-            try {
-                Thread.sleep(2000);
-            }
-            catch(Exception e) {
-            }
+            Thread.sleep(2000);
 
             boolean ok = addNeighbors();
             int nbrTry = 0;
             while(!ok && nbrTry++ < 5) {
                 System.out.println("Failed to add neighbors, trying again...");
-                try {
-                    Thread.sleep(2000);
-                }
-                catch(Exception e) {
-                }
+                Thread.sleep(2000);
                 ok = addNeighbors();
             }
         }
 
-        resp.setSuccess(rval);
+        resp.setSuccess(success);
         resp.setMsg(msg);
 
-        if(rval) {
+        if(success) {
             resp.addProperty(new IccrPropertyDto("resultCode", Integer.toString(rc)));
         }
         resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));
@@ -108,12 +101,12 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
         if(resp.isSuccess() &&
                 resp.getProperty(ACTION_PROP) != null &&
                 resp.getProperty(ACTION_PROP).valueIsSuccess()) {
-            persister.logIotaAction(PersistenceService.IOTA_START,
+            persistenceService.logIotaAction(PersistenceService.IOTA_START,
                     propSource.getIotaStartCmd(),
                     "");
         }
         else {
-            persister.logIotaAction(PersistenceService.IOTA_START_FAIL,
+            persistenceService.logIotaAction(PersistenceService.IOTA_START_FAIL,
                     propSource.getIotaStartCmd(),
                     resp.getMsg());
         }
@@ -124,8 +117,7 @@ public class StartIotaAction extends AbstractAction implements IotaAction {
     private boolean addNeighbors() {
         System.out.println("started, adding neighbors...");
 
-        AddNeighborsIotaAction addNbrs = new AddNeighborsIotaAction();
-        ActionResponse resp = addNbrs.execute(actionProps);
+        ActionResponse resp = new AddNeighborsIotaAction().execute(actionProps);
         return resp.isSuccess() &&
                 resp.getProperty(AddNeighborsIotaAction.ACTION_PROP) != null &&
                 resp.getProperty(AddNeighborsIotaAction.ACTION_PROP).valueIsSuccess();

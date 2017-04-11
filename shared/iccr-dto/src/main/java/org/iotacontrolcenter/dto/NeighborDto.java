@@ -4,7 +4,7 @@ package org.iotacontrolcenter.dto;
 public class NeighborDto {
 
     private boolean active;
-    private String descr;
+    private String description;
     private String key;
     private String name;
     private String uri;
@@ -15,11 +15,11 @@ public class NeighborDto {
     public NeighborDto() {
     }
 
-    public NeighborDto(String key, String uri, String name, String descr,
+    public NeighborDto(String key, String uri, String name, String description,
                        boolean active) {
         this.key = key;
         this.name = name;
-        this.descr = descr;
+        this.description = description;
         this.active = active;
         this.uri = uri;
     }
@@ -48,12 +48,12 @@ public class NeighborDto {
         this.name = name;
     }
 
-    public String getDescr() {
-        return descr;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescr(String descr) {
-        this.descr = descr;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public boolean isActive() {
@@ -93,7 +93,7 @@ public class NeighborDto {
         return "NeighborDto{" +
                 "key='" + key + '\'' +
                 ", name='" + name + '\'' +
-                ", descr='" + descr + '\'' +
+                ", descr='" + description + '\'' +
                 ", active=" + active + '\'' +
                 ", uri='" + uri + '\'' +
                 '}';
@@ -106,8 +106,7 @@ public class NeighborDto {
 
         NeighborDto that = (NeighborDto) o;
 
-        if (getUri() != that.getUri()) return false;
-        return getKey().equals(that.getKey());
+        return getUri().equals(that.getUri()) && getKey().equals(that.getKey());
     }
 
     @Override

@@ -4,7 +4,6 @@ import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.http.GetIotaNodeInfo;
-import org.iotacontrolcenter.iota.agent.http.HttpGet;
 import org.iotacontrolcenter.iota.agent.process.IotaStatusProcess;
 import org.iotacontrolcenter.iota.agent.process.OsProcess;
 import org.iotacontrolcenter.properties.source.PropertySource;
@@ -23,8 +22,8 @@ public class StatusIotaAction extends AbstractAction implements IotaAction {
         preExecute();
 
         ActionResponse resp = new ActionResponse();
-        boolean rval = true;
-        String msg = null;
+        boolean success = true;
+        String msg;
 
         if(propSource.osIsWindows()) {
             GetIotaNodeInfo nodeInfoReq = new GetIotaNodeInfo(propSource.getLocalIotaUrl());
@@ -38,10 +37,10 @@ public class StatusIotaAction extends AbstractAction implements IotaAction {
                     resp.addProperty(new IccrPropertyDto("content", nodeInfoReq.responseAsString()));
 
                     System.out.println(nodeInfoReq.getName() + " " +
-                            localizer.getLocalText("httpRequestSuccess"));
+                            localization.getLocalText("httpRequestSuccess"));
                 }
                 else {
-                    rval = false;
+                    success = false;
                     msg = nodeInfoReq.getResponseReason();
                     if(msg == null || msg.isEmpty()) {
                         msg = nodeInfoReq.getStartError();
@@ -52,39 +51,39 @@ public class StatusIotaAction extends AbstractAction implements IotaAction {
             catch(IllegalStateException ise) {
                 // Message is already localized
                 System.out.println(nodeInfoReq.getName() + " " +
-                        localizer.getLocalTextWithFixed("startHttpException", ise.getMessage()));
-                rval = false;
+                        localization.getLocalTextWithFixed("startHttpException", ise.getMessage()));
+                success = false;
                 msg = ise.getMessage();
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             }
 
-            resp.setSuccess(rval);
+            resp.setSuccess(success);
             resp.setMsg(msg);
         }
         else {
             OsProcess proc = new IotaStatusProcess();
-            rval = proc.start();
-            msg = localizer.getLocalText("processSuccess");
+            success = proc.start();
+            msg = localization.getLocalText("processSuccess");
             int rc = 0;
-            if (!rval) {
+            if (!success) {
                 if (proc.isStartError()) {
                     System.out.println(proc.getStartError());
                     msg = proc.getStartError();
                 }
                 else {
-                    msg = localizer.getLocalText("processFail");
+                    msg = localization.getLocalText("processFail");
                 }
             } else {
                 rc = proc.getResultCode();
                 System.out.println(proc.getName() + " " +
-                        localizer.getLocalText("processSuccess") + ", " +
-                        localizer.getLocalText("resultCode") + ": " + rc);
+                        localization.getLocalText("processSuccess") + ", " +
+                        localization.getLocalText("resultCode") + ": " + rc);
             }
 
-            resp.setSuccess(rval);
+            resp.setSuccess(success);
             resp.setMsg(msg);
 
-            if(rval) {
+            if(success) {
                 resp.addProperty(new IccrPropertyDto("resultCode", Integer.toString(rc)));
             }
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));
