@@ -38,7 +38,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         // Must be instantiated after logging fraction:
-        PropertySource propertySource  = null;
+        PropertySource propertySource;
         if(args != null) {
             if(args.length > 0) {
                 System.out.println("args[0] -> " + args[0]);

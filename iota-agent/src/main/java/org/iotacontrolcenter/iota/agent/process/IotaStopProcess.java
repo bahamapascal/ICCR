@@ -4,14 +4,13 @@ import java.io.File;
 
 public class IotaStopProcess extends OsProcess {
 
-    private String runScript = "stopiota";
-
     public IotaStopProcess() {
         super("iotastop");
 
+        String runScript = "stopiota";
         runScript += propSource.osIsWindows() ? ".bat" : ".bash";
 
-        setArgs(new String[] { propSource.getIccrBinDir() + "/" + runScript });
+        setArgs(new String[] { propSource.getIccrBinDir() + "/" + runScript});
 
         setDir(new File(propSource.getIccrBinDir()));
     }

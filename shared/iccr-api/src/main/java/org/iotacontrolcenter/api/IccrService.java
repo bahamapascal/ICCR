@@ -53,7 +53,7 @@ public interface IccrService {
     @GET
     @Path("/app/config/iota/nbrs")
     @Produces(MediaType.APPLICATION_JSON)
-    Response getIotaNbrsConfig(@Context HttpServletRequest request);
+    Response getIotaNeighborsConfig(@Context HttpServletRequest request);
 
     @PUT
     @Path("/app/config")
@@ -73,7 +73,7 @@ public interface IccrService {
     @Path("/app/config/iota/nbrs")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    Response updateIotaNbrsConfig(@Context HttpServletRequest request, IccrIotaNeighborsPropertyDto nbrs);
+    Response updateIotaNeighborsConfig(@Context HttpServletRequest request, IccrIotaNeighborsPropertyDto nbrs);
 
     @POST
     @Path("/iccr/cmd/{action}")

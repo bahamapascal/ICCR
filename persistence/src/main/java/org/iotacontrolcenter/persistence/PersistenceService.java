@@ -2,7 +2,7 @@ package org.iotacontrolcenter.persistence;
 
 import org.apache.commons.io.FileUtils;
 import org.iotacontrolcenter.dto.LogLinesResponse;
-import org.iotacontrolcenter.properties.locale.Localizer;
+import org.iotacontrolcenter.properties.locale.Localization;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 import java.io.File;
@@ -27,16 +27,16 @@ public class PersistenceService {
     public static final String IOTA_DELETE_FAIL = "deleteIotaFail";
     public static final String IOTA_DELETE_DB = "deleteIotaDb";
     public static final String IOTA_DELETE_DB_FAIL = "deleteIotaDbFail";
-    public static final String IOTA_ADD_NBRS_FAIL = "addIotaNeighbors";
-    public static final String IOTA_ADD_NBRS = "addIotaNeighbors";
-    public static final String IOTA_REMOVE_NBRS_FAIL = "removeIotaNeighborsFail";
-    public static final String IOTA_REMOVE_NBRS = "removeIotaNeighbors";
+    public static final String IOTA_ADD_NEIGHBORS_FAIL = "addIotaNeighbors";
+    public static final String IOTA_ADD_NEIGHBORS = "addIotaNeighbors";
+    public static final String IOTA_REMOVE_NEIGHBORS_FAIL = "removeIotaNeighborsFail";
+    public static final String IOTA_REMOVE_NEIGHBORS = "removeIotaNeighbors";
 
     public static final String ICCR_RESTART = "restartIccr";
     public static final String ICCR_RESTART_FAIL = "restartIccrFail";
 
     private static PersistenceService instance;
-    private static Object SYNC_INST = new Object();
+    private static final Object SYNC_INST = new Object();
     public static PersistenceService getInstance() {
         synchronized (SYNC_INST) {
             if(PersistenceService.instance == null) {
@@ -52,19 +52,17 @@ public class PersistenceService {
     private static final String HEAD_DIRECTIVE = "head";
     private static final String TAIL_DIRECTIVE = "tail";
 
-    private Localizer localizer;
-    private PropertySource propSource;
-    private String iccrEventFilepath;
-    private String iotaLogFilepath;
-    private String iccrLogFilepath;
+    private final Localization localization;
+    private final String iccrEventFilepath;
+    private final String iotaLogFilepath;
 
     private PersistenceService() {
         System.out.println("new PersistenceService");
-        propSource = PropertySource.getInstance();
-        localizer = Localizer.getInstance();
+        PropertySource propSource = PropertySource.getInstance();
+        localization = Localization.getInstance();
         iccrEventFilepath = propSource.getIccrDataDir() + "/" + ICCR_IOTA_EVENT_FILE;
         iotaLogFilepath = propSource.getIotaAppDir() + "/" + IOTA_LOG_FILE;
-        iccrLogFilepath = propSource.getIccrLogDir() + "/" + ICCR_LOG_FILE;
+        String iccrLogFilepath = propSource.getIccrLogDir() + "/" + ICCR_LOG_FILE;
 
         //iotaLogFilepath = iccrLogFilepath;
     }
@@ -85,8 +83,7 @@ public class PersistenceService {
         }
         else {
             System.out.println("Unrecognized file direction: " + fileDirection);
-            LogLinesResponse resp = new LogLinesResponse(false, "Unsupported fileDirection parameter: '" + fileDirection + "'");
-            return resp;
+            return new LogLinesResponse(false, "Unsupported fileDirection parameter: '" + fileDirection + "'");
         }
     }
 
@@ -127,7 +124,7 @@ public class PersistenceService {
         }
 
         long lineNum = 0;
-        String curLine = null;
+        String curLine;
         while(lineNum < numLines && (curLine = raf.readLine()) != null) {
             lineNum++;
             resp.addLine(curLine);
@@ -183,14 +180,14 @@ public class PersistenceService {
             System.out.println("first seek offset: " + firstSeekOffset + ", first seek position: " + firstSeekPosition);
             raf.seek(firstSeekPosition);
         }
-        else if(lastFilePosition != null && lastFilePosition > 0) {
+        else if(lastFilePosition > 0) {
             if(lastFilePosition <= curFileLen) {
                 raf.seek(lastFilePosition);
             }
         }
 
         long lineNum = 0;
-        String curLine = null;
+        String curLine;
         while(lineNum < numLines && (curLine = raf.readLine()) != null) {
             lineNum++;
             resp.addLine(curLine);
@@ -213,7 +210,6 @@ public class PersistenceService {
                 System.out.println("corrected first seek offset: " + firstSeekOffset + ", first seek position: " + firstSeekPosition);
                 raf.seek(firstSeekPosition);
                 lineNum = 0;
-                curLine = null;
                 resp.getLines().clear();
                 while(lineNum < numLines && (curLine = raf.readLine()) != null) {
                     lineNum++;
@@ -250,7 +246,7 @@ public class PersistenceService {
         return resp;
     }
 
-    public List<String> getEventLog() throws IOException {
+    public List<String> getEventLog() {
         File f = new File(iccrEventFilepath);
 
         //if(f.exists()) {
@@ -262,7 +258,7 @@ public class PersistenceService {
         }
     }
 
-    public void deleteEventLog() throws IOException {
+    public void deleteEventLog() {
         System.out.println("deleting Event log");
         FileUtils.deleteQuietly(new File(iccrEventFilepath));
     }
@@ -274,7 +270,7 @@ public class PersistenceService {
     public void logIotaAction(String event, String data, String msg) {
         //System.out.println("logIotaAction : " + event);
         try {
-            String line = localizer.getEventTime() + "," +  localizer.getLocalText(event) + "," + data;
+            String line = localization.getEventTime() + "," +  localization.getLocalText(event) + "," + data;
             if(msg != null && !msg.isEmpty()) {
                 line += "," + msg;
             }

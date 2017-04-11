@@ -21,14 +21,14 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
     @Override
     protected void validatePreconditions() {
 
-        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") +
+        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") +
                     ": " + propSource.getIotaAppDir());
         }
     }
 
     @Override
-    public ActionResponse execute(IccrPropertyListDto actionProps) {
+    public ActionResponse execute(IccrPropertyListDto actionProps) throws InterruptedException {
         preExecute();
 
         ActionResponse resp = new ActionResponse();
@@ -38,13 +38,13 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
 
             if(!AgentUtil.stopIota()) {
                 System.out.println(ACTION_PROP + " " +
-                        localizer.getLocalText("stopIotaFail"));
+                        localization.getLocalText("stopIotaFail"));
 
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                 resp.setSuccess(false);
-                resp.setMsg(localizer.getLocalText("stopIotaFail"));
+                resp.setMsg(localization.getLocalText("stopIotaFail"));
 
-                persister.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
+                persistenceService.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
                         "",
                         resp.getMsg());
 
@@ -53,11 +53,7 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
         }
 
         // Pause for a sec to let it stop...
-        try {
-            Thread.sleep(1000);
-        }
-        catch(Exception e) {
-        }
+        Thread.sleep(1000);
 
         System.out.println("restartIota, starting...");
 
@@ -71,7 +67,7 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
 
             // Confusing to have restart event after start has logged
             /*
-            persister.logIotaAction(PersistenceService.IOTA_RESTART,
+            persistenceService.logIotaAction(PersistenceService.IOTA_RESTART,
                     propSource.getIotaStartCmd(),
                     "");
              */
@@ -81,7 +77,7 @@ public class RestartIotaAction extends AbstractAction implements IotaAction {
             resp.setSuccess(false);
             resp.setMsg(startResp.getMsg());
 
-            persister.logIotaAction(PersistenceService.IOTA_RESTART_FAIL,
+            persistenceService.logIotaAction(PersistenceService.IOTA_RESTART_FAIL,
                     "",
                     "");
         }

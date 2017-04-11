@@ -22,8 +22,8 @@ public class NodeInfoIotaAction extends AbstractAction implements IotaAction {
     @Override
     protected void validatePreconditions() {
 
-        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") +
+        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") +
                     ": " + propSource.getIotaAppDir());
         }
     }
@@ -33,13 +33,13 @@ public class NodeInfoIotaAction extends AbstractAction implements IotaAction {
         preExecute();
 
         ActionResponse resp = new ActionResponse();
-        String msg = "";
-        boolean rval = true;
+        String msg;
+        boolean success = true;
 
         if (!AgentUtil.isIotaActive()) {
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             resp.setSuccess(false);
-            resp.setMsg(localizer.getLocalText("iotaNotActive"));
+            resp.setMsg(localization.getLocalText("iotaNotActive"));
         }
         else {
             GetIotaNodeInfo request = new GetIotaNodeInfo(propSource.getLocalIotaUrl());
@@ -52,7 +52,7 @@ public class NodeInfoIotaAction extends AbstractAction implements IotaAction {
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                     resp.setContent(request.responseAsString());
 
-                    IotaGetNodeInfoResponseDto dto = null;
+                    IotaGetNodeInfoResponseDto dto;
                     try {
                         Gson gson = new GsonBuilder().create();
                         dto = gson.fromJson(resp.getContent(), IotaGetNodeInfoResponseDto.class);
@@ -68,10 +68,10 @@ public class NodeInfoIotaAction extends AbstractAction implements IotaAction {
                     //request.rep
 
                     System.out.println(request.getName() + " " +
-                            localizer.getLocalText("httpRequestSuccess"));
+                            localization.getLocalText("httpRequestSuccess"));
                 }
                 else {
-                    rval = false;
+                    success = false;
                     msg = request.getResponseReason();
                     if(msg == null || msg.isEmpty()) {
                         msg = request.getStartError();
@@ -82,13 +82,13 @@ public class NodeInfoIotaAction extends AbstractAction implements IotaAction {
             catch(IllegalStateException ise) {
                 // Message is already localized
                 System.out.println(request.getName() + " " +
-                        localizer.getLocalTextWithFixed("startHttpException", ise.getMessage()));
-                rval = false;
+                        localization.getLocalTextWithFixed("startHttpException", ise.getMessage()));
+                success = false;
                 msg = ise.getMessage();
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             }
 
-            resp.setSuccess(rval);
+            resp.setSuccess(success);
             resp.setMsg(msg);
         }
 

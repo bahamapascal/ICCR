@@ -10,39 +10,33 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class Localizer {
+public class Localization {
 
-    private static Localizer instance;
-    private static Object SYNC_INST = new Object();
-    public static Localizer getInstance() {
+    private static Localization instance;
+    private static final Object SYNC_INST = new Object();
+    public static Localization getInstance() {
         synchronized (SYNC_INST) {
-            if(Localizer.instance == null) {
-                Localizer.instance = new Localizer();
+            if(Localization.instance == null) {
+                Localization.instance = new Localization();
             }
-            return Localizer.instance;
+            return Localization.instance;
         }
     }
 
-    private String confDir;
-    private String country;
-    private Locale defaultLoc;
     private ResourceBundle defLocText;
-    private DateTimeFormatter eventDtf;
-    private String lang;
-    private Locale loc;
+    private final DateTimeFormatter eventDtf;
     private ResourceBundle locText;
-    private PropertySource propSource;
 
-    private Localizer() {
-        System.out.println("new Localizer");
+    private Localization() {
+        System.out.println("new Localization");
 
-        propSource = PropertySource.getInstance();
+        PropertySource propSource = PropertySource.getInstance();
 
-        confDir = propSource.getIccrConfDir();
+        String confDir = propSource.getIccrConfDir();
 
-        lang = propSource.getLocaleLanguage();
-        country = propSource.getLocaleCountry();
-        loc = new Locale(lang, country);
+        String lang = propSource.getLocaleLanguage();
+        String country = propSource.getLocaleCountry();
+        Locale loc = new Locale(lang, country);
 
         eventDtf = DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(loc);
 
@@ -53,11 +47,11 @@ public class Localizer {
             ClassLoader loader = new URLClassLoader(urls);
 
             locText = ResourceBundle.getBundle("MessagesBundle", loc, loader);
-            defaultLoc = new Locale("en", "US");
+            Locale defaultLoc = new Locale("en", "US");
             defLocText = ResourceBundle.getBundle("MessagesBundle", defaultLoc, loader);
         }
         catch(Exception e) {
-            System.out.println("Localizer exception: " + e.getLocalizedMessage());
+            System.out.println("Localization exception: " + e.getLocalizedMessage());
         }
     }
 
@@ -74,12 +68,12 @@ public class Localizer {
     }
 
     public String getLocalText(String key) {
-        String txt = null;
+        String txt;
         try {
             txt = locText.getString(key);
-            if (txt == null || txt.isEmpty()) {
+            if (txt.isEmpty()) {
                 txt = defLocText.getString(key);
-                if (txt == null || txt.isEmpty()) {
+                if (txt.isEmpty()) {
                     txt = key;
                 }
             }
