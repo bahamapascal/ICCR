@@ -1,5 +1,14 @@
 # ICCR - IOTA Control Center Receiver
 
+## Build Instructions
+
+These instructions will create a `tgz` file that can be unpacked and deployed onto a server.
+* Install Java 8
+* Install maven
+* Open the command line to the directory with the ICCR source code
+* `mvn package`
+* `sudo ./release <VERSION> <USER> <GROUP>` - where `<VERSION>` is the package version, and `<USER>` and `<GROUP>` are the user/group that will own the /opt/iccr directory
+* Deploy the generated file, `iccr-pkg-<VERSION>.tgz`, to your server
 
 
 ## 1) Overview
