@@ -70,6 +70,33 @@ public class NeighborDtoTest {
         activity.set(0, activityLength-1, false);
         nbr.setActivity(activity);
         assertEquals(0, nbr.getActivityPercentageOverLastDay());
+
+        // Test if refresh time is set to zero
+        boolean caughtArgumentException = true;
+        try {
+            nbr.setIotaNeighborRefreshTime(0);
+            caughtArgumentException = false;
+        }
+        catch (IllegalArgumentException e) {
+            caughtArgumentException &= true;
+        }
+
+        try {
+            nbr.setIotaNeighborRefreshTime(-1);
+            caughtArgumentException = false;
+        }
+        catch (IllegalArgumentException e) {
+            caughtArgumentException &= true;
+        }
+
+        try {
+            nbr.setIotaNeighborRefreshTime(Integer.MIN_VALUE);
+            caughtArgumentException = false;
+        }
+        catch (IllegalArgumentException e) {
+            caughtArgumentException &= true;
+        }
+        assertTrue("NeighhborDto shouldn't allow invalid refresh times", caughtArgumentException);
     }
 
     /**

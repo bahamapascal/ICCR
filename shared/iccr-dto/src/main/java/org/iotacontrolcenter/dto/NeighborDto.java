@@ -21,7 +21,7 @@ public class NeighborDto {
     private BitSet activity = new BitSet();
 
 
-    private int iotaNeighborRefreshTime = 0;
+    private int iotaNeighborRefreshTime = 1;
 
     // Length in real time to keep history (two weeks in minutes)
     private final int activityRealTimeLength = 2*7*24*60;
@@ -155,6 +155,9 @@ public class NeighborDto {
     }
 
     public void setIotaNeighborRefreshTime(int iotaNeighborRefreshTime) {
+        if(iotaNeighborRefreshTime <= 0) {
+            throw new IllegalArgumentException("Refresh time must be greater than 0");
+        }
         this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
         this.updateTickLenth();
     }
