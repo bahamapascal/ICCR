@@ -44,6 +44,19 @@ public class NeighborDto {
         this.updateTickLenth();
     }
 
+    public NeighborDto(String key, String uri, String name, String descr,
+            boolean active, int iotaNeighborRefreshTime) {
+        this.key = key;
+        this.name = name;
+        this.descr = descr;
+        this.active = active;
+        this.uri = uri;
+        this.activity = new BitSet();
+        this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
+
+        this.updateTickLenth();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
