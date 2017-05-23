@@ -8,23 +8,28 @@ import java.time.Period;
 import java.time.temporal.TemporalAdjusters;
 import java.util.BitSet;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public class NeighborDto {
 
     private boolean active;
-    private String descr;
-    private String key;
-    private String name;
-    private String uri;
-    private int numAt = 0;
-    private int numIt = 0;
-    private int numNt = 0;
-    private BitSet activity = new BitSet();
+    private String  descr;
+    private String  key;
+    private String  name;
+    private String  uri;
+    private int     numAt = 0;
+    private int     numIt = 0;
+    private int     numNt = 0;
 
+    @JsonSerialize(using = BitSetSerializer.class)
+    @JsonDeserialize(using = BitSetDeserializer.class)
+    private BitSet activity = new BitSet();
 
     private int iotaNeighborRefreshTime = 1;
 
     // Length in real time to keep history (two weeks in minutes)
-    private final int activityRealTimeLength = 2*7*24*60;
+    private final int activityRealTimeLength = 2 * 7 * 24 * 60;
     // Number of ticks to store activity
     private int activityTickLength;
 
@@ -68,10 +73,19 @@ public class NeighborDto {
 
         NeighborDto that = (NeighborDto) o;
 
-        if (getUri() != that.getUri()) {
-            return false;
-        }
-        return getKey().equals(that.getKey());
+        boolean sameKey = getKey().equals(that.getKey());
+        boolean sameUri = getUri().equals(that.getUri());
+        boolean sameActivity = getActivity().hashCode() == that.getActivity()
+                .hashCode();
+        boolean sameRefreshTime = getIotaNeighborRefreshTime() == that
+                .getIotaNeighborRefreshTime();
+
+        boolean sameTransasctions = getNumAt() == that.getNumAt()
+                && getNumIt() == that.getNumIt()
+                && getNumNt() == that.getNumNt();
+
+        return sameKey && sameUri && sameActivity && sameRefreshTime
+                && sameTransasctions;
     }
 
     public BitSet getActivity() {
@@ -79,18 +93,19 @@ public class NeighborDto {
     }
 
     public int getActivityPercentageOverLastDay() {
-        LocalDateTime now    = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         LocalDateTime dayAgo = now.minus(Period.ofDays(1));
 
         return calcActivityPercentageOverPeriod(dayAgo, now);
     }
 
     public int getActivityPercentageOverLastWeek() {
-        LocalDateTime now    = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         LocalDateTime weekAgo = now.minus(Period.ofWeeks(1));
 
         return calcActivityPercentageOverPeriod(weekAgo, now);
     }
+
     public int getActivityRealTimeLength() {
         return activityRealTimeLength;
     }
@@ -155,8 +170,9 @@ public class NeighborDto {
     }
 
     public void setIotaNeighborRefreshTime(int iotaNeighborRefreshTime) {
-        if(iotaNeighborRefreshTime <= 0) {
-            throw new IllegalArgumentException("Refresh time must be greater than 0");
+        if (iotaNeighborRefreshTime <= 0) {
+            throw new IllegalArgumentException(
+                    "Refresh time must be greater than 0");
         }
         this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
         this.updateTickLenth();
@@ -172,8 +188,7 @@ public class NeighborDto {
 
     public void setNumAt(int numAt) {
         // Update activity
-        if (this.iotaNeighborRefreshTime > 0 &&
-                numAt > this.numAt) {
+        if (this.iotaNeighborRefreshTime > 0 && numAt > this.numAt) {
             this.activity.set(this.getCurrentTick());
         }
         this.numAt = numAt;
@@ -193,29 +208,28 @@ public class NeighborDto {
 
     @Override
     public String toString() {
-        return "NeighborDto{" +
-                "key='" + key + '\'' +
-                ", name='" + name + '\'' +
-                ", descr='" + descr + '\'' +
-                ", active='" + active + '\'' +
-                ", uri='" + uri + '\'' +
-                '}';
+        return "NeighborDto{" + "key='" + key + '\'' + ", name='" + name + '\''
+                + ", descr='" + descr + '\'' + ", active='" + active + '\''
+                + ", uri='" + uri + '\'' + '}';
     }
 
-    private int calcActivityPercentageOverPeriod(LocalDateTime start, LocalDateTime end) {
+    private int calcActivityPercentageOverPeriod(LocalDateTime start,
+            LocalDateTime end) {
         int startTick = this.getTickAtTime(start);
-        int endTick   = this.getTickAtTime(end);
+        int endTick = this.getTickAtTime(end);
         BitSet activity = this.activity.get(startTick, endTick);
 
-        if(activity.length() < 1) {
+        if (activity.length() < 1) {
             return 0;
-        } else {
-            return 100*activity.cardinality()/activity.length();
+        }
+        else {
+            return 100 * activity.cardinality() / activity.length();
         }
     }
 
-    private void updateTickLenth(){
-        this.activityTickLength = this.activityRealTimeLength/this.iotaNeighborRefreshTime;
+    private void updateTickLenth() {
+        this.activityTickLength = this.activityRealTimeLength
+                / this.iotaNeighborRefreshTime;
     }
 
     protected int getCurrentTick() {
@@ -225,11 +239,13 @@ public class NeighborDto {
     protected int getTickAtTime(LocalDateTime time) {
 
         // Two week span starting two Sundays ago
-        LocalDateTime two_sundays_ago = LocalDate.now().minus(Period.ofWeeks(1)).with(
-                TemporalAdjusters.previous(DayOfWeek.SUNDAY)).atStartOfDay();
+        LocalDateTime two_sundays_ago = LocalDate.now().minus(Period.ofWeeks(1))
+                .with(TemporalAdjusters.previous(DayOfWeek.SUNDAY))
+                .atStartOfDay();
 
         Duration location_in_period = Duration.between(two_sundays_ago, time);
-        return (int) (location_in_period.toMinutes()/this.iotaNeighborRefreshTime);
+        return (int) (location_in_period.toMinutes()
+                / this.iotaNeighborRefreshTime);
 
     }
 }
