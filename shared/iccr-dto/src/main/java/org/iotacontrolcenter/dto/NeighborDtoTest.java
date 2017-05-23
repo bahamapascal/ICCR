@@ -13,8 +13,20 @@ import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.BitSet;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -23,7 +35,56 @@ import org.junit.Test;
  */
 public class NeighborDtoTest {
 
+    @Path("/hello-world")
+    public static class HelloWorldResource {
+        @GET
+        public String helloWorld() {
+            return "Hello World";
+        }
+    }
+
+    @Path("/get-nbr")
+    public static class TestNeighborResource {
+        static NeighborDto nbrResource;
+
+        @GET
+        @Produces(MediaType.APPLICATION_JSON)
+        public NeighborDto getNeighborDto(){
+            return nbrResource;
+        }
+    }
+
+    public static TestNeighborResource endpoint = new TestNeighborResource();
+    public static TJWSEmbeddedJaxrsServer server;
+
+
+    /**
+     * Setup embedded web server to invoke REST endpoints
+     *
+     * @throws Exception
+     */
+
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        server = new TJWSEmbeddedJaxrsServer();
+        server.setPort(8080);
+        server.setBindAddress("localhost");
+        server.start();
+        server.getDeployment().getRegistry().addPerRequestResource(TestNeighborResource.class);
+        server.getDeployment().getRegistry().addPerRequestResource(HelloWorldResource.class);
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        server.stop();
+    }
+
     NeighborDto nbr;
+
+    public String baseUri() {
+        return "http://localhost:8080";
+    }
+
     /**
      * @throws java.lang.Exception
      */
@@ -53,7 +114,6 @@ public class NeighborDtoTest {
     @After
     public void tearDown() throws Exception {
     }
-
 
     /**
      * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#getActivityPercentageOverLastDay()}.
@@ -245,6 +305,24 @@ public class NeighborDtoTest {
     }
 
     /**
+     * Test JSON serialization
+     */
+    @Test
+    public final void testJsonSerialization() {
+        TestNeighborResource.nbrResource = nbr;
+
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(baseUri() + "/get-nbr");
+
+        Response response = target.request().get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        NeighborDto actual = response.readEntity(NeighborDto.class);
+        assertEquals(nbr, actual);
+
+    }
+
+    /**
      * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#setActive(boolean)}.
      */
     @Test
@@ -342,6 +420,7 @@ public class NeighborDtoTest {
 
         assertEquals(expected, nbr.getNumNt());
     }
+
     /**
      * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#setUri(java.lang.String)}.
      */
@@ -353,6 +432,21 @@ public class NeighborDtoTest {
         assertEquals(expected, nbr.getUri());
     }
 
+    /**
+     * Test TJWS
+     */
+    @Test
+    public final void testTjws() {
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target(baseUri() + "/hello-world");
+
+        Response response = target.request().get();
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        String actual = response.readEntity(String.class);
+        assertEquals("Hello World", actual);
+
+    }
     /**
      * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#toString()}.
      */
