@@ -1,6 +1,7 @@
 package org.iotacontrolcenter.dto;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -27,7 +28,9 @@ public class BitSetSerializer extends StdSerializer<BitSet> {
                     throws IOException, JsonProcessingException {
 
         long[] value = bitset.toLongArray();
-        gen.writeArray(value, 0, value.length);
+        
+
+        gen.writeNumber(Arrays.toString(value));
 
     }
 
