@@ -50,3 +50,7 @@ target/
 *.iml
 **/*.iml
 
+# Eclipse #
+.project
+.settings/
+.classpath
