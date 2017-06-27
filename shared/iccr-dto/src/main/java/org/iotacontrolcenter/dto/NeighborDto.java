@@ -2,15 +2,17 @@ package org.iotacontrolcenter.dto;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.BitSet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class NeighborDto {
 
     private boolean active;
@@ -93,15 +95,15 @@ public class NeighborDto {
     }
 
     public int getActivityPercentageOverLastDay() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime dayAgo = now.minus(Period.ofDays(1));
+        ZonedDateTime now = currentDateTime();
+        ZonedDateTime dayAgo = now.minus(Period.ofDays(1));
 
         return calcActivityPercentageOverPeriod(dayAgo, now);
     }
 
     public int getActivityPercentageOverLastWeek() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime weekAgo = now.minus(Period.ofWeeks(1));
+        ZonedDateTime now = currentDateTime();
+        ZonedDateTime weekAgo = now.minus(Period.ofWeeks(1));
 
         return calcActivityPercentageOverPeriod(weekAgo, now);
     }
@@ -213,10 +215,10 @@ public class NeighborDto {
                 + ", uri='" + uri + '\'' + '}';
     }
 
-    private int calcActivityPercentageOverPeriod(LocalDateTime start,
-            LocalDateTime end) {
-        int startTick = this.getTickAtTime(start);
-        int endTick = this.getTickAtTime(end);
+    private int calcActivityPercentageOverPeriod(ZonedDateTime dayAgo,
+            ZonedDateTime now) {
+        int startTick = this.getTickAtTime(dayAgo);
+        int endTick = this.getTickAtTime(now);
         BitSet activity = this.activity.get(startTick, endTick);
 
         if (activity.length() < 1) {
@@ -233,19 +235,24 @@ public class NeighborDto {
     }
 
     protected int getCurrentTick() {
-        return this.getTickAtTime(LocalDateTime.now());
+        return this.getTickAtTime(currentDateTime());
     }
 
-    protected int getTickAtTime(LocalDateTime time) {
+    protected int getTickAtTime(ZonedDateTime dayAgo) {
 
         // Two week span starting two Sundays ago
-        LocalDateTime two_sundays_ago = LocalDate.now().minus(Period.ofWeeks(1))
-                .with(TemporalAdjusters.previous(DayOfWeek.SUNDAY))
-                .atStartOfDay();
+        ZonedDateTime two_sundays_ago = currentDateTime()
+                .minus(Period.ofWeeks(1))
+                .with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).withHour(0)
+                .withMinute(0).withSecond(0).withNano(0);
 
-        Duration location_in_period = Duration.between(two_sundays_ago, time);
+        Duration location_in_period = Duration.between(two_sundays_ago, dayAgo);
         return (int) (location_in_period.toMinutes()
                 / this.iotaNeighborRefreshTime);
 
+    }
+
+    private ZonedDateTime currentDateTime() {
+        return ZonedDateTime.now(ZoneOffset.UTC);
     }
 }
