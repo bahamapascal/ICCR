@@ -9,8 +9,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.BitSet;
 
 import javax.ws.rs.GET;
@@ -30,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * @author davad
+ * @author David Landry <david@dmwl.net>
  *
  */
 public class NeighborDtoTest {
@@ -67,7 +68,7 @@ public class NeighborDtoTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(8080);
+        server.setPort(8123);
         server.setBindAddress("localhost");
         server.start();
         server.getDeployment().getRegistry().addPerRequestResource(TestNeighborResource.class);
@@ -82,7 +83,7 @@ public class NeighborDtoTest {
     NeighborDto nbr;
 
     public String baseUri() {
-        return "http://localhost:8080";
+        return "http://localhost:8123";
     }
 
     /**
@@ -180,7 +181,8 @@ public class NeighborDtoTest {
 
         // Test 50% activity
         int now    = nbr.getCurrentTick();
-        int weekAgo = nbr.getTickAtTime(LocalDateTime.now().minus(Period.ofWeeks(1)));
+        int weekAgo = nbr.getTickAtTime(
+                ZonedDateTime.now(ZoneOffset.UTC).minus(Period.ofWeeks(1)));
 
         activity = new BitSet(activityLength);
         activity.set((weekAgo+now)/2, now);
@@ -206,6 +208,11 @@ public class NeighborDtoTest {
                 activity,
                 10
                 );
+
+        expected.setNumAt(10);
+        expected.setNumIt(10);
+        expected.setNumNt(10);
+
         assertEquals(expected, nbr);
     }
 
