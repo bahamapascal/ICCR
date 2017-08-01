@@ -132,7 +132,7 @@ public class NeighborDtoTest {
         nbr.setActivity(activity);
         assertEquals(0, nbr.getActivityPercentageOverLastDay());
 
-        // Test if refresh time is set to zero
+        // Test if neighbor refresh time is set to zero
         boolean caughtArgumentException = true;
         try {
             nbr.setIotaNeighborRefreshTime(0);
@@ -157,6 +157,7 @@ public class NeighborDtoTest {
         catch (IllegalArgumentException e) {
             caughtArgumentException &= true;
         }
+
         assertTrue("NeighhborDto shouldn't allow invalid refresh times", caughtArgumentException);
     }
 
@@ -225,18 +226,33 @@ public class NeighborDtoTest {
     }
 
     /**
-     * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#getActivityTickLength()}.
+     * Test method for
+     * {@link org.iotacontrolcenter.dto.NeighborDto#getActivityTickLength()},
+     * {@link org.iotacontrolcenter.dto.NeighborDto#getActivityGranularity()}
+     * and
+     * {@link org.iotacontrolcenter.dto.NeighborDto#getActivityRefreshTime()}.
+     * 
+     * @TODO: remove the magic number. 10 is default refresh sample rate.
      */
     @Test
     public final void testGetActivityTickLength() {
         Duration activityLengthRealTime = Duration.ofDays(14);
 
-        int refreshTime = 5;
-        int expected = (int) (activityLengthRealTime.toMinutes()/refreshTime);
+        // Test granularity -> number of ticks used
+        float granularity = 5;
+        float refreshTime = granularity * 10;
 
-        nbr.setIotaNeighborRefreshTime(refreshTime);
+        float assertDelta = 1 / 60;
 
-        assertEquals(expected, nbr.getActivityTickLength());
+        int expectedTickLength = (int) Math
+                .ceil(activityLengthRealTime.toMinutes() / granularity);
+
+        nbr.setActivityGranularity(granularity);
+        assertEquals("tick length from granularity", expectedTickLength,
+                nbr.getActivityTickLength());
+        assertEquals("refresh time from granularity", refreshTime,
+                nbr.getActivityRefreshTime(), assertDelta);
+
     }
 
     /**

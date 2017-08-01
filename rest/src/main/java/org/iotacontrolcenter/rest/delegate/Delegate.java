@@ -110,9 +110,10 @@ public class Delegate {
         return output;
     }
 
-    private java.util.Timer iotaNeighborRefreshTimer;
+    private java.util.Timer iotaNeighborRefreshTimer, iotaActivityRefreshTimer;
 
-    private Integer refreshTimeMin = null;
+    private Integer nbrRefreshTime = null;
+    private Float   activityRefreshTime = null;
 
     private PropertySource propertySource = PropertySource.getInstance();
 
@@ -133,30 +134,41 @@ public class Delegate {
 
     public synchronized  void iccrPropSet(String prop) {
         if(prop.equals(PropertySource.IOTA_NEIGHBORS_PROP)) {
-            stopNeighborRefresh();
-            startNeighborRefresh();
+            restartNeighborRefresh();
+            restartActivityRefresh();
         }
         else if(prop.equals(PropertySource.IOTA_NBR_REFRESH_TIME_PROP)) {
-            Integer prevRefreshTimeMin = refreshTimeMin;
+            Integer prevRefreshTimeMin = nbrRefreshTime;
             if(propertySource.getIotaNeighborRefreshTime() == prevRefreshTimeMin) {
                 return;
             }
-            stopNeighborRefresh();
-            startNeighborRefresh();
+            restartNeighborRefresh();
+        }
+        else if(prop.equals(PropertySource.IOTA_ACTIVITY_GRANULARITY_PROP)) {
+            // Granularity affects refresh time. Decide if we restart the timer.
+            Float prevActivityRefreshTime = activityRefreshTime;
+            if (propertySource
+                    .getIotaActivityRefreshTime() == prevActivityRefreshTime) {
+                return;
+             }
+            restartActivityRefresh();
         }
     }
 
     public synchronized  void iotaActionDone(String action, ActionResponse resp) {
         if(action.equals(ActionFactory.STOP)) {
             stopNeighborRefresh();
+            stopActivityRefresh();
         }
         else if(action.equals(ActionFactory.START)) {
             startNeighborRefresh();
+            startActivityRefresh();
         }
         else if(action.equals(ActionFactory.NEIGHBORS)){
             IotaGetNeighborsResponseDto dto = null;
             IccrIotaNeighborsPropertyDto iccrNbrs = propertySource.getIotaNeighbors();
-            int iotaNeighborRefreshTime = propertySource.getIotaNeighborRefreshTime();
+            int iotaNeighborRefreshTime           = propertySource.getIotaNeighborRefreshTime();
+            float iotaActivityGranularity         = propertySource.getIotaActivityGranularity();
 
             try {
                 Gson gson = new GsonBuilder().create();
@@ -165,7 +177,10 @@ public class Delegate {
                 for( IotaNeighborDto iotaNbr : dto.getNeighbors()) {
                     for ( NeighborDto iccrNbr : iccrNbrs.getNbrs()) {
                         if( isSameNbr(iccrNbr, iotaNbr) ) {
-                            iccrNbr.setIotaNeighborRefreshTime(iotaNeighborRefreshTime);
+                            iccrNbr.setIotaNeighborRefreshTime(
+                                    iotaNeighborRefreshTime);
+                            iccrNbr.setActivityGranularity(
+                                    iotaActivityGranularity);
                             iccrNbr.setNumAt(iotaNbr.getNumberOfAllTransactions());
                             iccrNbr.setNumIt(iotaNbr.getNumberOfInvalidTransactions());
                             iccrNbr.setNumNt(iotaNbr.getNumberOfNewTransactions());
@@ -189,9 +204,11 @@ public class Delegate {
     public synchronized void startNeighborRefresh() {
         System.out.println("startNeighborRefresh");
 
-        refreshTimeMin = propertySource.getIotaNeighborRefreshTime();
-        if(refreshTimeMin <= 0) {
-            System.out.println("Ignoring neighbor refresh start, refresh time is: " + refreshTimeMin);
+        nbrRefreshTime = propertySource.getIotaNeighborRefreshTime();
+        if (nbrRefreshTime <= 0) {
+            System.out.println(
+                    "Ignoring neighbor refresh start, refresh time is: "
+                            + nbrRefreshTime);
             return;
         }
 
@@ -199,8 +216,7 @@ public class Delegate {
             if(iotaNeighborRefreshTimer == null) {
                 iotaNeighborRefreshTimer = new java.util.Timer();
                 iotaNeighborRefreshTimer.schedule(new RefreshIotaNeighborTimerTask(),
-                        refreshTimeMin * 60 * 1000,
-                        refreshTimeMin * 60 * 1000);
+                        nbrRefreshTime * 60 * 1000, nbrRefreshTime * 60 * 1000);
             }
         }
         catch(Exception e) {
@@ -215,6 +231,49 @@ public class Delegate {
             iotaNeighborRefreshTimer.cancel();
             iotaNeighborRefreshTimer = null;
         }
+    }
+
+    public synchronized void startActivityRefresh() {
+        System.out.println("startActivityRefresh");
+
+        // refresh time in minutes
+        activityRefreshTime = propertySource.getIotaActivityRefreshTime();
+        if (activityRefreshTime <= 0) {
+            activityRefreshTime = 1f;
+        }
+
+        try {
+            int refreshTimeMilli = Math.round(activityRefreshTime * 60 * 1000);
+            if (iotaActivityRefreshTimer == null) {
+                iotaActivityRefreshTimer = new java.util.Timer();
+                iotaActivityRefreshTimer.schedule(
+                        new RefreshIotaActivityTimerTask(),
+                        refreshTimeMilli, refreshTimeMilli);
+            }
+        }
+        catch (Exception e) {
+            System.out.println(
+                    "startTimers iota activity refresh exception: " + e);
+        }
+    }
+
+    public synchronized void stopActivityRefresh() {
+        System.out.println("stopNeighborRefresh");
+
+        if (iotaActivityRefreshTimer != null) {
+            iotaActivityRefreshTimer.cancel();
+            iotaActivityRefreshTimer = null;
+        }
+    }
+
+    public synchronized void restartNeighborRefresh() {
+        stopNeighborRefresh();
+        startNeighborRefresh();
+    }
+
+    public synchronized void restartActivityRefresh() {
+        stopActivityRefresh();
+        startActivityRefresh();
     }
 
 }

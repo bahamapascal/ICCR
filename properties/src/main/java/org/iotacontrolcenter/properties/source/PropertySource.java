@@ -44,6 +44,7 @@ public class PropertySource {
     public static final String IOTA_START_PROP = "iotaStartCmd";
     public static final String IOTA_PORT_NUMBER_PROP = "iotaPortNumber";
     public static final String IOTA_NBR_REFRESH_TIME_PROP = "iotaNeighborRefreshTime";
+    public static final String IOTA_ACTIVITY_GRANULARITY_PROP = "iotaActivityRefreshTime";
 
     public static final String IOTA_NEIGHBORS_PROP = "iotaNeighbors";
     public static final String IOTA_NEIGHBOR_PROP_PREFIX = "iotaNeighbor";
@@ -222,6 +223,20 @@ public class PropertySource {
         throw new IllegalArgumentException("No value provided for " + key);
     }
 
+    public float getFloat(String key) {
+        String val = props.getProperty(key);
+        if (val != null) {
+            try {
+                return Float.parseFloat(val);
+            }
+            catch (NumberFormatException nfe) {
+                throw new IllegalArgumentException(
+                        "Invalid float value provided for " + key);
+            }
+        }
+        throw new IllegalArgumentException("No value provided for " + key);
+    }
+
     public String getIotaAppDir() {
         return getString(IOTA_APP_DIR_PROP);
     }
@@ -239,6 +254,20 @@ public class PropertySource {
         }
     }
 
+    public Float getIotaActivityRefreshTime() {
+        return getIotaActivityGranularity()
+                / NeighborDto.ACTIVITY_REFRESH_SAMPLE_RATE;
+    }
+
+    public Float getIotaActivityGranularity() {
+        try {
+            return getFloat(IOTA_ACTIVITY_GRANULARITY_PROP);
+        }
+        catch (Exception e) {
+            return 1f;
+        }
+    }
+
     public IccrIotaNeighborsPropertyDto getIotaNeighbors() {
         synchronized(SET_SYNC_OBJ) {
             List<NeighborDto> nbrs = new ArrayList<>();
@@ -251,7 +280,8 @@ public class PropertySource {
                             getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
                             getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id),
                             getBitSet(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".activity." + id),
-                            getIotaNeighborRefreshTime()));
+                            getIotaNeighborRefreshTime(),
+                            getIotaActivityGranularity()));
                 } catch (Exception e) {
                     System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());
                 }
@@ -336,6 +366,7 @@ public class PropertySource {
         keys.add(IOTA_APP_DIR_PROP);
         keys.add(IOTA_START_PROP);
         keys.add(IOTA_NBR_REFRESH_TIME_PROP);
+        keys.add(IOTA_ACTIVITY_GRANULARITY_PROP);
         return keys;
     }
 

@@ -30,25 +30,34 @@ public class NeighborDto {
 
     private int iotaNeighborRefreshTime = 1;
 
+    // Length in real time of a tick (minutes)
+    private float iotaActivityGranularity;
+
     // Length in real time to keep history (two weeks in minutes)
     private final int activityRealTimeLength = 2 * 7 * 24 * 60;
+
     // Number of ticks to store activity
     private int activityTickLength;
+
+    // How many times should the server refresh activity per tick
+    public static final int ACTIVITY_REFRESH_SAMPLE_RATE = 10;
 
     public NeighborDto() {
     }
 
     public NeighborDto(String key, String uri, String name, String descr,
-            boolean active, BitSet activity, int iotaNeighborRefreshTime) {
-        this.key = key;
-        this.name = name;
-        this.descr = descr;
-        this.active = active;
-        this.uri = uri;
-        this.activity = activity;
-        this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
+            boolean active, BitSet activity, int iotaNeighborRefreshTime,
+            float iotaActivityGranularity) {
+        this(key, uri, name, descr, active, activity, iotaNeighborRefreshTime);
 
-        this.updateTickLenth();
+        this.iotaActivityGranularity = iotaActivityGranularity;
+    }
+
+    public NeighborDto(String key, String uri, String name, String descr,
+            boolean active, BitSet activity, int iotaNeighborRefreshTime) {
+        this(key, uri, name, descr, active, iotaNeighborRefreshTime);
+
+        this.activity = activity;
     }
 
     public NeighborDto(String key, String uri, String name, String descr,
@@ -62,6 +71,24 @@ public class NeighborDto {
         this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
 
         this.updateTickLenth();
+    }
+
+    private int calcActivityPercentageOverPeriod(ZonedDateTime dayAgo,
+            ZonedDateTime now) {
+        int startTick = this.getTickAtTime(dayAgo);
+        int endTick = this.getTickAtTime(now);
+        BitSet activity = this.activity.get(startTick, endTick);
+
+        if (activity.length() < 1) {
+            return 0;
+        }
+        else {
+            return 100 * activity.cardinality() / activity.length();
+        }
+    }
+
+    private ZonedDateTime currentDateTime() {
+        return ZonedDateTime.now(ZoneOffset.UTC);
     }
 
     @Override
@@ -112,8 +139,20 @@ public class NeighborDto {
         return activityRealTimeLength;
     }
 
+    public float getActivityRefreshTime() {
+        return iotaActivityGranularity / ACTIVITY_REFRESH_SAMPLE_RATE;
+    }
+
+    public float getActivityGranularity() {
+        return iotaActivityGranularity;
+    }
+
     public int getActivityTickLength() {
         return activityTickLength;
+    }
+
+    protected int getCurrentTick() {
+        return this.getTickAtTime(currentDateTime());
     }
 
     public String getDescr() {
@@ -144,6 +183,20 @@ public class NeighborDto {
         return numNt;
     }
 
+    protected int getTickAtTime(ZonedDateTime dayAgo) {
+
+        // Two week span starting two Sundays ago
+        ZonedDateTime two_sundays_ago = currentDateTime()
+                .minus(Period.ofWeeks(1))
+                .with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).withHour(0)
+                .withMinute(0).withSecond(0).withNano(0);
+
+        Duration location_in_period = Duration.between(two_sundays_ago, dayAgo);
+        return (int) (location_in_period.toMinutes()
+                / this.iotaActivityGranularity);
+
+    }
+
     public String getUri() {
         return uri;
     }
@@ -167,6 +220,11 @@ public class NeighborDto {
         this.activity = activity;
     }
 
+    public void setActivityGranularity(float activityGranularity) {
+        this.iotaActivityGranularity = activityGranularity;
+        this.updateTickLenth();
+    }
+
     public void setDescr(String descr) {
         this.descr = descr;
     }
@@ -177,7 +235,6 @@ public class NeighborDto {
                     "Refresh time must be greater than 0");
         }
         this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
-        this.updateTickLenth();
     }
 
     public void setKey(String key) {
@@ -190,7 +247,7 @@ public class NeighborDto {
 
     public void setNumAt(int numAt) {
         // Update activity
-        if (this.iotaNeighborRefreshTime > 0 && numAt > this.numAt) {
+        if (this.iotaActivityGranularity > 0 && numAt > this.numAt) {
             this.activity.set(this.getCurrentTick());
         }
         this.numAt = numAt;
@@ -215,44 +272,8 @@ public class NeighborDto {
                 + ", uri='" + uri + '\'' + '}';
     }
 
-    private int calcActivityPercentageOverPeriod(ZonedDateTime dayAgo,
-            ZonedDateTime now) {
-        int startTick = this.getTickAtTime(dayAgo);
-        int endTick = this.getTickAtTime(now);
-        BitSet activity = this.activity.get(startTick, endTick);
-
-        if (activity.length() < 1) {
-            return 0;
-        }
-        else {
-            return 100 * activity.cardinality() / activity.length();
-        }
-    }
-
     private void updateTickLenth() {
-        this.activityTickLength = this.activityRealTimeLength
-                / this.iotaNeighborRefreshTime;
-    }
-
-    protected int getCurrentTick() {
-        return this.getTickAtTime(currentDateTime());
-    }
-
-    protected int getTickAtTime(ZonedDateTime dayAgo) {
-
-        // Two week span starting two Sundays ago
-        ZonedDateTime two_sundays_ago = currentDateTime()
-                .minus(Period.ofWeeks(1))
-                .with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).withHour(0)
-                .withMinute(0).withSecond(0).withNano(0);
-
-        Duration location_in_period = Duration.between(two_sundays_ago, dayAgo);
-        return (int) (location_in_period.toMinutes()
-                / this.iotaNeighborRefreshTime);
-
-    }
-
-    private ZonedDateTime currentDateTime() {
-        return ZonedDateTime.now(ZoneOffset.UTC);
+        this.activityTickLength = (int) Math.ceil(
+                this.activityRealTimeLength / this.iotaActivityGranularity);
     }
 }
