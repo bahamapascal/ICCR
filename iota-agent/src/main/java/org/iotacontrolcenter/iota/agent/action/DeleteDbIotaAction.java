@@ -1,18 +1,17 @@
 package org.iotacontrolcenter.iota.agent.action;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.apache.commons.io.FileUtils;
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.persistence.PersistenceService;
 import org.iotacontrolcenter.properties.source.PropertySource;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
 
@@ -63,8 +62,10 @@ public class DeleteDbIotaAction extends AbstractAction implements IotaAction  {
             Path dir = Paths.get(propSource.getIotaAppDir());
             Files.newDirectoryStream(dir).forEach(file -> {
                 try {
-                    if(file.getFileName().toString().endsWith(".iri")) {
-                        Files.delete(file);
+                    if (Files.isDirectory(file) && (file.endsWith("mainnetdb")
+                            || file.endsWith("testnetdb"))) {
+                        
+                        FileUtils.deleteDirectory(file.toFile());
                     }
                 }
                 catch (IOException ioe) {
