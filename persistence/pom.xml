@@ -6,7 +6,7 @@
     <parent>
       <groupId>org.iotacontrolcenter</groupId>
       <artifactId>iccr-parent</artifactId>
-      <version>0.9.0</version>
+      <version>1.0.0-r3</version>
     </parent>
 
     <artifactId>iccr-persistence</artifactId>

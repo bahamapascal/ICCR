@@ -1,19 +1,21 @@
 package org.iotacontrolcenter.properties.source;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.iotacontrolcenter.dto.ActivityDto;
 import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
 import org.iotacontrolcenter.dto.NeighborDto;
+
 
 public class PropertySource {
 
@@ -44,7 +46,6 @@ public class PropertySource {
     public static final String IOTA_START_PROP = "iotaStartCmd";
     public static final String IOTA_PORT_NUMBER_PROP = "iotaPortNumber";
     public static final String IOTA_NBR_REFRESH_TIME_PROP = "iotaNeighborRefreshTime";
-    public static final String IOTA_ACTIVITY_GRANULARITY_PROP = "iotaActivityRefreshTime";
 
     public static final String IOTA_NEIGHBORS_PROP = "iotaNeighbors";
     public static final String IOTA_NEIGHBOR_PROP_PREFIX = "iotaNeighbor";
@@ -127,6 +128,39 @@ public class PropertySource {
             output = new BitSet();
         }
         return output;
+    }
+
+    public ActivityDto getActivityDto(String key) {
+        String unparsed = getString(key);
+        ActivityDto output = new ActivityDto();
+
+        try {
+            output = ActivityDto.deserialize(unparsed);
+        }
+        catch (IOException e) {
+            System.out
+                    .println("PropertySource IOException loading ActivityDto: "
+                    + e.getLocalizedMessage());
+        }
+
+        return output;
+    }
+
+    public void setActivityDto(String key, ActivityDto activity) {
+        String serialized = "";
+
+        try {
+
+            serialized = activity.serialize();
+        }
+        catch (IOException e) {
+            System.out
+                    .println("PropertySource IOException saving RoaringBitmap: "
+                            + e.getLocalizedMessage());
+        }
+
+        setProperty(key, serialized);
+
     }
 
     public boolean getBoolean(String key) {
@@ -254,20 +288,6 @@ public class PropertySource {
         }
     }
 
-    public Float getIotaActivityRefreshTime() {
-        return getIotaActivityGranularity()
-                / NeighborDto.ACTIVITY_REFRESH_SAMPLE_RATE;
-    }
-
-    public Float getIotaActivityGranularity() {
-        try {
-            return getFloat(IOTA_ACTIVITY_GRANULARITY_PROP);
-        }
-        catch (Exception e) {
-            return 1f;
-        }
-    }
-
     public IccrIotaNeighborsPropertyDto getIotaNeighbors() {
         synchronized(SET_SYNC_OBJ) {
             List<NeighborDto> nbrs = new ArrayList<>();
@@ -279,9 +299,10 @@ public class PropertySource {
                             getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id),
                             getString(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id),
                             getBoolean(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id),
-                            getBitSet(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".activity." + id),
-                            getIotaNeighborRefreshTime(),
-                            getIotaActivityGranularity()));
+                            getActivityDto(
+                                    PropertySource.IOTA_NEIGHBOR_PROP_PREFIX
+                                            + ".activity." + id)
+                            ));
                 } catch (Exception e) {
                     System.out.println("getIotaNeighborsProperty exception: " + e.getLocalizedMessage());
                 }
@@ -366,7 +387,6 @@ public class PropertySource {
         keys.add(IOTA_APP_DIR_PROP);
         keys.add(IOTA_START_PROP);
         keys.add(IOTA_NBR_REFRESH_TIME_PROP);
-        keys.add(IOTA_ACTIVITY_GRANULARITY_PROP);
         return keys;
     }
 
@@ -443,9 +463,8 @@ public class PropertySource {
                     }
                     setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".active." + id, String.valueOf(nbr.isActive()).toLowerCase());
                     if (nbr.getActivity() != null) {
-                        String activity = Arrays.toString(nbr.getActivity().toLongArray());
-                        activity = activity.substring(1, activity.length()-1);  // strip the []
-                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".activity." + id, activity);
+                        setActivityDto(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX
+                                + ".activity." + id, nbr.getActivity());
                     }
                     else {
                         setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".activity." + id, "");

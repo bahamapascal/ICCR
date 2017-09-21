@@ -144,15 +144,6 @@ public class Delegate {
             }
             restartNeighborRefresh();
         }
-        else if(prop.equals(PropertySource.IOTA_ACTIVITY_GRANULARITY_PROP)) {
-            // Granularity affects refresh time. Decide if we restart the timer.
-            Float prevActivityRefreshTime = activityRefreshTime;
-            if (propertySource
-                    .getIotaActivityRefreshTime() == prevActivityRefreshTime) {
-                return;
-             }
-            restartActivityRefresh();
-        }
     }
 
     public synchronized  void iotaActionDone(String action, ActionResponse resp) {
@@ -168,7 +159,6 @@ public class Delegate {
             IotaGetNeighborsResponseDto dto = null;
             IccrIotaNeighborsPropertyDto iccrNbrs = propertySource.getIotaNeighbors();
             int iotaNeighborRefreshTime           = propertySource.getIotaNeighborRefreshTime();
-            float iotaActivityGranularity         = propertySource.getIotaActivityGranularity();
 
             try {
                 Gson gson = new GsonBuilder().create();
@@ -177,10 +167,6 @@ public class Delegate {
                 for( IotaNeighborDto iotaNbr : dto.getNeighbors()) {
                     for ( NeighborDto iccrNbr : iccrNbrs.getNbrs()) {
                         if( isSameNbr(iccrNbr, iotaNbr) ) {
-                            iccrNbr.setIotaNeighborRefreshTime(
-                                    iotaNeighborRefreshTime);
-                            iccrNbr.setActivityGranularity(
-                                    iotaActivityGranularity);
                             iccrNbr.setNumAt(iotaNbr.getNumberOfAllTransactions());
                             iccrNbr.setNumIt(iotaNbr.getNumberOfInvalidTransactions());
                             iccrNbr.setNumNt(iotaNbr.getNumberOfNewTransactions());
@@ -237,10 +223,7 @@ public class Delegate {
         System.out.println("startActivityRefresh");
 
         // refresh time in minutes
-        activityRefreshTime = propertySource.getIotaActivityRefreshTime();
-        if (activityRefreshTime <= 0) {
-            activityRefreshTime = 1f;
-        }
+        activityRefreshTime = 1f;
 
         try {
             int refreshTimeMilli = Math.round(activityRefreshTime * 60 * 1000);
@@ -258,7 +241,7 @@ public class Delegate {
     }
 
     public synchronized void stopActivityRefresh() {
-        System.out.println("stopNeighborRefresh");
+        System.out.println("stopActivityRefresh");
 
         if (iotaActivityRefreshTimer != null) {
             iotaActivityRefreshTimer.cancel();
@@ -267,11 +250,13 @@ public class Delegate {
     }
 
     public synchronized void restartNeighborRefresh() {
+        System.out.println("restartNeighborRefresh");
         stopNeighborRefresh();
         startNeighborRefresh();
     }
 
     public synchronized void restartActivityRefresh() {
+        System.out.println("restartActivityRefresh");
         stopActivityRefresh();
         startActivityRefresh();
     }

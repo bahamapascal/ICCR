@@ -1,12 +1,12 @@
 package org.iotacontrolcenter.dto;
 
-import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Period;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAdjusters;
-import java.util.BitSet;
+import java.util.concurrent.TimeUnit;
+
+import org.roaringbitmap.RoaringBitmap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -24,20 +24,21 @@ public class NeighborDto {
     private int     numIt = 0;
     private int     numNt = 0;
 
-    @JsonSerialize(using = BitSetSerializer.class)
-    @JsonDeserialize(using = BitSetDeserializer.class)
-    private BitSet activity = new BitSet();
+    @JsonSerialize(using = ActivityDtoSerializer.class)
+    @JsonDeserialize(using = ActivityDtoDeserializer.class)
+    private ActivityDto activity = new ActivityDto();
 
     private int iotaNeighborRefreshTime = 1;
 
     // Length in real time of a tick (minutes)
-    private float iotaActivityGranularity;
+    private float iotaActivityGranularity = 15;
 
-    // Length in real time to keep history (two weeks in minutes)
-    private final int activityRealTimeLength = 2 * 7 * 24 * 60;
+    // Don't keep more than this much history (in minutes)
+    public static final long trimTrigger = TimeUnit.DAYS.toMinutes(9);
 
-    // Number of ticks to store activity
-    private int activityTickLength;
+    // Trim down to this much history (in minutes)
+    public static final long activityRealTimeLength = TimeUnit.DAYS
+            .toMinutes(7);
 
     // How many times should the server refresh activity per tick
     public static final int ACTIVITY_REFRESH_SAMPLE_RATE = 10;
@@ -46,48 +47,47 @@ public class NeighborDto {
     }
 
     public NeighborDto(String key, String uri, String name, String descr,
-            boolean active, BitSet activity, int iotaNeighborRefreshTime,
-            float iotaActivityGranularity) {
-        this(key, uri, name, descr, active, activity, iotaNeighborRefreshTime);
+            boolean active, ActivityDto activity
+            ) {
 
-        this.iotaActivityGranularity = iotaActivityGranularity;
-    }
-
-    public NeighborDto(String key, String uri, String name, String descr,
-            boolean active, BitSet activity, int iotaNeighborRefreshTime) {
-        this(key, uri, name, descr, active, iotaNeighborRefreshTime);
-
-        this.activity = activity;
-    }
-
-    public NeighborDto(String key, String uri, String name, String descr,
-            boolean active, int iotaNeighborRefreshTime) {
         this.key = key;
         this.name = name;
         this.descr = descr;
         this.active = active;
         this.uri = uri;
-        this.activity = new BitSet();
-        this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
-
-        this.updateTickLenth();
+        this.activity = activity;
     }
 
-    private int calcActivityPercentageOverPeriod(ZonedDateTime dayAgo,
-            ZonedDateTime now) {
-        int startTick = this.getTickAtTime(dayAgo);
-        int endTick = this.getTickAtTime(now);
-        BitSet activity = this.activity.get(startTick, endTick);
+    public NeighborDto(String key, String uri, String name, String descr,
+            boolean active, ActivityDto activity,
+            int iotaNeighborRefreshTime) {
+        this(key, uri, name, descr, active);
 
-        if (activity.length() < 1) {
-            return 0;
-        }
-        else {
-            return 100 * activity.cardinality() / activity.length();
-        }
+        this.activity = activity;
     }
 
-    private ZonedDateTime currentDateTime() {
+    public NeighborDto(String key, String uri, String name, String descr,
+            boolean active) {
+        this.key = key;
+        this.name = name;
+        this.descr = descr;
+        this.active = active;
+        this.uri = uri;
+        this.activity = new ActivityDto();
+    }
+
+    private int calcActivityPercentageOverPeriod(ZonedDateTime start,
+            ZonedDateTime end) {
+        
+        RoaringBitmap mask = generateMask(start, end);
+        int cardinality = RoaringBitmap.andCardinality(this.activity, mask);
+
+        Duration duration = Duration.between(start, end);
+        return (int) (100 * cardinality
+                / (duration.toMinutes() / iotaActivityGranularity));
+    }
+
+    public static ZonedDateTime currentDateTime() {
         return ZonedDateTime.now(ZoneOffset.UTC);
     }
 
@@ -117,7 +117,7 @@ public class NeighborDto {
                 && sameTransasctions;
     }
 
-    public BitSet getActivity() {
+    public ActivityDto getActivity() {
         return activity;
     }
 
@@ -135,7 +135,7 @@ public class NeighborDto {
         return calcActivityPercentageOverPeriod(weekAgo, now);
     }
 
-    public int getActivityRealTimeLength() {
+    public long getActivityRealTimeLength() {
         return activityRealTimeLength;
     }
 
@@ -145,10 +145,6 @@ public class NeighborDto {
 
     public float getActivityGranularity() {
         return iotaActivityGranularity;
-    }
-
-    public int getActivityTickLength() {
-        return activityTickLength;
     }
 
     protected int getCurrentTick() {
@@ -183,17 +179,11 @@ public class NeighborDto {
         return numNt;
     }
 
-    protected int getTickAtTime(ZonedDateTime dayAgo) {
+    public int getTickAtTime(ZonedDateTime time) {
 
-        // Two week span starting two Sundays ago
-        ZonedDateTime two_sundays_ago = currentDateTime()
-                .minus(Period.ofWeeks(1))
-                .with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).withHour(0)
-                .withMinute(0).withSecond(0).withNano(0);
+        long minutes = TimeUnit.SECONDS.toMinutes(time.toEpochSecond());
 
-        Duration location_in_period = Duration.between(two_sundays_ago, dayAgo);
-        return (int) (location_in_period.toMinutes()
-                / this.iotaActivityGranularity);
+        return (int) (minutes / this.iotaActivityGranularity);
 
     }
 
@@ -216,25 +206,12 @@ public class NeighborDto {
         this.active = active;
     }
 
-    public void setActivity(BitSet activity) {
+    public void setActivity(ActivityDto activity) {
         this.activity = activity;
-    }
-
-    public void setActivityGranularity(float activityGranularity) {
-        this.iotaActivityGranularity = activityGranularity;
-        this.updateTickLenth();
     }
 
     public void setDescr(String descr) {
         this.descr = descr;
-    }
-
-    public void setIotaNeighborRefreshTime(int iotaNeighborRefreshTime) {
-        if (iotaNeighborRefreshTime <= 0) {
-            throw new IllegalArgumentException(
-                    "Refresh time must be greater than 0");
-        }
-        this.iotaNeighborRefreshTime = iotaNeighborRefreshTime;
     }
 
     public void setKey(String key) {
@@ -248,9 +225,38 @@ public class NeighborDto {
     public void setNumAt(int numAt) {
         // Update activity
         if (this.iotaActivityGranularity > 0 && numAt > this.numAt) {
-            this.activity.set(this.getCurrentTick());
+            this.updateActivity();
         }
         this.numAt = numAt;
+    }
+
+    private void updateActivity() {
+        // Record current activity
+        this.activity.add(this.getCurrentTick());
+
+        // Check if we need to trim
+        if (this.activity.getLongCardinality() > trimTrigger) {
+            trimActivity();
+        }
+    }
+
+    private void trimActivity() {
+        ZonedDateTime now = currentDateTime();
+        ZonedDateTime start = now.minus(Period.ofDays(7)).withHour(0)
+                .withMinute(0).withSecond(0).withNano(0);
+
+        RoaringBitmap mask = generateMask(start, now);
+
+        this.activity.and(mask);
+    }
+
+    private RoaringBitmap generateMask(ZonedDateTime start, ZonedDateTime end) {
+        long startTick = this.getTickAtTime(start);
+        long endTick = this.getTickAtTime(end);
+
+        RoaringBitmap mask = new RoaringBitmap();
+        mask.add(startTick, endTick);
+        return mask;
     }
 
     public void setNumIt(int numIt) {
@@ -272,8 +278,4 @@ public class NeighborDto {
                 + ", uri='" + uri + '\'' + '}';
     }
 
-    private void updateTickLenth() {
-        this.activityTickLength = (int) Math.ceil(
-                this.activityRealTimeLength / this.iotaActivityGranularity);
-    }
 }
