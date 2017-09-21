@@ -12,6 +12,8 @@ public class RefreshIotaActivityTimerTask extends TimerTask {
     private boolean isRunning = false;
     private Object syncObj = new Object();
 
+    private Delegate delegate = Delegate.getInstance();
+
     @Override
     public void run() {
         if(isRunning()) {
@@ -20,6 +22,7 @@ public class RefreshIotaActivityTimerTask extends TimerTask {
         setIsRunning(true);
         try {
             ActionResponse resp = runIotaAction(ActionFactory.NEIGHBORS);
+            delegate.iotaActionDone(ActionFactory.NEIGHBORS, resp);
         }
         catch(Exception e) {
         }
