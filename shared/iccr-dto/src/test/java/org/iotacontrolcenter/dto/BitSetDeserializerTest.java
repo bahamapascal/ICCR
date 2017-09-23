@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 public class BitSetDeserializerTest {
     private BitSet             expected;
     private String             json;
-    private BitSetDeserializer bitSetDeserializer;
 
     /**
     * @throws java.lang.Exception
@@ -34,7 +33,6 @@ public class BitSetDeserializerTest {
 
         json = "[142, -9223372036854775808]";
 
-        bitSetDeserializer = new BitSetDeserializer();
     }
 
     /**

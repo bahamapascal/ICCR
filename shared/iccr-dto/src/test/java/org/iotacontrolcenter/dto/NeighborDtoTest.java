@@ -8,11 +8,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.time.Duration;
 import java.time.Period;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.BitSet;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -68,7 +66,7 @@ public class NeighborDtoTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         server = new TJWSEmbeddedJaxrsServer();
-        server.setPort(8123);
+        server.setPort(8234);
         server.setBindAddress("localhost");
         server.start();
         server.getDeployment().getRegistry().addPerRequestResource(TestNeighborResource.class);
@@ -83,7 +81,7 @@ public class NeighborDtoTest {
     NeighborDto nbr;
 
     public String baseUri() {
-        return "http://localhost:8123";
+        return "http://localhost:8234";
     }
 
     /**
@@ -91,8 +89,8 @@ public class NeighborDtoTest {
      */
     @Before
     public void setUp() throws Exception {
-        BitSet activity = new BitSet();
-        activity.set(5);
+        ActivityDto activity = new ActivityDto();
+        activity.add(5);
 
         nbr = new NeighborDto(
                 "key",
@@ -121,43 +119,22 @@ public class NeighborDtoTest {
      */
     @Test
     public final void testActivityPercentageOverLastDay() {
-        int activityLength = nbr.getActivityTickLength();
 
-        BitSet activity = new BitSet();
-        activity.set(0, activityLength-1);
+        ActivityDto activity = new ActivityDto();
+
+        ZonedDateTime startDateTime = NeighborDto.currentDateTime()
+                .minus(Period.ofDays(1))
+                .withHour(0).withMinute(0).withSecond(0).withNano(0);
+        long start = nbr.getTickAtTime(startDateTime);
+        long end = nbr.getTickAtTime(NeighborDto.currentDateTime());
+
+        activity.add(start, end);
         nbr.setActivity(activity);
         assertEquals(100, nbr.getActivityPercentageOverLastDay());
 
-        activity.set(0, activityLength-1, false);
+        activity.remove(start, end);
         nbr.setActivity(activity);
         assertEquals(0, nbr.getActivityPercentageOverLastDay());
-
-        // Test if refresh time is set to zero
-        boolean caughtArgumentException = true;
-        try {
-            nbr.setIotaNeighborRefreshTime(0);
-            caughtArgumentException = false;
-        }
-        catch (IllegalArgumentException e) {
-            caughtArgumentException &= true;
-        }
-
-        try {
-            nbr.setIotaNeighborRefreshTime(-1);
-            caughtArgumentException = false;
-        }
-        catch (IllegalArgumentException e) {
-            caughtArgumentException &= true;
-        }
-
-        try {
-            nbr.setIotaNeighborRefreshTime(Integer.MIN_VALUE);
-            caughtArgumentException = false;
-        }
-        catch (IllegalArgumentException e) {
-            caughtArgumentException &= true;
-        }
-        assertTrue("NeighhborDto shouldn't allow invalid refresh times", caughtArgumentException);
     }
 
     /**
@@ -165,27 +142,32 @@ public class NeighborDtoTest {
      */
     @Test
     public final void testActivityPercentageOverLastWeek() {
-        int activityLength = nbr.getActivityTickLength();
 
         // Test 100% activity
-        BitSet activity = new BitSet();
-        activity.set(0, activityLength-1, true);
+        ActivityDto activity = new ActivityDto();
+        ZonedDateTime startDateTime = NeighborDto.currentDateTime()
+                .minus(Period.ofWeeks(1)).withHour(0).withMinute(0)
+                .withSecond(0).withNano(0);
+        long start = nbr.getTickAtTime(startDateTime);
+        long end = nbr.getTickAtTime(NeighborDto.currentDateTime());
+
+        activity.add(start, end);
         nbr.setActivity(activity);
         assertEquals(100, nbr.getActivityPercentageOverLastWeek());
 
         // Test 0% activity
-        activity = new BitSet();
-        activity.set(0, activityLength-1, false);
+        activity = new ActivityDto();
+        activity.remove(start, end);
         nbr.setActivity(activity);
         assertEquals(0, nbr.getActivityPercentageOverLastWeek());
 
         // Test 50% activity
-        int now    = nbr.getCurrentTick();
-        int weekAgo = nbr.getTickAtTime(
+        long now = nbr.getCurrentTick();
+        long weekAgo = nbr.getTickAtTime(
                 ZonedDateTime.now(ZoneOffset.UTC).minus(Period.ofWeeks(1)));
 
-        activity = new BitSet(activityLength);
-        activity.set((weekAgo+now)/2, now);
+        activity = new ActivityDto();
+        activity.add((weekAgo + now) / 2, now);
         nbr.setActivity(activity);
         assertEquals(50, nbr.getActivityPercentageOverLastWeek());
 
@@ -196,8 +178,8 @@ public class NeighborDtoTest {
      */
     @Test
     public final void testEqualsObject() {
-        BitSet activity = new BitSet();
-        activity.set(5);
+        ActivityDto activity = new ActivityDto();
+        activity.add(5);
 
         NeighborDto expected = new NeighborDto(
                 "key",
@@ -221,22 +203,29 @@ public class NeighborDtoTest {
      */
     @Test
     public final void testGetActivity() {
-        assertThat(nbr.getActivity(), instanceOf(BitSet.class));
+        assertThat(nbr.getActivity(), instanceOf(ActivityDto.class));
     }
 
     /**
-     * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#getActivityTickLength()}.
+     * Test method for
+     * {@link org.iotacontrolcenter.dto.NeighborDto#getActivityTickLength()},
+     * {@link org.iotacontrolcenter.dto.NeighborDto#getActivityGranularity()}
+     * and
+     * {@link org.iotacontrolcenter.dto.NeighborDto#getActivityRefreshTime()}.
+     * 
      */
     @Test
     public final void testGetActivityTickLength() {
-        Duration activityLengthRealTime = Duration.ofDays(14);
+        // Test granularity -> number of ticks used
+        float granularity = nbr.getActivityGranularity();
+        float refreshTime = granularity
+                / NeighborDto.ACTIVITY_REFRESH_SAMPLE_RATE;
 
-        int refreshTime = 5;
-        int expected = (int) (activityLengthRealTime.toMinutes()/refreshTime);
+        float assertDelta = 1 / 60;
 
-        nbr.setIotaNeighborRefreshTime(refreshTime);
+        assertEquals("refresh time from granularity", refreshTime,
+                nbr.getActivityRefreshTime(), assertDelta);
 
-        assertEquals(expected, nbr.getActivityTickLength());
     }
 
     /**
@@ -343,9 +332,9 @@ public class NeighborDtoTest {
      */
     @Test
     public final void testSetActivity() {
-        BitSet newActivity = new BitSet();
-        newActivity.set(1,10);
-        newActivity.set(12345);
+        ActivityDto newActivity = new ActivityDto();
+        newActivity.add(1L, 10);
+        newActivity.add(12345);
 
         nbr.setActivity(newActivity);
         assertEquals(newActivity.hashCode(), nbr.getActivity().hashCode());
@@ -362,16 +351,6 @@ public class NeighborDtoTest {
         assertEquals(expected, nbr.getDescr());
     }
 
-    /**
-     * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#setIotaNeighborRefreshTime(int)}.
-     */
-    @Test
-    public final void testSetIotaNeighborRefreshTime() {
-        int expected = 1;
-        nbr.setIotaNeighborRefreshTime(expected);
-
-        assertEquals(expected, nbr.getIotaNeighborRefreshTime());
-    }
 
     /**
      * Test method for {@link org.iotacontrolcenter.dto.NeighborDto#setKey(java.lang.String)}.

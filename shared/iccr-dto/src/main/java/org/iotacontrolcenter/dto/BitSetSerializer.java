@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 public class BitSetSerializer extends StdSerializer<BitSet> {
 
-    private static final long serialVersionUID = 6401269449283859213L;
-
     public BitSetSerializer() {
         this(null);
     }
