@@ -26,7 +26,7 @@ user=$2
 group=$3
 dir=/opt
 iccrdir=$dir/iccr
-dist=~/projects/dist
+dist=$PWD/dist
 
 if [ -d $dir/iccr-pre-${version} ]; then
     rm -rf $dir/iccr-pre-${version} > /dev/null 2>&1

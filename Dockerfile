@@ -10,7 +10,7 @@ RUN bash -c 'mkdir -p /opt/iota /opt/iccr/{bak,bin,conf,data,download,lib,logs,t
 
 COPY . /src
 WORKDIR /src
-RUN mvn package
+RUN mvn clean package
 RUN ./deploy-iccr.bash
 
 COPY iri.jar /opt/iota/IRI.jar
