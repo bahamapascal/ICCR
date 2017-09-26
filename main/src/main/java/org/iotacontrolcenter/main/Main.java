@@ -1,8 +1,13 @@
 package org.iotacontrolcenter.main;
 
+import java.io.File;
+
 import org.iotacontrolcenter.properties.source.PropertySource;
-import org.iotacontrolcenter.rest.resource.*;
+import org.iotacontrolcenter.rest.resource.IccrServiceImpl;
+import org.iotacontrolcenter.rest.resource.NotFoundExceptionMapper;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+// For WARArchive:
+import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.config.management.SecurityRealm;
 import org.wildfly.swarm.config.management.security_realm.SslServerIdentity;
@@ -18,12 +23,7 @@ import org.wildfly.swarm.jaxrs.JAXRSArchive;
 import org.wildfly.swarm.logging.LoggingFraction;
 import org.wildfly.swarm.management.ManagementFraction;
 import org.wildfly.swarm.undertow.UndertowFraction;
-
-
-// For WARArchive:
-import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
 import org.wildfly.swarm.undertow.WARArchive;
-import java.io.File;
 
 //import java.util.logging.Logger;
 
