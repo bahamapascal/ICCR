@@ -4,20 +4,12 @@ services:
   iccr:
     build:
       context: .
-    volumes:
-      - "cache:/root/.m2"
-      - "./:/src"
     restart: always
     ports:
       - "14265:14265"
       - "14266:14266"
       - "1044:1044"
-    command: java -Xdebug -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=n -DiccrDir=/opt/iccr -Dswarm.https.port=14266 -jar /opt/iccr/lib/iccr.jar debug
-
-volumes:
-  cache:
-    external:
-      name: maven-cache
+    command: java -Xdebug -Djava.net.preferIPv4Stack=true -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=n -DiccrDir=/opt/iccr -Dswarm.https.port=14266 -jar /opt/iccr/lib/iccr.jar debug
 
 networks:
   default:
