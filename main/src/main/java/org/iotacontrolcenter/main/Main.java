@@ -1,12 +1,10 @@
 package org.iotacontrolcenter.main;
 
-import java.io.File;
-
 import org.iotacontrolcenter.properties.source.PropertySource;
+import org.iotacontrolcenter.rest.resource.CORSFilter;
 import org.iotacontrolcenter.rest.resource.IccrServiceImpl;
 import org.iotacontrolcenter.rest.resource.NotFoundExceptionMapper;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-// For WARArchive:
 import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
 import org.wildfly.swarm.Swarm;
 import org.wildfly.swarm.config.management.SecurityRealm;
@@ -25,6 +23,10 @@ import org.wildfly.swarm.management.ManagementFraction;
 import org.wildfly.swarm.undertow.UndertowFraction;
 import org.wildfly.swarm.undertow.WARArchive;
 
+import java.io.File;
+
+// For WARArchive:
+
 //import java.util.logging.Logger;
 
 public class Main {
@@ -38,15 +40,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         // Must be instantiated after logging fraction:
-        PropertySource propertySource  = null;
-        if(args != null) {
-            if(args.length > 0) {
+        PropertySource propertySource = null;
+        if (args != null) {
+            if (args.length > 0) {
                 System.out.println("args[0] -> " + args[0]);
                 noSsl = args[0].toLowerCase().equals("nossl");
                 debug = args[0].toLowerCase().equals("debug");
                 info = args[0].toLowerCase().equals("info");
             }
-            if(args.length > 1) {
+            if (args.length > 1) {
                 System.out.println("args[1] -> " + args[1]);
                 debug = args[1].toLowerCase().equals("debug");
                 info = args[1].toLowerCase().equals("info");
@@ -55,18 +57,16 @@ public class Main {
 
         Swarm swarm = new Swarm();
 
-        if(info) {
+        if (info) {
             swarm.fraction(LoggingFraction.createDefaultLoggingFraction());
-        }
-        else if(debug) {
+        } else if (debug) {
             swarm.fraction(LoggingFraction.createDebugLoggingFraction());
-        }
-        else{
+        } else {
             swarm.fraction(LoggingFraction.createErrorLoggingFraction());
         }
 
         propertySource = PropertySource.getInstance();
-        if(!noSsl) {
+        if (!noSsl) {
             System.out.println("Setting up SSL");
             swarm.fraction(new ManagementFraction()
                     .securityRealm(new SecurityRealm("SSLRealm")
@@ -94,8 +94,7 @@ public class Main {
                     .servletContainer(new ServletContainer("default")
                             .websocketsSetting(new WebsocketsSetting()))
                     .handlerConfiguration(new HandlerConfiguration()));
-        }
-        else {
+        } else {
             //logger.info("No SSL");
             System.out.println("No SSL");
         }
@@ -106,6 +105,7 @@ public class Main {
 
         System.out.println("Deploying ICCR...");
         JAXRSArchive iccrWar = ShrinkWrap.create(JAXRSArchive.class, "iccr-app.war");
+        iccrWar.addClass(CORSFilter.class);
         iccrWar.addClass(IccrServiceImpl.class);
         iccrWar.addClass(NotFoundExceptionMapper.class);
         iccrWar.addAllDependencies();
@@ -125,14 +125,13 @@ public class Main {
 
         //logger.info("Deploying ICC WAR...");
         File iccSrcdir = new File(propertySource.getIccrDir() + "/lib/icc");
-        if(iccSrcdir.exists()) {
+        if (iccSrcdir.exists()) {
             System.out.println("Deploying ICC...");
             WARArchive iccWar = ShrinkWrap.create(WARArchive.class);
             iccWar.as(ExplodedImporter.class).importDirectory(iccSrcdir);
             iccWar.setContextRoot("icc");
             swarm.deploy(iccWar);
         }
-
 
 
         //logger.info("Done...");
