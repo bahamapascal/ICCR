@@ -1,5 +1,10 @@
 package org.iotacontrolcenter.properties.source;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.iotacontrolcenter.dto.ActivityDto;
+import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
+import org.iotacontrolcenter.dto.NeighborDto;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,11 +15,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
-
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.iotacontrolcenter.dto.ActivityDto;
-import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
-import org.iotacontrolcenter.dto.NeighborDto;
 
 
 public class PropertySource {
@@ -398,6 +398,7 @@ public class PropertySource {
         try {
             InputStream is = new FileInputStream(confFile);
             props.load(is);
+            is.close();
         }
         catch(Exception e) {
             System.out.println("failed to load iccr.properties from " + confDir);
