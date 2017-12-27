@@ -58,7 +58,7 @@ fi
 ./deploy-iccr.bash
 
 if [ ! -d $dist ]; then
-    mkdir $dist
+    mkdir -p $dist
 fi
 
 #cp changelog.txt $dist/icc-${version}-changelog.txt
