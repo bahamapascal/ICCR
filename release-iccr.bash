@@ -1,27 +1,21 @@
 #!/bin/bash
 
 if [ -z "${1}" ]; then
-    echo "Pass version, user, and group on command line"
+    echo "Pass user, and group on command line"
     echo You are:
     id
     exit
 fi
 
 if [ -z "${2}" ]; then
-    echo "Pass version, user, and group on command line"
+    echo "Pass user, and group on command line"
     echo You are:
     id
     exit
 fi
 
-if [ -z "${3}" ]; then
-    echo "Pass version, user, and group on command line"
-    echo You are:
-    id
-    exit
-fi
 
-version=$1
+version=1.0.0
 user=$2
 group=$3
 dir=/opt
