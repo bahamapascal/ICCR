@@ -36,10 +36,13 @@ public class PersistenceService {
     public static final String ICCR_RESTART_FAIL = "restartIccrFail";
 
     private static PersistenceService instance;
-    private static final Object SYNC_INST = new Object();
+
+    private static Object SYNC_INST = new Object();
+
+
     public static PersistenceService getInstance() {
         synchronized (SYNC_INST) {
-            if(PersistenceService.instance == null) {
+            if (PersistenceService.instance == null) {
                 PersistenceService.instance = new PersistenceService();
             }
             return PersistenceService.instance;
@@ -67,21 +70,24 @@ public class PersistenceService {
         //iotaLogFilepath = iccrLogFilepath;
     }
 
+    public void adaptToChanges() {
+        iccrEventFilepath = propSource.getIccrDataDir() + "/" + ICCR_IOTA_EVENT_FILE;
+        iotaLogFilepath = propSource.getIotaAppDir() + "/" + IOTA_LOG_FILE;
+        iccrLogFilepath = propSource.getIccrLogDir() + "/" + ICCR_LOG_FILE;
+    }
+
     public LogLinesResponse getIotaLog(String fileDirection,
                                        Long lastFilePosition,
                                        Long lastFileLength,
                                        Long numLines) throws IOException {
 
-        if(fileDirection == null || fileDirection.isEmpty()) {
+        if (fileDirection == null || fileDirection.isEmpty()) {
             return getAllIotaLogLines();
-        }
-        else if(fileDirection.equalsIgnoreCase(HEAD_DIRECTIVE)) {
+        } else if (fileDirection.equalsIgnoreCase(HEAD_DIRECTIVE)) {
             return getIotaLogFromHead(lastFilePosition, lastFileLength, numLines);
-        }
-        else if(fileDirection.equalsIgnoreCase(TAIL_DIRECTIVE)) {
+        } else if (fileDirection.equalsIgnoreCase(TAIL_DIRECTIVE)) {
             return getIotaLogFromTail(lastFilePosition, lastFileLength, numLines);
-        }
-        else {
+        } else {
             System.out.println("Unrecognized file direction: " + fileDirection);
             return new LogLinesResponse(false, "Unsupported fileDirection parameter: '" + fileDirection + "'");
         }
@@ -89,11 +95,11 @@ public class PersistenceService {
 
     private LogLinesResponse getIotaLogFromHead(Long lastFilePosition, Long lastFileLength, Long numLines) throws IOException {
 
-        System.out.println("getIotaLogFromHead lastFilePosition: "  + lastFilePosition +
-                ", lastFileLength: "  + lastFileLength +
-                ", numLines: "  + numLines);
+        System.out.println("getIotaLogFromHead lastFilePosition: " + lastFilePosition +
+                ", lastFileLength: " + lastFileLength +
+                ", numLines: " + numLines);
 
-        if(numLines == null) {
+        if (numLines == null) {
             numLines = 500L;
         }
 
@@ -114,18 +120,19 @@ public class PersistenceService {
         }
         */
 
-        if(lastFilePosition != null && lastFilePosition > 0) {
-            if(lastFilePosition <= curFileLen) {
+        if (lastFilePosition != null && lastFilePosition > 0) {
+            if (lastFilePosition <= curFileLen) {
                 raf.seek(lastFilePosition);
             }
-        }
-        else {
+        } else {
             raf.seek(0L);
         }
 
         long lineNum = 0;
-        String curLine;
-        while(lineNum < numLines && (curLine = raf.readLine()) != null) {
+
+        String curLine = null;
+        while (lineNum < numLines && (curLine = raf.readLine()) != null) {
+
             lineNum++;
             resp.addLine(curLine);
         }
@@ -141,11 +148,11 @@ public class PersistenceService {
 
     private LogLinesResponse getIotaLogFromTail(Long lastFilePosition, Long lastFileLength, Long numLines) throws IOException {
 
-        System.out.println("getIotaLogFromTail lastFilePosition: "  + lastFilePosition +
-                ", lastFileLength: "  + lastFileLength +
-                ", numLines: "  + numLines);
+        System.out.println("getIotaLogFromTail lastFilePosition: " + lastFilePosition +
+                ", lastFileLength: " + lastFileLength +
+                ", numLines: " + numLines);
 
-        if(numLines == null) {
+        if (numLines == null) {
             numLines = 500L;
         }
 
@@ -171,47 +178,50 @@ public class PersistenceService {
         // of lines backward from bottom of file:
         long firstSeekPosition = 0L;
         long firstSeekOffset = 0L;
-        if(lastFilePosition == null) {
+        if (lastFilePosition == null) {
             firstSeekOffset = numLines * 132;
             firstSeekPosition = curFileLen - firstSeekOffset;
-            if(firstSeekPosition < 0) {
+            if (firstSeekPosition < 0) {
                 firstSeekPosition = 0L;
             }
             System.out.println("first seek offset: " + firstSeekOffset + ", first seek position: " + firstSeekPosition);
             raf.seek(firstSeekPosition);
-        }
-        else if(lastFilePosition > 0) {
-            if(lastFilePosition <= curFileLen) {
+
+        } else if (lastFilePosition != null && lastFilePosition > 0) {
+            if (lastFilePosition <= curFileLen) {
+
                 raf.seek(lastFilePosition);
             }
         }
 
         long lineNum = 0;
-        String curLine;
-        while(lineNum < numLines && (curLine = raf.readLine()) != null) {
+
+        String curLine = null;
+        while (lineNum < numLines && (curLine = raf.readLine()) != null) {
+
             lineNum++;
             resp.addLine(curLine);
         }
 
         // On first time through, try to correct if we got it badly wrong:
-        if(lastFilePosition ==  null) {
+        if (lastFilePosition == null) {
 
             System.out.println("getIotaLogFromTail, first tail query, read " + lineNum + " lines, " +
                     ", fileLength: " + curFileLen +
                     ", lastFilePosition: " + raf.getFilePointer());
 
-            if(lineNum != numLines && firstSeekPosition > 0) {
+            if (lineNum != numLines && firstSeekPosition > 0) {
                 System.out.println("getIotaLogFromTail, first tail query, correcting seek offset");
-                firstSeekOffset =  (firstSeekOffset / lineNum) * numLines;
+                firstSeekOffset = (firstSeekOffset / lineNum) * numLines;
                 firstSeekPosition = curFileLen - firstSeekOffset;
-                if(firstSeekPosition < 0) {
+                if (firstSeekPosition < 0) {
                     firstSeekPosition = 0L;
                 }
                 System.out.println("corrected first seek offset: " + firstSeekOffset + ", first seek position: " + firstSeekPosition);
                 raf.seek(firstSeekPosition);
                 lineNum = 0;
                 resp.getLines().clear();
-                while(lineNum < numLines && (curLine = raf.readLine()) != null) {
+                while (lineNum < numLines && (curLine = raf.readLine()) != null) {
                     lineNum++;
                     resp.addLine(curLine);
                 }
@@ -252,8 +262,7 @@ public class PersistenceService {
         //if(f.exists()) {
         try {
             return FileUtils.readLines(f);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             return new ArrayList<>();
         }
     }
@@ -269,9 +278,10 @@ public class PersistenceService {
 
     public void logIotaAction(String event, String data, String msg) {
         //System.out.println("logIotaAction : " + event);
-        try {
-            String line = localization.getEventTime() + "," +  localization.getLocalText(event) + "," + data;
-            if(msg != null && !msg.isEmpty()) {
+
+            String line = localizer.getEventTime() + "," + localizer.getLocalText(event) + "," + data;
+            if (msg != null && !msg.isEmpty()) {
+
                 line += "," + msg;
             }
             line += System.lineSeparator();
@@ -286,10 +296,9 @@ public class PersistenceService {
             */
 
             FileUtils.write(f, line, true);
-        }
-        catch(IOException ioe) {
+        } catch (IOException ioe) {
             System.out.println("logIotaAction, exception writing to file (" +
-                    iccrEventFilepath + "): " +ioe.getLocalizedMessage());
+                    iccrEventFilepath + "): " + ioe.getLocalizedMessage());
         }
     }
 

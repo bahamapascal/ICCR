@@ -25,6 +25,7 @@ cd $ICCR_DIR
 # for start:
 loglevel=
 nossl=
+preferIPv4Flag=
 for arg in "$@"; do
     if [ "${arg}" = "debug" ]; then
         loglevel=debug
@@ -35,6 +36,10 @@ for arg in "$@"; do
     if [ "${arg}" = "nossl" ]; then
         nossl="nossl"
     fi
+    if [ "${arg}" = "ipv4" ]; then
+        preferIPv4Flag="-Djava.net.preferIPv4Stack=true"
+    fi
+
 done
 
 stop() {
@@ -120,7 +125,7 @@ start() {
     #java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs}
     #CP="-cp ${ICCR_LIB_DIR}"
     
-    nohup java ${jvm_env} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
+    nohup java ${jvm_env} ${preferIPv4Flag} -jar ${ICCR_LIB_DIR}/${ICCR_JAR_NAME} ${iccrargs} > ${ICCR_LOG_DIR}/iccr.log 2>&1 &
 
     iccrPid=$!
 
@@ -178,6 +183,7 @@ elif [ "${1}" = "start" ]; then
 else
     echo Unsupported or missing command, supported commands are: stop, start, restart, status
 fi
-# Else what?
+# What else?!
+
 
 

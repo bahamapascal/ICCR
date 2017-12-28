@@ -20,7 +20,7 @@ function printApiKeyHelp {
     echo '- at least one special case character from this set of characters: !@#$_'
 }
 
-ver=0.9.0
+ver=1.0.0-rc3
 pkg=iccr-${ver}.tgz
 dir=/opt
 iccrDir=$dir/iccr

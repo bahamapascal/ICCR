@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=1.0.6
+ver=1.0.0-rc3
 pkg=iccr-${ver}.tgz
 dir=/opt
 iccrDir=$dir/iccr
