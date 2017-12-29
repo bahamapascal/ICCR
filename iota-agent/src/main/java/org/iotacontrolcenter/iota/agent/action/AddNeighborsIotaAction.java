@@ -17,8 +17,8 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
     @Override
     protected void validatePreconditions() {
 
-        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localizer.getLocalText("missingDirectory") +
+        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localization.getLocalText("missingDirectory") +
                     ": " + propSource.getIotaAppDir());
         }
     }
@@ -28,27 +28,27 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
         preExecute();
 
         ActionResponse resp = new ActionResponse();
-        String msg = "";
-        boolean rval = true;
+        String msg;
+        boolean success = true;
 
         if (!AgentUtil.isIotaActive()) {
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             resp.setSuccess(false);
-            resp.setMsg(localizer.getLocalText("iotaNotActive"));
+            resp.setMsg(localization.getLocalText("iotaNotActive"));
         }
         else {
             AddIotaNeighbors request = new AddIotaNeighbors(propSource.getLocalIotaUrl());
 
-            IccrIotaNeighborsPropertyDto nbrs = propSource.getIotaNeighbors();
+            IccrIotaNeighborsPropertyDto iotaNeighbors = propSource.getIotaNeighbors();
 
-            if(nbrs == null || nbrs.getNbrs() == null || nbrs.getNbrs().isEmpty()) {
+            if(iotaNeighbors == null || iotaNeighbors.getNeighbors() == null || iotaNeighbors.getNeighbors().isEmpty()) {
                 System.out.println(ACTION_PROP + ", neighbors property is empty");
                 resp.setSuccess(true);
                 resp.setMsg("Neighbors was empty, nothing to add");
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                 resp.setContent("Neighbors was empty, nothing to add");
 
-                persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS_FAIL,
+                persistenceService.logIotaAction(PersistenceService.IOTA_ADD_NEIGHBORS_FAIL,
                         "",
                         "Neighbors configuration is empty");
 
@@ -56,7 +56,7 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
             }
 
             IotaAddNeighborsCommandDto payload = new IotaAddNeighborsCommandDto();
-            nbrs.getNbrs().forEach((nbr) -> {
+            iotaNeighbors.getNeighbors().forEach((nbr) -> {
                 if(nbr.isActive()) {
                     payload.addUri(nbr.getUri());
                 }
@@ -68,7 +68,7 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                 resp.setContent("No active neighbors, nothing to add");
 
-                persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS_FAIL,
+                persistenceService.logIotaAction(PersistenceService.IOTA_ADD_NEIGHBORS_FAIL,
                         "",
                         "No active neighbors, nothing to add");
 
@@ -87,21 +87,21 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
                     resp.setContent(request.responseAsString());
 
                     System.out.println(request.getName() + " " +
-                            localizer.getLocalText("httpRequestSuccess"));
+                            localization.getLocalText("httpRequestSuccess"));
 
-                    persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS);
+                    persistenceService.logIotaAction(PersistenceService.IOTA_ADD_NEIGHBORS);
                 }
                 else {
                     System.out.println(request.getName() + " addNeighbors response was not successful");
 
-                    rval = false;
+                    success = false;
                     msg = request.getResponseReason();
                     if(msg == null || msg.isEmpty()) {
                         msg = request.getStartError();
                     }
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
 
-                    persister.logIotaAction(PersistenceService.IOTA_ADD_NBRS_FAIL,
+                    persistenceService.logIotaAction(PersistenceService.IOTA_ADD_NEIGHBORS_FAIL,
                             "",
                             resp.getMsg());
                 }
@@ -109,13 +109,13 @@ public class AddNeighborsIotaAction extends AbstractAction implements IotaAction
             catch(IllegalStateException ise) {
                 // Message is already localized
                 System.out.println(request.getName() + " " +
-                        localizer.getLocalTextWithFixed("startHttpException", ise.getMessage()));
-                rval = false;
+                        localization.getLocalTextWithFixed("startHttpException", ise.getMessage()));
+                success = false;
                 msg = ise.getMessage();
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             }
 
-            resp.setSuccess(rval);
+            resp.setSuccess(success);
             resp.setMsg(msg);
         }
 

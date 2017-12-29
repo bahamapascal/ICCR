@@ -6,14 +6,14 @@ import java.util.List;
 
 public class IccrIotaNeighborsPropertyDto extends IccrPropertyDto {
 
-    private List<NeighborDto> nbrs;
+    private List<NeighborDto> neighbors;
 
     public IccrIotaNeighborsPropertyDto() {
     }
 
-    public IccrIotaNeighborsPropertyDto(String key, List<NeighborDto> nbrs) {
+    public IccrIotaNeighborsPropertyDto(String key, List<NeighborDto> neighbors) {
         super(key, null);
-        this.nbrs = nbrs;
+        this.neighbors = neighbors;
     }
 
     // Convenience method, but don't want it to cause bean type getter/setter problems
@@ -21,10 +21,10 @@ public class IccrIotaNeighborsPropertyDto extends IccrPropertyDto {
     public String nbrKeys() {
         String val = "";
         String sep = "";
-        if(nbrs == null || nbrs.isEmpty()) {
+        if(neighbors == null || neighbors.isEmpty()) {
             return val;
         }
-        for(NeighborDto nbr : nbrs) {
+        for(NeighborDto nbr : neighbors) {
             val += sep + nbr.getKey();
             if(sep.isEmpty()) {
                 sep = ",";
@@ -33,25 +33,25 @@ public class IccrIotaNeighborsPropertyDto extends IccrPropertyDto {
         return val;
     }
 
-    public List<NeighborDto> getNbrs() {
-        return nbrs;
+    public List<NeighborDto> getNeighbors() {
+        return neighbors;
     }
 
-    public void setNbrs(List<NeighborDto> nbrs) {
-        this.nbrs = nbrs;
+    public void setNeighbors(List<NeighborDto> neighbors) {
+        this.neighbors = neighbors;
     }
 
     public void addNeighbor(NeighborDto nbr) {
-        if(nbrs == null) {
-            nbrs = new ArrayList<>();
+        if(neighbors == null) {
+            neighbors = new ArrayList<>();
         }
-        nbrs.add(nbr);
+        neighbors.add(nbr);
     }
 
     @Override
     public String toString() {
         return "IccrIotaNeighborsPropertyDto{" +
-                "nbrs=" + nbrs +
+                "neighbors=" + neighbors +
                 '}';
     }
 }

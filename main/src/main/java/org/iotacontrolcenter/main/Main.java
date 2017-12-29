@@ -40,9 +40,11 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         // Must be instantiated after logging fraction:
+
         PropertySource propertySource = null;
         if (args != null) {
             if (args.length > 0) {
+
                 System.out.println("args[0] -> " + args[0]);
                 noSsl = args[0].toLowerCase().equals("nossl");
                 debug = args[0].toLowerCase().equals("debug");

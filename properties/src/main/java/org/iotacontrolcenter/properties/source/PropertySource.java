@@ -1,5 +1,6 @@
 package org.iotacontrolcenter.properties.source;
 
+
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.iotacontrolcenter.dto.ActivityDto;
 import org.iotacontrolcenter.dto.IccrIotaNeighborsPropertyDto;
@@ -63,19 +64,19 @@ public class PropertySource {
         }
     }
 
-    private Properties props;
-    private String bakDir;
-    private String binDir;
-    private String confDir;
-    private String confFile;
-    private String dataDir;
-    private String dldDir;
+    private final Properties props;
+    private final String bakDir;
+    private final String binDir;
+    private final String confDir;
+    private final String confFile;
+    private final String dataDir;
+    private final String dldDir;
     private String iccrDir;
-    private String logDir;
-    private String osName;
-    private String tmpDir;
+    private final String logDir;
+    private final String osName;
+    private final String tmpDir;
     private PropertiesConfiguration propWriter;
-    private DateTimeFormatter ymdhmsFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private final DateTimeFormatter ymdhmsFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final Object SET_SYNC_OBJ = new Object();
 
@@ -435,8 +436,8 @@ public class PropertySource {
             Properties seenKeys = new Properties();
             String id;
 
-            if (nbrs.getNbrs() != null) {
-                for (NeighborDto nbr : nbrs.getNbrs()) {
+            if (nbrs.getNeighbors() != null) {
+                for (NeighborDto nbr : nbrs.getNeighbors()) {
                     System.out.println("updated neighbor: " + nbr);
                     id = nbr.getKey();
                     if (seenKeys.containsKey(id)) {
@@ -456,8 +457,8 @@ public class PropertySource {
                     else {
                         setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".name." + id, "");
                     }
-                    if (nbr.getDescr() != null) {
-                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescr());
+                    if (nbr.getDescription() != null) {
+                        setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, nbr.getDescription());
                     }
                     else {
                         setProperty(PropertySource.IOTA_NEIGHBOR_PROP_PREFIX + ".descr." + id, "");

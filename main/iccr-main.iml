@@ -58,15 +58,11 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.7.4" level="project" />
     <orderEntry type="library" name="Maven: org.wildfly.swarm:management:2016.12.1" level="project" />
     <orderEntry type="library" name="Maven: org.wildfly.swarm:logging:2016.12.1" level="project" />
-    <orderEntry type="module" module-name="iccr-dto" />
-    <orderEntry type="module" module-name="iccr-api" />
     <orderEntry type="module" module-name="iccr-rest" />
-    <orderEntry type="module" module-name="iota-agent" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.3.1" level="project" />
-    <orderEntry type="module" module-name="iccr-persistence" />
     <orderEntry type="module" module-name="iccr-properties" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: commons-configuration:commons-configuration:1.10" level="project" />

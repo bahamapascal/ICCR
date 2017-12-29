@@ -2,7 +2,7 @@ package org.iotacontrolcenter.iccr.agent;
 
 import org.iotacontrolcenter.iccr.agent.action.IccrAction;
 import org.iotacontrolcenter.iccr.agent.action.RestartIccrAction;
-import org.iotacontrolcenter.properties.locale.Localizer;
+import org.iotacontrolcenter.properties.locale.Localization;
 
 public class IccrActionFactory {
 
@@ -31,7 +31,7 @@ public class IccrActionFactory {
             return new StopIccrAction();
         }
         */
-        throw new IllegalArgumentException(Localizer.getInstance().getFixedWithLocalText("IccrActionFactory (" + cmd + "): ", "unsupportedAction"));
+        throw new IllegalArgumentException(Localization.getInstance().getFixedWithLocalText("IccrActionFactory (" + cmd + "): ", "unsupportedAction"));
     }
 
     public static boolean isValidAction(String cmd) {
