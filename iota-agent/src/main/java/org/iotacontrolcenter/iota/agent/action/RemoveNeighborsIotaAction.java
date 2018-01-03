@@ -18,8 +18,8 @@ public class RemoveNeighborsIotaAction extends AbstractAction implements IotaAct
     @Override
     protected void validatePreconditions() {
 
-        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localization.getLocalText("missingDirectory") +
+        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localizer.getLocalText("missingDirectory") +
                     ": " + propSource.getIotaAppDir());
         }
     }
@@ -29,13 +29,13 @@ public class RemoveNeighborsIotaAction extends AbstractAction implements IotaAct
         preExecute();
 
         ActionResponse resp = new ActionResponse();
-        String msg;
-        boolean success = true;
+        String msg = "";
+        boolean rval = true;
 
         if (!AgentUtil.isIotaActive()) {
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             resp.setSuccess(false);
-            resp.setMsg(localization.getLocalText("iotaNotActive"));
+            resp.setMsg(localizer.getLocalText("iotaNotActive"));
         }
         else {
             RemoveIotaNeighbors request = new RemoveIotaNeighbors(propSource.getLocalIotaUrl());
@@ -44,15 +44,15 @@ public class RemoveNeighborsIotaAction extends AbstractAction implements IotaAct
 
             if(actionProps != null && actionProps.getProperties() != null &&
                     !actionProps.getProperties().isEmpty()) {
-                // Removing only the specified neighbors:
+                // Removing only the specified nbrs:
                 for(IccrPropertyDto nbr : actionProps.getProperties()) {
                     payload.addUri(nbr.getValue());
                 }
             }
             else {
-                // Removing all the currently configured neighbors:
-                IccrIotaNeighborsPropertyDto iotaNeighborsPropertyDto = propSource.getIotaNeighbors();
-                iotaNeighborsPropertyDto.getNeighbors().forEach((nbr) -> {
+                // Removing all the currently configured nbrs:
+                IccrIotaNeighborsPropertyDto nbrs = propSource.getIotaNeighbors();
+                nbrs.getNbrs().forEach((nbr) -> {
                     if (nbr.isActive()) {
                         payload.addUri(nbr.getUri());
                     }
@@ -72,19 +72,19 @@ public class RemoveNeighborsIotaAction extends AbstractAction implements IotaAct
                     resp.setContent(request.responseAsString());
 
                     System.out.println(request.getName() + " " +
-                            localization.getLocalText("httpRequestSuccess"));
+                            localizer.getLocalText("httpRequestSuccess"));
 
-                    persistenceService.logIotaAction(PersistenceService.IOTA_REMOVE_NEIGHBORS);
+                    persister.logIotaAction(PersistenceService.IOTA_REMOVE_NBRS);
                 }
                 else {
-                    success = false;
+                    rval = false;
                     msg = request.getResponseReason();
                     if(msg == null || msg.isEmpty()) {
                         msg = request.getStartError();
                     }
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
 
-                    persistenceService.logIotaAction(PersistenceService.IOTA_REMOVE_NEIGHBORS_FAIL,
+                    persister.logIotaAction(PersistenceService.IOTA_REMOVE_NBRS_FAIL,
                             "",
                             resp.getMsg());
                 }
@@ -92,15 +92,15 @@ public class RemoveNeighborsIotaAction extends AbstractAction implements IotaAct
             catch(IllegalStateException ise) {
                 // Message is already localized
                 System.out.println(request.getName() + " " +
-                        localization.getLocalTextWithFixed("startHttpException", ise.getMessage()));
+                        localizer.getLocalTextWithFixed("startHttpException", ise.getMessage()));
                 ise.printStackTrace();
 
-                success = false;
+                rval = false;
                 msg = ise.getMessage();
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             }
 
-            resp.setSuccess(success);
+            resp.setSuccess(rval);
             resp.setMsg(msg);
         }
 

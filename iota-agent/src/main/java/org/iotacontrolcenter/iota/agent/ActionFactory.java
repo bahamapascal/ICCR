@@ -1,7 +1,9 @@
 package org.iotacontrolcenter.iota.agent;
 
 import org.iotacontrolcenter.iota.agent.action.*;
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
+
+import java.util.List;
 
 public class ActionFactory {
 
@@ -10,25 +12,25 @@ public class ActionFactory {
     public static final String RESTART = "restart";
     public static final String STATUS = "status";
     public static final String STOP = "stop";
-    public static final String DELETE_DB = "deleteDb";
+    public static final String DELETEDB = "deletedb";
     public static final String DELETE = "delete";
-    public static final String NODE_INFO = "nodeInfo";
+    public static final String NODEINFO = "nodeinfo";
     public static final String NEIGHBORS = "neighbors";
-    public static final String ADD_NEIGHBORS = "addNeighbors";
-    public static final String REMOVE_NEIGHBORS = "removeNeighbors";
+    public static final String ADDNEIGHBORS = "addNeighbors";
+    public static final String REMOVENEIGHBORS = "removeNeighbors";
 
-    private static final String[] CMD_LIST = {
+    private static final String[] cmdList = {
             INSTALL,
             START,
             RESTART,
             STATUS,
             STOP,
-            DELETE_DB,
+            DELETEDB,
             DELETE,
-            NODE_INFO,
+            NODEINFO,
             NEIGHBORS,
-            ADD_NEIGHBORS,
-            REMOVE_NEIGHBORS
+            ADDNEIGHBORS,
+            REMOVENEIGHBORS
     };
 
     public static IotaAction getAction(String cmd) {
@@ -47,30 +49,30 @@ public class ActionFactory {
         else if(STOP.equals(cmd)) {
             return new StopIotaAction();
         }
-        else if(DELETE_DB.equals(cmd)) {
+        else if(DELETEDB.equals(cmd)) {
             return new DeleteDbIotaAction();
         }
         else if(DELETE.equals(cmd)) {
             return new DeleteIotaAction();
         }
-        else if(NODE_INFO.equals(cmd)) {
+        else if(NODEINFO.equals(cmd)) {
             return new NodeInfoIotaAction();
         }
         else if(NEIGHBORS.equals(cmd)) {
             return new NeighborsIotaAction();
         }
-        else if(ADD_NEIGHBORS.equals(cmd)) {
+        else if(ADDNEIGHBORS.equals(cmd)) {
             return new AddNeighborsIotaAction();
         }
-        else if(REMOVE_NEIGHBORS.equals(cmd)) {
+        else if(REMOVENEIGHBORS.equals(cmd)) {
             return new RemoveNeighborsIotaAction();
         }
-        throw new IllegalArgumentException(Localization.getInstance().getFixedWithLocalText("ActionFactory (" + cmd + "): ", "unsupportedAction"));
+        throw new IllegalArgumentException(Localizer.getInstance().getFixedWithLocalText("ActionFactory (" + cmd + "): ", "unsupportedAction"));
     }
 
     public static boolean isValidAction(String cmd) {
         if(cmd != null && !cmd.isEmpty()) {
-            for(String s : CMD_LIST) {
+            for(String s : cmdList) {
                 if(s.equals(cmd)) {
                     return true;
                 }

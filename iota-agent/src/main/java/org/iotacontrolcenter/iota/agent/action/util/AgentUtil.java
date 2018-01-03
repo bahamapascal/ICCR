@@ -9,22 +9,41 @@ import java.io.File;
 
 public class AgentUtil {
 
-    public static boolean dirDoesNotExist(String dirPath) {
-        File f = new File(dirPath);
-        return !(f.exists() && !f.isDirectory());
+    public static boolean dirExists(String dirPath) {
+        boolean rval = false;
+        try {
+            File f = new File(dirPath);
+            rval = f.exists() && f.isDirectory();
+        }
+        catch(Exception e) {
+            System.out.println("dirExists(" + dirPath + ") exception: " + e.getLocalizedMessage());
+        }
+        return rval;
     }
 
     public static boolean fileExists(String filePath) {
-        File f = new File(filePath);
-        return f.exists();
+        boolean rval = false;
+        try {
+            File f = new File(filePath);
+            rval = f.exists();
+        }
+        catch(Exception e) {
+            System.out.println("fileExists(" + filePath + ") exception: " + e.getLocalizedMessage());
+        }
+        return rval;
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteFileQuietly(String filePath) {
-        new File(filePath).delete();
+        if(fileExists(filePath)) {
+            try {
+                File f = new File(filePath);
+                f.delete();
+            } catch (Exception e) {
+            }
+        }
     }
 
-    public static  boolean stopIota() throws InterruptedException {
+    public static  boolean stopIota() {
         StopIotaAction stopper = new StopIotaAction();
         ActionResponse resp = stopper.execute(null);
         return resp.isSuccess() &&
@@ -40,12 +59,12 @@ public class AgentUtil {
                 resp.getProperty(StatusIotaAction.ACTION_PROP).valueIsSuccess();
     }
 
-    public static ActionResponse startIota() throws InterruptedException {
+    public static ActionResponse startIota() {
         StartIotaAction starter = new StartIotaAction();
         return starter.execute(null);
     }
 
-    public static boolean startIotaBoolean() throws InterruptedException {
+    public static boolean startIotaBoolean() {
         StartIotaAction starter = new StartIotaAction();
         ActionResponse resp =  starter.execute(null);
         return resp.isSuccess() &&

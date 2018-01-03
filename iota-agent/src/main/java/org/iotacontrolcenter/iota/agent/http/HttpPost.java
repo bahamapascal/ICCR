@@ -38,19 +38,19 @@ public class HttpPost extends HttpMethod  {
     @Override
     public void execute() {
         if(name == null || name.isEmpty()) {
-            throw new IllegalStateException(localization.getLocalText("emptyHttpRequestName"));
+            throw new IllegalStateException(localizer.getLocalText("emptyHttpRequestName"));
         }
 
         if(url == null || url.isEmpty()) {
-            throw new IllegalStateException(localization.getFixedWithLocalText(name + ": ", "emptyHttpRequestUrl"));
+            throw new IllegalStateException(localizer.getFixedWithLocalText(name + ": ", "emptyHttpRequestUrl"));
         }
 
         if(payload == null) {
-            throw new IllegalStateException(localization.getLocalTextWithFixed("emptyHttpRequestPayload",
+            throw new IllegalStateException(localizer.getLocalTextWithFixed("emptyHttpRequestPayload",
                     " (" + name + "): " + url));
         }
 
-        System.out.println(localization.getLocalTextWithFixed("executingHttpRequest", " (" + name + "): " + url));
+        System.out.println(localizer.getLocalTextWithFixed("executingHttpRequest", " (" + name + "): " + url));
 
         org.apache.http.client.methods.HttpPost post = new org.apache.http.client.methods.HttpPost(url);
         try {
@@ -64,10 +64,12 @@ public class HttpPost extends HttpMethod  {
             post.setConfig(conf);
 
             if(headers != null && !headers.isEmpty()) {
-                headers.forEach(post::setHeader);
+                headers.forEach((k,v) -> {
+                    post.setHeader(k, v);
+                });
             }
 
-            StringEntity entity;
+            StringEntity entity = null;
             if(payload instanceof  String) {
                 entity = new StringEntity((String)payload, ContentType.create("application/json", "UTF-8"));
                 post.setEntity(entity);
@@ -91,7 +93,7 @@ public class HttpPost extends HttpMethod  {
             httpRequestBase = post;
         }
         catch(IOException ioe) {
-            startError = localization.getLocalTextWithFixed("httpRequestException",
+            startError = localizer.getLocalTextWithFixed("httpRequestException",
                     " (name: " + name + ", URL: " + url + "): " + ioe.getLocalizedMessage());
             System.out.println(startError);
         }

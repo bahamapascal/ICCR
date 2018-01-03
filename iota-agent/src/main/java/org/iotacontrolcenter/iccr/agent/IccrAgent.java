@@ -2,13 +2,13 @@ package org.iotacontrolcenter.iccr.agent;
 
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class IccrAgent {
 
     private static IccrAgent instance;
-    private static final Object SYNC_INST = new Object();
+    private static Object SYNC_INST = new Object();
     public static IccrAgent getInstance() {
         synchronized (SYNC_INST) {
             if(IccrAgent.instance == null) {
@@ -18,17 +18,18 @@ public class IccrAgent {
         }
     }
 
-    private final Localization localization;
+    private Localizer localizer;
+    private PropertySource propSource;
 
     private IccrAgent() {
         System.out.println("new ICCR Agent");
-        PropertySource propSource = PropertySource.getInstance();
-        localization = Localization.getInstance();
+        propSource = PropertySource.getInstance();
+        localizer = Localizer.getInstance();
     }
 
     public ActionResponse action(String cmd, IccrPropertyListDto actionProps) {
         if(!IccrActionFactory.isValidAction(cmd)) {
-            throw new IllegalArgumentException(localization.getFixedWithLocalText("IccrAgent (" + cmd + "): ", "unsupportedAction"));
+            throw new IllegalArgumentException(localizer.getFixedWithLocalText("IccrAgent (" + cmd + "): ", "unsupportedAction"));
         }
 
         return IccrActionFactory.getAction(cmd).execute(actionProps);

@@ -1,5 +1,6 @@
 package org.iotacontrolcenter.iota.agent.action;
 
+import org.apache.commons.io.FileUtils;
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyDto;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
@@ -8,6 +9,7 @@ import org.iotacontrolcenter.persistence.PersistenceService;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 import java.io.File;
+import java.io.IOException;
 
 public class DeleteIotaAction extends AbstractAction implements IotaAction  {
 
@@ -19,31 +21,31 @@ public class DeleteIotaAction extends AbstractAction implements IotaAction  {
 
     @Override
     protected void validatePreconditions() {
-        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localization.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
+        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localizer.getLocalText("missingDirectory") + ": " + propSource.getIotaAppDir());
         }
     }
 
     @Override
-    public ActionResponse execute(IccrPropertyListDto actionProps) throws InterruptedException {
+    public ActionResponse execute(IccrPropertyListDto actionProps) {
         preExecute();
 
         ActionResponse resp = new ActionResponse();
 
-        boolean success;
+        boolean rval = true;
         String msg = "";
 
         if (AgentUtil.isIotaActive()) {
             System.out.println("deleteIota, first stopping");
             if(!AgentUtil.stopIota()) {
                 System.out.println(ACTION_PROP + " " +
-                        localization.getLocalText("deleteIotaFail"));
+                        localizer.getLocalText("deleteIotaFail"));
 
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
                 resp.setSuccess(false);
-                resp.setMsg(localization.getLocalText("deleteIotaFail"));
+                resp.setMsg(localizer.getLocalText("deleteIotaFail"));
 
-                persistenceService.logIotaAction(PersistenceService.IOTA_DELETE_FAIL,
+                persister.logIotaAction(PersistenceService.IOTA_DELETE_FAIL,
                         "",
                         resp.getMsg());
 
@@ -56,33 +58,33 @@ public class DeleteIotaAction extends AbstractAction implements IotaAction  {
         if(AgentUtil.fileExists(filePath)) {
             try {
                 File f = new File(filePath);
-                success = f.delete();
+                rval = f.delete();
             } catch (Exception e) {
                 msg = e.getLocalizedMessage();
                 System.out.println(ACTION_PROP + " " +
-                        localization.getLocalText("deleteIotaFail") +
+                        localizer.getLocalText("deleteIotaFail") +
                         ": " + msg);
-                success = false;
+                rval = false;
             }
         }
         else {
-            msg = filePath + " " + localization.getLocalText("noFile");
-            success = true;
+            msg = filePath + " " + localizer.getLocalText("noFile");
+            rval = true;
         }
 
         AgentUtil.deleteFileQuietly(propSource.getIotaAppDir() + "/iota.pid");
 
         AgentUtil.deleteFileQuietly(propSource.getIotaAppDir() + "/console.log");
 
-        resp.setSuccess(success);
+        resp.setSuccess(rval);
         resp.setMsg(msg);
-        resp.addProperty(new IccrPropertyDto(ACTION_PROP, success ? "true" : "false"));
+        resp.addProperty(new IccrPropertyDto(ACTION_PROP, rval ? "true" : "false"));
 
-        if(success) {
-            persistenceService.logIotaAction(PersistenceService.IOTA_DELETE);
+        if(rval) {
+            persister.logIotaAction(PersistenceService.IOTA_DELETE);
         }
         else {
-            persistenceService.logIotaAction(PersistenceService.IOTA_DELETE_FAIL);
+            persister.logIotaAction(PersistenceService.IOTA_DELETE_FAIL);
         }
         return resp;
     }

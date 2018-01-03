@@ -3,6 +3,7 @@ package org.iotacontrolcenter.iota.agent.http;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -24,14 +25,14 @@ public class HttpGet extends HttpMethod {
     @Override
     public void execute() {
         if(name == null || name.isEmpty()) {
-            throw new IllegalStateException(localization.getLocalText("emptyHttpRequestName"));
+            throw new IllegalStateException(localizer.getLocalText("emptyHttpRequestName"));
         }
 
         if(url == null || url.isEmpty()) {
-            throw new IllegalStateException(localization.getFixedWithLocalText(name + ": ", "emptyHttpRequestUrl"));
+            throw new IllegalStateException(localizer.getFixedWithLocalText(name + ": ", "emptyHttpRequestUrl"));
         }
 
-        System.out.println(localization.getLocalTextWithFixed("executingHttpRequest", " (" + name + "): " + url));
+        System.out.println(localizer.getLocalTextWithFixed("executingHttpRequest", " (" + name + "): " + url));
 
         org.apache.http.client.methods.HttpGet get = new org.apache.http.client.methods.HttpGet(url);
         try {
@@ -45,22 +46,24 @@ public class HttpGet extends HttpMethod {
             get.setConfig(getConfig);
 
             if(headers != null && !headers.isEmpty()) {
-                headers.forEach(get::setHeader);
+                headers.forEach((k,v) -> {
+                    get.setHeader(k, v);
+                });
             }
 
             CloseableHttpClient client = HttpClientBuilder.create().disableAutomaticRetries().build();
 
             response = client.execute(get);
 
-            // For releasing connection in calls from the base:
+            // For releasigng connection in calls from the base:
             httpRequestBase = get;
         }
         catch(IOException ioe) {
-            System.out.println("http get io exe:");
+            System.out.println("httpget io exe:");
             ioe.printStackTrace();
 
             System.out.println("startError:");
-            startError = localization.getLocalTextWithFixed("httpRequestException",
+            startError = localizer.getLocalTextWithFixed("httpRequestException",
                     " (name: " + name + ", URL: " + url + "): " + ioe.getLocalizedMessage());
             System.out.println(startError);
         }

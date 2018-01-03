@@ -4,5 +4,5 @@ import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
 
 public interface IotaAction {
-    ActionResponse execute(IccrPropertyListDto actionProps) throws InterruptedException;
+    ActionResponse execute(IccrPropertyListDto actionProps);
 }

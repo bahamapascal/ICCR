@@ -21,7 +21,7 @@ public class RestartIccrAction extends AbstractIccrAction implements IccrAction 
     @Override
     protected void validatePreconditions() {
 
-        if (AgentUtil.dirDoesNotExist(propSource.getIccrDir())) {
+        if (!AgentUtil.dirExists(propSource.getIccrDir())) {
             throw new IllegalStateException("Missing directory: " + propSource.getIccrDir());
         }
     }
@@ -35,30 +35,30 @@ public class RestartIccrAction extends AbstractIccrAction implements IccrAction 
         System.out.println(ACTION_PROP + ", executing...");
 
         OsProcess proc = new IccrRestartProcess();
-        boolean success = proc.start();
+        boolean rval = proc.start();
 
-        String msg = localization.getLocalText("processSuccess");
+        String msg = localizer.getLocalText("processSuccess");
         int rc = 0;
-        if (!success) {
+        if (!rval) {
             if (proc.isStartError()) {
                 System.out.println(ACTION_PROP + ", " + proc.getStartError());
                 msg = proc.getStartError();
             }
             else {
-                msg = localization.getLocalText("processFail");
+                msg = localizer.getLocalText("processFail");
             }
         }
         else {
             rc = proc.getResultCode();
             System.out.println(ACTION_PROP + ", " + proc.getName() + " " +
-                    localization.getLocalText("processSuccess") + ", " +
-                    localization.getLocalText("resultCode") + ": " + rc);
+                    localizer.getLocalText("processSuccess") + ", " +
+                    localizer.getLocalText("resultCode") + ": " + rc);
         }
 
-        resp.setSuccess(success);
+        resp.setSuccess(rval);
         resp.setMsg(msg);
 
-        if(success) {
+        if(rval) {
             resp.addProperty(new IccrPropertyDto("resultCode", Integer.toString(rc)));
         }
         resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));
@@ -66,10 +66,10 @@ public class RestartIccrAction extends AbstractIccrAction implements IccrAction 
         if(resp.isSuccess() &&
                 resp.getProperty(ACTION_PROP) != null &&
                 resp.getProperty(ACTION_PROP).valueIsSuccess()) {
-            persistenceService.logIotaAction(PersistenceService.ICCR_RESTART, proc.getCmd(), "");
+            persister.logIotaAction(PersistenceService.ICCR_RESTART, proc.getCmd(), "");
         }
         else {
-            persistenceService.logIotaAction(PersistenceService.ICCR_RESTART_FAIL, proc.getCmd(), "");
+            persister.logIotaAction(PersistenceService.ICCR_RESTART_FAIL, proc.getCmd(), "");
         }
 
         return resp;

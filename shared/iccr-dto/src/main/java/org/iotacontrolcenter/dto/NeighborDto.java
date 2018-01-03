@@ -46,14 +46,13 @@ public class NeighborDto {
     public NeighborDto() {
     }
 
-
     public NeighborDto(String key, String uri, String name, String descr,
             boolean active, ActivityDto activity
             ) {
 
         this.key = key;
         this.name = name;
-        this.description = description;
+        this.descr = descr;
         this.active = active;
         this.uri = uri;
         this.activity = activity;
@@ -152,8 +151,8 @@ public class NeighborDto {
         return this.getTickAtTime(currentDateTime());
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescr() {
+        return descr;
     }
 
     public int getIotaNeighborRefreshTime() {

@@ -17,7 +17,7 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
     }
 
     @Override
-    public ActionResponse execute(IccrPropertyListDto actionProps) throws InterruptedException {
+    public ActionResponse execute(IccrPropertyListDto actionProps) {
         System.out.println(ACTION_PROP);
         preExecute();
 
@@ -25,22 +25,22 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
         ActionResponse resp = new ActionResponse();
 
         OsProcess proc = new IotaStopProcess();
-        boolean success = proc.start();
-        String msg = localization.getLocalText("processSuccess");
+        boolean rval = proc.start();
+        String msg = localizer.getLocalText("processSuccess");
         int rc = 0;
-        if (!success) {
+        if (!rval) {
             if (proc.isStartError()) {
                 System.out.println(proc.getStartError());
                 msg = proc.getStartError();
             }
             else {
-                msg = localization.getLocalText("processFail");
+                msg = localizer.getLocalText("processFail");
             }
         } else {
             rc = proc.getResultCode();
             System.out.println(proc.getName() + " " +
-                    localization.getLocalText("processSuccess") + ", " +
-                    localization.getLocalText("resultCode") + ": " + rc);
+                    localizer.getLocalText("processSuccess") + ", " +
+                    localizer.getLocalText("resultCode") + ": " + rc);
         }
         */
 
@@ -50,7 +50,10 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
             int maxTry = 0;
             while(AgentUtil.isIotaActive() && maxTry < 3) {
                 // Pause for a bit to let it spin down
-                Thread.sleep(2000);
+                try {
+                    Thread.sleep(2000);
+                } catch (Exception e) {
+                }
                 maxTry++;
 
                 resp = doStop();
@@ -58,10 +61,10 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
         }
 
         /*
-        resp.setSuccess(success);
+        resp.setSuccess(rval);
         resp.setMsg(msg);
 
-        if(success) {
+        if(rval) {
             resp.addProperty(new IccrPropertyDto("resultCode", Integer.toString(rc)));
         }
         resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));
@@ -70,10 +73,10 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
         if(resp.isSuccess() &&
                 resp.getProperty(ACTION_PROP) != null &&
                 resp.getProperty(ACTION_PROP).valueIsSuccess()) {
-            persistenceService.logIotaAction(PersistenceService.IOTA_STOP);
+            persister.logIotaAction(PersistenceService.IOTA_STOP);
         }
         else {
-            persistenceService.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
+            persister.logIotaAction(PersistenceService.IOTA_STOP_FAIL,
                     "",
                     resp.getMsg());
         }
@@ -84,29 +87,29 @@ public class StopIotaAction extends AbstractAction implements IotaAction {
     private ActionResponse  doStop() {
         ActionResponse resp = new ActionResponse();
         OsProcess proc = new IotaStopProcess();
-        boolean success = proc.start();
-        String msg = localization.getLocalText("processSuccess");
+        boolean rval = proc.start();
+        String msg = localizer.getLocalText("processSuccess");
         int rc = 0;
-        if (!success) {
+        if (!rval) {
             if (proc.isStartError()) {
                 System.out.println(proc.getStartError());
                 msg = proc.getStartError();
             }
             else {
-                msg = localization.getLocalText("processFail");
+                msg = localizer.getLocalText("processFail");
             }
         }
         else {
             rc = proc.getResultCode();
             System.out.println(proc.getName() + " " +
-                    localization.getLocalText("processSuccess") + ", " +
-                    localization.getLocalText("resultCode") + ": " + rc);
+                    localizer.getLocalText("processSuccess") + ", " +
+                    localizer.getLocalText("resultCode") + ": " + rc);
         }
 
-        resp.setSuccess(success);
+        resp.setSuccess(rval);
         resp.setMsg(msg);
 
-        if(success) {
+        if(rval) {
             resp.addProperty(new IccrPropertyDto("resultCode", Integer.toString(rc)));
         }
         resp.addProperty(new IccrPropertyDto(ACTION_PROP, (rc == 0 ? "true" : "false")));

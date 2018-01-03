@@ -22,7 +22,7 @@ public class Delegate {
 
 
     private static Delegate instance;
-    private static final Object SYNC_INST = new Object();
+    private static Object SYNC_INST = new Object();
     public static Delegate getInstance() {
         synchronized (SYNC_INST) {
             if(Delegate.instance == null) {
@@ -31,7 +31,6 @@ public class Delegate {
             return Delegate.instance;
         }
     }
-
 
     public static boolean isSameHost(String ip1, String ip2) {
         //[2a01:4f8:190:32cc::2]
@@ -123,7 +122,6 @@ public class Delegate {
     }
 
     public synchronized  void iccrActionDone(String action) {
-        //noinspection StatementWithEmptyBody
         if(action.equals(IccrActionFactory.RESTART)) {
             //startNeighborRefresh();
         }
@@ -208,7 +206,7 @@ public class Delegate {
             }
         }
         catch(Exception e) {
-            System.out.println("startTimers iota neighbors refresh exception: " + e);
+            System.out.println("startTimers iota nbrs refresh exception: " + e);
         }
     }
 

@@ -1,21 +1,21 @@
 package org.iotacontrolcenter.iccr.agent.action;
 
 import org.iotacontrolcenter.persistence.PersistenceService;
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public abstract class AbstractIccrAction {
 
-    protected final Localization localization;
-    protected final PersistenceService persistenceService;
-    protected final String[] propNames;
-    protected final PropertySource propSource;
+    protected Localizer localizer;
+    protected PersistenceService persister;
+    protected String[] propNames;
+    protected PropertySource propSource;
 
     protected AbstractIccrAction(String[] propNames) {
         this.propNames = propNames;
         propSource = PropertySource.getInstance();
-        localization = Localization.getInstance();
-        persistenceService = PersistenceService.getInstance();
+        localizer = Localizer.getInstance();
+        persister = PersistenceService.getInstance();
     }
 
     protected void preExecute() {
@@ -28,7 +28,7 @@ public abstract class AbstractIccrAction {
             for(String key : propNames) {
                 String val = propSource.getString(key);
                 if(val == null || val.isEmpty()) {
-                    throw new IllegalStateException(localization.getLocalText("missingProperty") + ": " + key);
+                    throw new IllegalStateException(localizer.getLocalText("missingProperty") + ": " + key);
                 }
             }
         }

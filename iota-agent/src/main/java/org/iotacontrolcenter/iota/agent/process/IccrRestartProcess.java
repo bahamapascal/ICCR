@@ -4,10 +4,11 @@ import java.io.File;
 
 public class IccrRestartProcess extends OsProcess {
 
+    private String runScript = "restarticcr";
+
     public IccrRestartProcess() {
         super("iccrrestart");
 
-        String runScript = "restarticcr";
         runScript += propSource.osIsWindows() ? ".bat" : ".bash";
 
         setArgs(new String[] { propSource.getIccrBinDir() + "/" + runScript });

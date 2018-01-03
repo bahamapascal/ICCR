@@ -57,15 +57,15 @@ public class ActionResponse {
     }
 
     public IccrPropertyDto getProperty(String key) {
-        IccrPropertyDto propertyDto = null;
+        IccrPropertyDto rval = null;
         if(properties != null) {
             for (IccrPropertyDto dto : properties) {
                 if (dto.getKey().equals(key)) {
-                    propertyDto = dto;
+                    rval = dto;
                     break;
                 }
             }
         }
-        return propertyDto;
+        return rval;
     }
 }

@@ -1,7 +1,7 @@
 package org.iotacontrolcenter.iota.agent.process;
 
 
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 import java.io.*;
@@ -15,18 +15,18 @@ public abstract class OsProcess {
     protected InputStream errorStream;
     protected Map<String,String> env;
     protected String exeCmd;
-    protected final Localization localization;
-    protected final String name;
+    protected Localizer localizer;
+    protected String name;
     protected InputStream outputStream;
     protected ProcessBuilder pb;
     protected Process p;
-    protected final PropertySource propSource;
+    protected PropertySource propSource;
     protected int resultCode;
     protected String startError;
 
     protected OsProcess(String name) {
         this.name = name;
-        localization = Localization.getInstance();
+        localizer = Localizer.getInstance();
         propSource = PropertySource.getInstance();
     }
 
@@ -58,29 +58,29 @@ public abstract class OsProcess {
         }
 
         startError = null;
-        boolean success = true;
-        System.out.println(localization.getLocalTextWithFixed("executingCmd", " (" + getName() + "): " + exeCmd));
+        boolean rval = true;
+        System.out.println(localizer.getLocalTextWithFixed("executingCmd", " (" + getName() + "): " + exeCmd));
         try {
             p = pb.start();
             errorStream = p.getErrorStream();
             outputStream = p.getInputStream();
         }
         catch(IOException ioe) {
-            startError = localization.getLocalTextWithFixed("startActionException",
+            startError = localizer.getLocalTextWithFixed("startActionException",
                     " (name: " + getName() + ", cmd: " + exeCmd + "): " + ioe.getLocalizedMessage());
             System.out.println(startError);
-            success = false;
+            rval = false;
         }
-        if(success) {
+        if(rval) {
             try {
                 resultCode = p.waitFor();
             } catch (InterruptedException ie) {
-                System.out.println(localization.getLocalTextWithFixed("actionException",
+                System.out.println(localizer.getLocalTextWithFixed("actionException",
                         " (name: " + getName() + ", cmd: " + exeCmd + "): " + ie.getLocalizedMessage()));
-                success = false;
+                rval = false;
             }
         }
-        return success;
+        return rval;
     }
 
     public boolean isStartError() {
@@ -113,7 +113,7 @@ public abstract class OsProcess {
             }
         }
         catch(IOException ioe) {
-            System.out.println(localization.getLocalTextWithFixed("actionOutputException",
+            System.out.println(localizer.getLocalTextWithFixed("actionOutputException",
                     " (name: " + getName() + ", cmd: " + exeCmd + "): " + ioe.getLocalizedMessage()));
         }
         return sb.toString();
@@ -122,7 +122,9 @@ public abstract class OsProcess {
     protected void generateExeCmd() {
         exeCmd = "";
         if(args != null && args.length > 0) {
-            Arrays.stream(args).forEach((s) -> exeCmd += " " + s);
+            Arrays.stream(args).forEach((s) -> {
+                exeCmd += " " + s;
+            });
         }
     }
 
@@ -133,7 +135,9 @@ public abstract class OsProcess {
 
         pb = new ProcessBuilder();
         if(env != null && !env.isEmpty()) {
-            env.forEach((k,v) -> pb.environment().put(k,v));
+            env.forEach((k,v) -> {
+                pb.environment().put(k,v);
+            });
         }
         if(dir != null) {
             pb.directory(dir);
@@ -144,7 +148,7 @@ public abstract class OsProcess {
 
     protected void validateCommand() {
         if(args == null || args.length == 0) {
-            throw new IllegalStateException(localization.getFixedWithLocalText(getProcessActionName() + ": ", "emptyCmd"));
+            throw new IllegalStateException(localizer.getFixedWithLocalText(getProcessActionName() + ": ", "emptyCmd"));
         }
     }
 

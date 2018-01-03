@@ -2,13 +2,13 @@ package org.iotacontrolcenter.iota.agent;
 
 import org.iotacontrolcenter.dto.ActionResponse;
 import org.iotacontrolcenter.dto.IccrPropertyListDto;
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 
 public class Agent {
 
     private static Agent instance;
-    private static final Object SYNC_INST = new Object();
+    private static Object SYNC_INST = new Object();
     public static Agent getInstance() {
         synchronized (SYNC_INST) {
             if(Agent.instance == null) {
@@ -18,17 +18,18 @@ public class Agent {
         }
     }
 
-    private final Localization localization;
+    private Localizer localizer;
+    private PropertySource propSource;
 
     private Agent() {
         System.out.println("new Iota Agent");
-        PropertySource propSource = PropertySource.getInstance();
-        localization = Localization.getInstance();
+        propSource = PropertySource.getInstance();
+        localizer = Localizer.getInstance();
     }
 
-    public ActionResponse action(String cmd, IccrPropertyListDto actionProps) throws InterruptedException {
+    public ActionResponse action(String cmd, IccrPropertyListDto actionProps) {
         if(!ActionFactory.isValidAction(cmd)) {
-            throw new IllegalArgumentException(localization.getFixedWithLocalText("IotaAgent (" + cmd + "): ", "unsupportedAction"));
+            throw new IllegalArgumentException(localizer.getFixedWithLocalText("IotaAgent (" + cmd + "): ", "unsupportedAction"));
         }
 
         return ActionFactory.getAction(cmd).execute(actionProps);

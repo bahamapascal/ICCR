@@ -5,7 +5,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,8 +16,8 @@ public abstract class HttpMethod {
 
     protected Map<String, String> headers;
     protected HttpRequestBase httpRequestBase;
-    protected final Localization localization;
-    protected final String name;
+    protected Localizer localizer;
+    protected String name;
     public CloseableHttpResponse response;
     protected String startError;
     protected int timeOutSec = 30;
@@ -35,7 +35,7 @@ public abstract class HttpMethod {
         this.name = name;
         this.url = url;
         this.headers = headers;
-        localization = Localization.getInstance();
+        localizer = Localizer.getInstance();
     }
 
     public String getName() {
@@ -83,14 +83,14 @@ public abstract class HttpMethod {
 
     public InputStream getResponseContent() {
         if(response == null) {
-            throw new IllegalStateException(localization.getLocalTextWithFixed("emptyHttpResponse",
+            throw new IllegalStateException(localizer.getLocalTextWithFixed("emptyHttpResponse",
                     " (name: " + name + ", URL: " + url));
         }
         try {
             return response.getEntity().getContent();
         }
         catch(IOException ioe) {
-            throw new IllegalStateException(localization.getLocalTextWithFixed("httpResponseException",
+            throw new IllegalStateException(localizer.getLocalTextWithFixed("httpResponseException",
                     " (name: " + name + ", URL: " + url));
         }
     }
@@ -107,7 +107,7 @@ public abstract class HttpMethod {
         catch(IOException ioe) {
             System.out.println("to byte array ioe:");
             ioe.printStackTrace();
-            throw new IllegalStateException(localization.getLocalTextWithFixed("httpResponseException",
+            throw new IllegalStateException(localizer.getLocalTextWithFixed("httpResponseException",
                     " (name: " + name + ", URL: " + url + "): " + ioe.getLocalizedMessage()));
         }
     }
@@ -127,7 +127,7 @@ public abstract class HttpMethod {
             System.out.println("to string ioe:");
             ioe.printStackTrace();
 
-            throw new IllegalStateException(localization.getLocalTextWithFixed("httpResponseException",
+            throw new IllegalStateException(localizer.getLocalTextWithFixed("httpResponseException",
                     " (name: " + name + ", URL: " + url + "): " + ioe.getLocalizedMessage()));
         }
     }

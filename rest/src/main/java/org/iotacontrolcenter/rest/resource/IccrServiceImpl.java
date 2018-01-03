@@ -7,7 +7,7 @@ import org.iotacontrolcenter.iota.agent.ActionFactory;
 import org.iotacontrolcenter.iota.agent.Agent;
 import org.iotacontrolcenter.iota.agent.action.util.AgentUtil;
 import org.iotacontrolcenter.persistence.PersistenceService;
-import org.iotacontrolcenter.properties.locale.Localization;
+import org.iotacontrolcenter.properties.locale.Localizer;
 import org.iotacontrolcenter.properties.source.PropertySource;
 import org.iotacontrolcenter.rest.delegate.Delegate;
 
@@ -19,12 +19,12 @@ import java.util.Properties;
 
 public class IccrServiceImpl implements IccrService {
 
-    private final Agent agent = Agent.getInstance();
-    private final IccrAgent iccrAgent = IccrAgent.getInstance();
-    private final Localization localization = Localization.getInstance();
-    private final PropertySource propSource = PropertySource.getInstance();
-    private final PersistenceService persistenceService = PersistenceService.getInstance();
-    private final Delegate delegate = Delegate.getInstance();
+    private Agent agent = Agent.getInstance();
+    private IccrAgent iccrAgent = IccrAgent.getInstance();
+    private Localizer localizer = Localizer.getInstance();
+    private PropertySource propSource = PropertySource.getInstance();
+    private PersistenceService persistenceService = PersistenceService.getInstance();
+    private Delegate delegate = Delegate.getInstance();
 
     public IccrServiceImpl() {
         System.out.println("creating new IccrServiceImpl");
@@ -83,7 +83,7 @@ public class IccrServiceImpl implements IccrService {
             System.out.println("doIccrAction server error: " + e.getMessage());
             e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
-                    entity(new SimpleResponse(false, localization.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
 
         return r.build();
@@ -121,7 +121,7 @@ public class IccrServiceImpl implements IccrService {
             System.out.println("doIotaAction server error: " + e.getMessage());
             e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
-                    entity(new SimpleResponse(false, localization.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
 
         return r.build();
@@ -129,9 +129,7 @@ public class IccrServiceImpl implements IccrService {
 
     @Override
     public Response getConfigProperties(HttpServletRequest request) {
-
         if (!authorizedRequest(request)) {
-
             return unauthorizedResponse(request);
         }
         System.out.println("getConfigProperties");
@@ -148,7 +146,6 @@ public class IccrServiceImpl implements IccrService {
 
     @Override
     public Response getConfigProperty(HttpServletRequest request, String key) {
-
         if (!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
@@ -157,7 +154,7 @@ public class IccrServiceImpl implements IccrService {
 
         if (key == null || key.isEmpty()) {
             r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-                    entity(new SimpleResponse(false, localization.getLocalText("invalidRequestNoKey")));
+                    entity(new SimpleResponse(false, localizer.getLocalText("invalidRequestNoKey")));
             return r.build();
         }
 
@@ -272,7 +269,7 @@ public class IccrServiceImpl implements IccrService {
         if (!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("getIotaNeighborsConfig");
+        System.out.println("getIotaNbrsConfig");
         Response.ResponseBuilder r = Response.status(HttpURLConnection.HTTP_OK);
         IccrIotaNeighborsPropertyDto prop = propSource.getIotaNeighbors();
 
@@ -331,7 +328,7 @@ public class IccrServiceImpl implements IccrService {
 
         if (properties == null) {
             r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-                    entity(new SimpleResponse(false, localization.getLocalText("invalidUpdateNoProperties")));
+                    entity(new SimpleResponse(false, localizer.getLocalText("invalidUpdateNoProperties")));
             return r.build();
         }
 
@@ -350,7 +347,7 @@ public class IccrServiceImpl implements IccrService {
             System.out.println("updateConfigProperties exception: ");
             e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
-                    entity(new SimpleResponse(false, localization.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
 
         return r.build();
@@ -366,7 +363,7 @@ public class IccrServiceImpl implements IccrService {
 
         if (prop == null) {
             r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-                    entity(new SimpleResponse(false, localization.getLocalText("invalidUpdateNoProperties")));
+                    entity(new SimpleResponse(false, localizer.getLocalText("invalidUpdateNoProperties")));
             return r.build();
         }
 
@@ -389,7 +386,7 @@ public class IccrServiceImpl implements IccrService {
             System.out.println("updateConfigProperty exception: ");
             e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
-                    entity(new SimpleResponse(false, localization.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
 
         return r.build();
@@ -400,16 +397,16 @@ public class IccrServiceImpl implements IccrService {
         if (!authorizedRequest(request)) {
             return unauthorizedResponse(request);
         }
-        System.out.println("updateIotaNeighborsConfig:\n" + prop);
+        System.out.println("updateIotaNbrsConfig:\n" + prop);
         Response.ResponseBuilder r;
 
         if (prop == null) {
             r = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).
-                    entity(new SimpleResponse(false, localization.getLocalText("invalidUpdateNoProperties")));
+                    entity(new SimpleResponse(false, localizer.getLocalText("invalidUpdateNoProperties")));
             return r.build();
         }
 
-        // If IOTA was active, need to update its neighbors list, we'll just remove all prev, then update config,
+        // If IOTA was active, need to update its nbrs list, we'll just remove all prev, then update config,
         // then add all current
         boolean wasActive = AgentUtil.isIotaActive();
 
@@ -418,12 +415,12 @@ public class IccrServiceImpl implements IccrService {
             IccrIotaNeighborsPropertyDto prevNbrs = propSource.getIotaNeighbors();
             if (prevNbrs != null && !prevNbrs.getNbrs().isEmpty()) {
 
-                System.out.println("updateIotaNeighborsConfig: IOTA was active, removing neighbors");
+                System.out.println("updateIotaNbrsConfig: IOTA was active, removing neighbors");
 
                 try {
-                    ActionResponse resp1 = agent.action(ActionFactory.REMOVE_NEIGHBORS, null);
+                    ActionResponse resp1 = agent.action(ActionFactory.REMOVENEIGHBORS, null);
                 } catch (Exception e) {
-                    System.out.println("updateIotaNeighborsConfig remove neighbors exception: ");
+                    System.out.println("updateIotaNbrsConfig remove nbrs exception: ");
                     e.printStackTrace();
                 }
             } else {
@@ -441,10 +438,10 @@ public class IccrServiceImpl implements IccrService {
             r.entity(new SimpleResponse(true, localizer.getLocalText("updateSuccess")));
         } catch (Exception e) {
             ok = false;
-            System.out.println("updateIotaNeighborsConfig exception: ");
+            System.out.println("updateIotaNbrsConfig exception: ");
             e.printStackTrace();
             r = Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).
-                    entity(new SimpleResponse(false, localization.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
+                    entity(new SimpleResponse(false, localizer.getLocalText("serverError") + ": " + e.getLocalizedMessage()));
         }
 
         if (ok && wasActive) {
@@ -463,7 +460,7 @@ public class IccrServiceImpl implements IccrService {
 
     private boolean authorizedRequest(HttpServletRequest request) {
         String apiAccessKey = request.getHeader(ResourceUtil.API_ACCESS_KEY_PROP);
-        return apiAccessKey == null || apiAccessKey.isEmpty() || !apiAccessKey.equals(propSource.getApiKey());
+        return apiAccessKey != null && !apiAccessKey.isEmpty() && apiAccessKey.equals(propSource.getApiKey());
     }
 
     private Response unauthorizedResponse(HttpServletRequest request) {

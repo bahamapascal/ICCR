@@ -22,8 +22,8 @@ public class NeighborsIotaAction extends AbstractAction implements IotaAction {
     @Override
     protected void validatePreconditions() {
 
-        if (AgentUtil.dirDoesNotExist(propSource.getIotaAppDir())) {
-            throw new IllegalStateException(localization.getLocalText("missingDirectory") +
+        if (!AgentUtil.dirExists(propSource.getIotaAppDir())) {
+            throw new IllegalStateException(localizer.getLocalText("missingDirectory") +
                     ": " + propSource.getIotaAppDir());
         }
     }
@@ -33,13 +33,13 @@ public class NeighborsIotaAction extends AbstractAction implements IotaAction {
         preExecute();
 
         ActionResponse resp = new ActionResponse();
-        String msg;
-        boolean success = true;
+        String msg = "";
+        boolean rval = true;
 
         if (!AgentUtil.isIotaActive()) {
             resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             resp.setSuccess(false);
-            resp.setMsg(localization.getLocalText("iotaNotActive"));
+            resp.setMsg(localizer.getLocalText("iotaNotActive"));
         }
         else {
             GetIotaNeighbors request = new GetIotaNeighbors(propSource.getLocalIotaUrl());
@@ -52,7 +52,7 @@ public class NeighborsIotaAction extends AbstractAction implements IotaAction {
                     resp.addProperty(new IccrPropertyDto(ACTION_PROP, "true"));
                     resp.setContent(request.responseAsString());
 
-                    IotaGetNeighborsResponseDto dto;
+                    IotaGetNeighborsResponseDto dto = null;
 
                     try {
                         Gson gson = new GsonBuilder().create();
@@ -67,10 +67,10 @@ public class NeighborsIotaAction extends AbstractAction implements IotaAction {
                     System.out.println(ACTION_PROP + ", content: " + resp.getContent());
 
                     System.out.println(request.getName() + " " +
-                            localization.getLocalText("httpRequestSuccess"));
+                            localizer.getLocalText("httpRequestSuccess"));
                 }
                 else {
-                    success = false;
+                    rval = false;
                     msg = request.getResponseReason();
                     if(msg == null || msg.isEmpty()) {
                         msg = request.getStartError();
@@ -81,13 +81,13 @@ public class NeighborsIotaAction extends AbstractAction implements IotaAction {
             catch(IllegalStateException ise) {
                 // Message is already localized
                 System.out.println(request.getName() + " " +
-                        localization.getLocalTextWithFixed("startHttpException", ise.getMessage()));
-                success = false;
+                        localizer.getLocalTextWithFixed("startHttpException", ise.getMessage()));
+                rval = false;
                 msg = ise.getMessage();
                 resp.addProperty(new IccrPropertyDto(ACTION_PROP, "false"));
             }
 
-            resp.setSuccess(success);
+            resp.setSuccess(rval);
             resp.setMsg(msg);
         }
 

@@ -13,10 +13,10 @@ These instructions will create a `tgz` file that can be unpacked and deployed on
 
 ## 1) Overview
 
-The ICCR is a java based micro-service server process.  It provides a ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine. It functions as microservice by using the Wildfly Swarm framework to generate a single "fat" JAR file. It requires that java version 1.8 or greater be installed on the target machine.
+The ICCR is a java based microservice server process.  It provides a ReST (Representational State Transfer) API that allows for management and control of an IOTA (IRI) process on a single machine. It functions as microservice by using the Wildfly Swarm framework to generate a single "fat" JAR file. It requires that java version 1.8 or greater be installed on the target machine.
 
 The ICCR:
-* is a single JAR file distributed in an TAR gzipped archive
+* is a single JAR file destributed in an TAR gzipped archive
 * is distributed with control scripts to that manage its life-cycle (start, stop, status)
 * is a lightweight standalone executable that does not require any other framework to execute
 * exposes a ReST API using standard HTTP operations based as the basis for control of an IOTA instance
@@ -40,7 +40,7 @@ The ICCR:
 ### 2.a) Directory Structure
 
 /opt/iccr/data
-The /opt/iccr/data directory contains a comma separted value (CSV) formatted file: iota-event.csv
+The /opt/iccr/data directory contains a comma separted value (CSV) formattted file: iota-event.csv
 
 The iota-event.csv file contains a record of the events that the ICCR executed when controlling and configuring the IOTA IRI process.
 
