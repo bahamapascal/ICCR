@@ -16,21 +16,6 @@
 
 Changes that are cosmetic in nature and do not add anything substantial to the stability, functionality, or testability of *ICCR* will generally not be accepted.
 
-
-
-#### **Guidelines to merge a Pull Request**
-
-* Follow the pull request template.
-
-* A pull request shall be reviewed by at least two peoples.
-
-* At least Two  reviewers shall be selected, preferably people who have worked on the piece.
-
-* A pull request shouldn't be reviewed if the test coverage is insufficient.
-
-* Pull requests shouldn't be merged if the test case(s) are failing.
-
-
 </br>
 
 
