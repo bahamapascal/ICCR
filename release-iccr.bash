@@ -1,29 +1,8 @@
 #!/bin/bash
 
-if [ -z "${1}" ]; then
-    echo "Pass version, user, and group on command line"
-    echo You are:
-    id
-    exit
-fi
-
-if [ -z "${2}" ]; then
-    echo "Pass version, user, and group on command line"
-    echo You are:
-    id
-    exit
-fi
-
-if [ -z "${3}" ]; then
-    echo "Pass version, user, and group on command line"
-    echo You are:
-    id
-    exit
-fi
-
-version=$1
-user=$2
-group=$3
+version=1.0.0
+user=$USER
+group=$(id -Gn $user | awk '{print $1}')
 dir=/opt
 iccrdir=$dir/iccr
 dist=$PWD/dist
@@ -58,7 +37,7 @@ fi
 ./deploy-iccr.bash
 
 if [ ! -d $dist ]; then
-    mkdir $dist
+    mkdir  $dist
 fi
 
 #cp changelog.txt $dist/icc-${version}-changelog.txt
