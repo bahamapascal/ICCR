@@ -29,7 +29,7 @@ which executes  the JAR file in `/opt/iccr/lib/iccr.jar`.
 
 *NOTE: docker and docker-compose must be installed*
 
-`sudo docker-compose up -d` 
+- Execute the following command to spawn ICCR in containers `sudo docker-compose up -d`. 
 
 For further details please refer to the [wikis](https://github.com/bahamapascal/ICCR/wiki) page.
 
