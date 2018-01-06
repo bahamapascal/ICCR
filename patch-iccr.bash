@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#import common enviornment variables.
+source global-variables.bash
+
 pkg=iccr-${version}.tgz
 dir=/opt
 iccrDir=$dir/iccr

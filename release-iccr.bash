@@ -1,6 +1,8 @@
 #!/bin/bash
 
-version=1.0.0
+#import common enviornment variables.
+source global-variables.bash
+
 user=$USER
 group=$(id -Gn $user | awk '{print $1}')
 dir=/opt
@@ -58,6 +60,9 @@ cp patch-iccr.bash $dist
 
 echo -n "Did you put the desired release version into install-iccr.bash? [Y/n] "
 read yNo
+
+echo "cp global-variables.bash $dist"
+cp global-variables.bash $dist
 
 echo "cp install-iccr.bash $dist"
 cp install-iccr.bash $dist

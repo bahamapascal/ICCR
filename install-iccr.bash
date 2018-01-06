@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#import common enviornment variables.
+source global-variables.bash
+
 # Support for API access key complexity:
 r1='^.*[A-Z].*$'
 r2='^.*[a-z].*$'
