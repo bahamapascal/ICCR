@@ -3,18 +3,17 @@
 #import common enviornment variables.
 source global-variables.bash
 
-user=$USER
-group=$(id -Gn $user | awk '{print $1}')
-dir=/opt
-iccrdir=$dir/iccr
-dist=$PWD/dist
-
 if [ -d $dir/iccr-pre-${version} ]; then
     rm -rf $dir/iccr-pre-${version} > /dev/null 2>&1
 fi
 
+if [ ! -d $dist ]; then
+    mkdir -p $dist
+fi
+
+
 if [ ! -d $dir ]; then
-    sudo mkdir $dir
+    sudo mkdir -p $dir
     sudo chown $user:$group $dir
 fi
 
@@ -24,7 +23,7 @@ fi
 
 
 if [ ! -d $iccrdir ]; then
-    sudo mkdir $iccrdir
+    sudo mkdir -p $iccrdir
     sudo chown $user:$group $iccrdir
     mkdir $iccrdir/bak
     mkdir $iccrdir/bin
@@ -36,56 +35,41 @@ if [ ! -d $iccrdir ]; then
     mkdir $iccrdir/tmp
 fi
 
-./deploy-iccr.bash
+cp packager/swarm/target/iccr-swarm.jar $iccrdir/lib/iccr.jar
 
-if [ ! -d $dist ]; then
-    mkdir  $dist
+cp installer/property-files/src/main/resources/* $iccrdir/conf
+
+cp installer/iccr-scripts/src/main/scripts/* $iccrdir/bin
+
+if [ "${3}" = "icc" ]; then
+    cp -r ${ICC_PROD_DIR} $iccrdir/lib
 fi
 
-#cp changelog.txt $dist/icc-${version}-changelog.txt
-
-echo "cd $dir"
 cd $dir
 
 rm -f $dist/iccr-${version}.tgz  > /dev/null 2>&1
 
-echo "tar -czf $dist/iccr-${version}.tgz iccr"
+echo "Packaging iccr build env $dist/iccr-${version}.tgz iccr"
 tar -czf $dist/iccr-${version}.tgz iccr
 
 echo "cd -"
 cd -
 
-echo "cp patch-iccr.bash $dist"
+echo "Copying patch-iccr.bash to $dist"
 cp patch-iccr.bash $dist
 
-
-echo "cp global-variables.bash $dist"
+echo "Copying global-variables.bash to $dist"
 cp global-variables.bash $dist
 
-echo "cp install-iccr.bash $dist"
+echo "Copying install-iccr.bash to $dist"
 cp install-iccr.bash $dist
 
-echo "cd $dist"
+echo "Changing directory to $dist"
 cd $dist
 
-echo "tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash global-variables.bash"
+echo "Packaging iccr..."
 tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash global-variables.bash
 
-echo "cd $dir"
-cd $dir
-
-# for immediate testing:
-echo "rm -rf iccr-${version}-dist > /dev/null 2>&1"
-rm -rf iccr-${version}-dist > /dev/null 2>&1
-
-echo "mv iccr iccr-${version}-dist"
-mv iccr iccr-${version}-dist
-
-echo "tar -xzf $dist/iccr-${version}.tgz"
-tar -xzf $dist/iccr-${version}.tgz
-
-echo "sudo chown -R $user:$group iccr"
-sudo chown -R $user:$group iccr
-
-
+echo "removing temporary directory..."
+rm -rf $dir
 
