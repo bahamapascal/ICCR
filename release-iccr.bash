@@ -58,8 +58,6 @@ cd -
 echo "cp patch-iccr.bash $dist"
 cp patch-iccr.bash $dist
 
-echo -n "Did you put the desired release version into install-iccr.bash? [Y/n] "
-read yNo
 
 echo "cp global-variables.bash $dist"
 cp global-variables.bash $dist
@@ -70,8 +68,8 @@ cp install-iccr.bash $dist
 echo "cd $dist"
 cd $dist
 
-echo "tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash"
-tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash
+echo "tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash global-variables.bash"
+tar -czf iccr-pkg-${version}.tgz iccr-${version}.tgz patch-iccr.bash install-iccr.bash global-variables.bash
 
 echo "cd $dir"
 cd $dir
