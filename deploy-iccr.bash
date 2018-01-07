@@ -1,35 +1,17 @@
 #!/bin/bash
 
+#import common enviornment variables.
+source global-variables.bash
+
 ICC_PROD_DIR=~/projects/extjs/iccw/build/production/icc
 
 if [ ! -d $dir ]; then
-    if [ -z "${1}" ]; then
-        echo "For initial deploy, pass user and group on command line"
-        echo You are:
-        id
-        exit
-    fi
-
-    if [ -z "${2}" ]; then
-        echo "For initial deploy, pass user and group on command line"
-        echo You are:
-        id
-        exit
-    fi
-fi
-
-user=$1
-group=$2
-dir=/opt
-iccrdir=$dir/iccr
-
-if [ ! -d $dir ]; then
-    sudo mkdir $dir
+    sudo mkdir -p $dir
     sudo chown $user:$group $dir
 fi
 
 if [ ! -d $iccrdir ]; then
-    sudo mkdir $iccrdir
+    sudo mkdir -p $iccrdir
     sudo chown $user:$group $iccrdir
     mkdir $iccrdir/bak
     mkdir $iccrdir/bin
