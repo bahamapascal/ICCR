@@ -35,9 +35,16 @@ if [ ! -d $iccrdir ]; then
     mkdir $iccrdir/tmp
 fi
 
-./deploy-iccr.bash
+cp packager/swarm/target/iccr-swarm.jar $iccrdir/lib/iccr.jar
 
-echo "cd $dir"
+cp installer/property-files/src/main/resources/* $iccrdir/conf
+
+cp installer/iccr-scripts/src/main/scripts/* $iccrdir/bin
+
+if [ "${3}" = "icc" ]; then
+    cp -r ${ICC_PROD_DIR} $iccrdir/lib
+fi
+
 cd $dir
 
 rm -f $dist/iccr-${version}.tgz  > /dev/null 2>&1
