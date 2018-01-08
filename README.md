@@ -11,12 +11,35 @@ These instructions will create a tgz file that can be unpacked and deployed onto
 
 *NOTE : Java 8 or above and maven required*
 - Clone the iccr repo `$ git clone https://github.com/bahamapascal/ICCR.git`.
-- change directory `$ cd iccr`.        
+- change directory `$ cd ICCR`.        
 - Build sources `$ mvn package`.
 - Install iccr in /opt/iccr `$ sudo ./release-iccr.bash`.  
 - Deploy the generated file `iccr-pkg-<VERSION>.tgz` to your server.
 
-## How to use?
+
+## How to install and run ICCR
+These instructions presume you have build or downloaded the `iccr-pkg-<VERSION>.tgz` file.
+
+*NOTE : Java 8 or above required*
+- Extract the package archive `tar -xzf iccr-pkg-<VERSION>.tgz`
+- For a first time install, run the install-iccr.bash script `./install-iccr.bash` and follow the setup
+- For updating the ICCR, make sure ICCR is stoped and run patch-iccr.bash `./patch-iccr.bash`
+Commands for starting/stopping the ICCR and other commands:
+- run iccr `/opt/iccr/bin/iccr-ctl start`
+- run iccr with IPv4 flg `/opt/iccr/bin/iccr-ctl start ipv4`
+- stop iccr `/opt/iccr/bin/iccr-ctl stop`
+- restart iccr `/opt/iccr/bin/iccr-ctl restart`
+- check iccr status `/opt/iccr/bin/iccr-ctl status`
+
+
+## Spawn ICCR in containers
+
+*NOTE: docker and docker-compose must be installed*
+
+- Execute the following command to spawn ICCR in containers `sudo docker-compose up -d`. 
+
+
+## Metadata
 - The ICCR is installed in /opt/iccr, it's controlled by the execution of the script `/opt/iccr/bin/iccr-ctl`,
 which executes  the JAR file in `/opt/iccr/lib/iccr.jar`.
 - The properties can be defined or altered in `/opt/iccr/conf/iccr.properties`.
@@ -25,11 +48,6 @@ which executes  the JAR file in `/opt/iccr/lib/iccr.jar`.
 - It copies downloaded IOTA IRI files into `/opt/iccr/download`.
 - It maintains backup copies of previous IOTA IRI file version in `/opt/iccr/bak`.
 
-## Spawn ICCR in containers
-
-*NOTE: docker and docker-compose must be installed*
-
-- Execute the following command to spawn ICCR in containers `sudo docker-compose up -d`. 
 
 For further details please refer to the [wikis](https://github.com/bahamapascal/ICCR/wiki) page.
 
