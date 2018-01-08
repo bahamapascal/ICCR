@@ -24,6 +24,7 @@ These instructions presume you have build or downloaded the `iccr-pkg-<VERSION>.
 - Extract the package archive `tar -xzf iccr-pkg-<VERSION>.tgz`
 - For a first time install, run the install-iccr.bash script `./install-iccr.bash` and follow the setup
 - For updating the ICCR, make sure ICCR is stoped and run patch-iccr.bash `./patch-iccr.bash`
+
 Commands for starting/stopping the ICCR and other commands:
 - run iccr `/opt/iccr/bin/iccr-ctl start`
 - run iccr with IPv4 flg `/opt/iccr/bin/iccr-ctl start ipv4`
