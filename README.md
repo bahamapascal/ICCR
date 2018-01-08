@@ -25,4 +25,11 @@ which executes  the JAR file in `/opt/iccr/lib/iccr.jar`.
 - It copies downloaded IOTA IRI files into `/opt/iccr/download`.
 - It maintains backup copies of previous IOTA IRI file version in `/opt/iccr/bak`.
 
+## Spawn ICCR in containers
+
+*NOTE: docker and docker-compose must be installed*
+
+- Execute the following command to spawn ICCR in containers `sudo docker-compose up -d`. 
+
 For further details please refer to the [wikis](https://github.com/bahamapascal/ICCR/wiki) page.
+
