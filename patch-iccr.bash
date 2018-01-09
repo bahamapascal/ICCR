@@ -1,7 +1,9 @@
 #!/bin/bash
 
-ver=1.0.0-rc3
-pkg=iccr-${ver}.tgz
+#import common enviornment variables.
+source global-variables.bash
+
+pkg=iccr-${version}.tgz
 dir=/opt
 iccrDir=$dir/iccr
 iccrPropDir=$iccrDir/conf
@@ -16,7 +18,7 @@ if [ $darwin = "Darwin" ]; then
 fi
 
 archDir=`pwd`
-tmpDir=/tmp/iccr-$ver
+tmpDir=/tmp/iccr-$version
 
 if [ ! -f $pkg ]; then
     echo "Failed to find the required $what archive file ($pkg) in the local directory!"
@@ -44,7 +46,7 @@ mkdir $tmpDir
 cd $tmpDir
 tar -xzf $archDir/$pkg
 
-echo "Copying in place updated $what version $ver binary and script files..."
+echo "Copying in place updated $what version $version binary and script files..."
 echo
 echo "cp -f $tmpDir/iccr/bin/* $iccrBinDir"
 cp -fr $tmpDir/iccr/bin/* $iccrBinDir
