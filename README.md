@@ -13,7 +13,7 @@ These instructions will create a tgz file that can be unpacked and deployed onto
 - Clone the iccr repo `$ git clone https://github.com/bahamapascal/ICCR.git`
 - change directory `$ cd ICCR`
 - Build sources `$ mvn package`
-- Install iccr in /opt/iccr `$ sudo ./release-iccr.bash`
+- Generate iccr-package file in ICCR/dist/ `$ sudo ./release-iccr.bash`
 - Deploy the generated file `iccr-pkg-<VERSION>.tgz` to your server
 
 
@@ -31,7 +31,7 @@ Commands for starting/stopping the ICCR and other commands:
 - Stop ICCR `/opt/iccr/bin/iccr-ctl stop`
 - Restart ICCR `/opt/iccr/bin/iccr-ctl restart`
 - Check ICCR status `/opt/iccr/bin/iccr-ctl status`
-- For debugging, `debug` flag can be used with `tart` and `restart` commands
+- For debugging, `debug` flag can be used with `start` and `restart` commands
 
 ## Spawn ICCR in containers
 
