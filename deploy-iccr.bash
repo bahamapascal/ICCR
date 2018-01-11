@@ -6,13 +6,13 @@ source global-variables.bash
 ICC_PROD_DIR=~/projects/extjs/iccw/build/production/icc
 
 if [ ! -d $dir ]; then
-    sudo mkdir -p $dir
-    sudo chown $user:$group $dir
+    mkdir -p $dir
+    chown $user:$group $dir
 fi
 
 if [ ! -d $iccrdir ]; then
-    sudo mkdir -p $iccrdir
-    sudo chown $user:$group $iccrdir
+    mkdir -p $iccrdir
+    chown $user:$group $iccrdir
     mkdir $iccrdir/bak
     mkdir $iccrdir/bin
     mkdir $iccrdir/conf

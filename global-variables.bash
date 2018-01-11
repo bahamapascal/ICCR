@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #Script to initiate common variables that are used globally.
 
@@ -7,5 +8,5 @@ group=$(id -Gn $user | awk '{print $1}')
 dir=$PWD/dist/temp
 iccrdir=$dir/iccr
 dist=$PWD/dist
-
-export user group dir iccrdir dist version
+API_KEY="!API_KEY"
+export user group dir iccrdir dist version API_KEY
