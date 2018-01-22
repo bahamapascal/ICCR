@@ -1,3 +1,4 @@
+
 #!/bin/bash
 #Script to initiate common variables that are used globally.
 
@@ -8,5 +9,5 @@ dir=$PWD/dist/temp
 iccrdir=$dir/iccr
 dist=$PWD/dist
 ICC_PROD_DIR=~/projects/extjs/iccw/build/production/icc
+export user group dir iccrdir dist version API_KEY ICC_PROD_DIR
 
-export user group dir iccrdir dist version ICC_PROD_DIR
