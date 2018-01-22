@@ -17,9 +17,15 @@ RUN mvn clean package
 RUN bash release-iccr.bash
 
 WORKDIR /src/dist
-RUN bash install-iccr.bash
 
 COPY --from=iri /iri/iri.jar /opt/iota/IRI.jar
 
+COPY docker-entrypoint.sh . 
+
+RUN chmod +x docker-entrypoint.sh
+
+ENV API_KEY="MY_SECRET"
+
 EXPOSE 14265 14266
 
+CMD ["./docker-entrypoint.sh"]

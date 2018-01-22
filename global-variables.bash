@@ -8,7 +8,6 @@ group=$(id -Gn $user | awk '{print $1}')
 dir=$PWD/dist/temp
 iccrdir=$dir/iccr
 dist=$PWD/dist
-API_KEY="!API_KEY"
 ICC_PROD_DIR=~/projects/extjs/iccw/build/production/icc
 export user group dir iccrdir dist version API_KEY ICC_PROD_DIR
 
