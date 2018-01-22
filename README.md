@@ -21,7 +21,7 @@ These instructions will create a tgz file that can be unpacked and deployed onto
 ### Building docker image
 *NOTE : docker is required*
 - build image `$ docker build . -t iccr:latest`
-- Spawn iccr container `$ docker run -e API_KEY=secret -it iccr:latest"
+- Spawn iccr container `$ docker run -e API_KEY=secret -it iccr:latest`
 ## How to install and run ICCR
 These instructions presume you have already built or downloaded the `iccr-pkg-<VERSION>.tgz` file.
 
