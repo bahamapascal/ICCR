@@ -9,14 +9,19 @@ ICCR is a java based manager and controller for Iota. It exposes restful APIs th
 ## Build Instructions
 These instructions will create a tgz file that can be unpacked and deployed onto a server
 
-*NOTE : Java 8 or above and maven required*
 - Clone the iccr repo `$ git clone https://github.com/bahamapascal/ICCR.git`
 - change directory `$ cd ICCR`
+
+### Packaging ICCR
+*NOTE : Java 8 or above and maven required*
 - Build sources `$ mvn package`
 - Generate iccr-package file in ICCR/dist/ `$ sudo ./release-iccr.bash`
 - Deploy the generated file `iccr-pkg-<VERSION>.tgz` to your server
 
-
+### Building docker image
+*NOTE : docker is required*
+- build image `$ docker build . -t iccr:latest`
+- Spawn iccr container `$ docker run -e API_KEY=secret -it iccr:latest"
 ## How to install and run ICCR
 These instructions presume you have already built or downloaded the `iccr-pkg-<VERSION>.tgz` file.
 
