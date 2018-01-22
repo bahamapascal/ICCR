@@ -270,10 +270,20 @@ if [ -z "$API_KEY" ];
     then
         echo -n "Enter an API access key:  "
         read pwd
-        if [ -z "${pwd}" ]; then
-              echo -n "Enter an API access key:  "
-              read pwd
-        fi
+	let try=0
+ 	checkApiKeyComplexity $pwd
+ 	while [ $? -eq 1 ]; do
+     		let try=$try+1
+     		if [ $try -gt 5 ]; then
+        		echo "Ok, we'll let you use the default API access key value: \"$origApiKey\""
+        	 	pwd=$origApiKey
+     		else
+        	 		printApiKeyHelp
+        	 		echo -n "Enter a stronger API access key:  "
+         			read pwd
+         			checkApiKeyComplexity $pwd
+     		fi
+ 	done
     else
      echo "API_KEY defined, ignoring interactive input"
         pwd=$API_KEY
