@@ -2,16 +2,10 @@ version: "2"
 
 services:
   iccr:
-    build:
-      context: .
-    restart: always
+    image: iccr:latest
     ports:
       - "14265:14265"
       - "14266:14266"
       - "1044:1044"
-    command: java -Xdebug -Djava.net.preferIPv4Stack=true -Xrunjdwp:transport=dt_socket,address=1044,server=y,suspend=n -DiccrDir=/opt/iccr -Dswarm.https.port=14266 -jar /opt/iccr/lib/iccr.jar debug
-
-networks:
-  default:
-    external:
-      name: iota
+    environment:
+      - API_KEY="some-key"
