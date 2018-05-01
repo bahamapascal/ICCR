@@ -26,6 +26,9 @@ cd $ICCR_DIR
 loglevel=
 nossl=
 preferIPv4Flag=
+src_path="$( cd "$(dirname "$0")" ; pwd -P )"
+cron="$src_path/bin/iccr-ctl $@"
+
 for arg in "$@"; do
     if [ "${arg}" = "debug" ]; then
         loglevel=debug
@@ -38,6 +41,10 @@ for arg in "$@"; do
     fi
     if [ "${arg}" = "ipv4" ]; then
         preferIPv4Flag="-Djava.net.preferIPv4Stack=true"
+    fi
+    if [ "${arg}" = "boot" ]; then
+	echo "Creating cron job"
+	crontab -l > "@reboot $cron"
     fi
 
 done
