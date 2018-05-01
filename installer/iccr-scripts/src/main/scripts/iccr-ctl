@@ -27,7 +27,7 @@ loglevel=
 nossl=
 preferIPv4Flag=
 src_path="$( cd "$(dirname "$0")" ; pwd -P )"
-cron="$src_path/bin/iccr-ctl $@"
+cron="@reboot $src_path/bin/iccr-ctl $@ 2>&1"
 
 for arg in "$@"; do
     if [ "${arg}" = "debug" ]; then
@@ -44,7 +44,11 @@ for arg in "$@"; do
     fi
     if [ "${arg}" = "boot" ]; then
 	echo "Creating cron job"
-	crontab -l > "@reboot $cron"
+	if  crontab -l | grep -q "$cron"; then
+		echo "crontab already exists... Ignoring"
+	else
+		crontab -l | { cat; echo "$cron"; } | crontab -
+	fi
     fi
 
 done
