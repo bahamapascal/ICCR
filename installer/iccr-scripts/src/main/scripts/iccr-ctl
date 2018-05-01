@@ -42,15 +42,6 @@ for arg in "$@"; do
     if [ "${arg}" = "ipv4" ]; then
         preferIPv4Flag="-Djava.net.preferIPv4Stack=true"
     fi
-    if [ "${arg}" = "boot" ]; then
-	echo "Creating cron job"
-	if  crontab -l | grep -q "$cron"; then
-		echo "crontab already exists... Ignoring"
-	else
-		crontab -l | { cat; echo "$cron"; } | crontab -
-	fi
-    fi
-
 done
 
 stop() {
@@ -81,6 +72,15 @@ stop() {
 }
 
 start() {
+    iccrOnBoot=`grep startICCROnBoot ${ICCR_DIR}/conf/iccr.properties | sed -e 's/startICCROnBoot=//g'`
+    if [ "$iccrOnBoot" = true ] ; then
+    echo "Creating cron job"
+        if  crontab -l | grep -q "$cron"; then
+    		echo "crontab already exists... Ignoring"
+    	else
+    		crontab -l | { cat; echo "$cron"; } | crontab -
+        fi
+    fi
     echo Starting $WHAT_APP
     # Are we already running?
     if [ -f $ICCR_PID_FILE ]; then
