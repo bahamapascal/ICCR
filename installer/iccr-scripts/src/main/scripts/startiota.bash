@@ -15,7 +15,7 @@ cd $iotaDir
 
 
 if [ "$iotaOnBoot" = true ] ; then
-    cronJob=" nohup (cd $iotaDir && ${iotaStartCmd} ${iotaPortNumber} > console.log 2>&1 )"
+    cronJob="cd $iotaDir && nohup ${iotaStartCmd} ${iotaPortNumber} > console.log 2>&1"
     echo "Creating cron job"
     if  crontab -l | grep -q "$cronJob"; then
 	    echo "crontab already exists... Ignoring"

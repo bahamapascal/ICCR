@@ -166,6 +166,7 @@ if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
                echo Setting cronjobs
                sudo systemctl enable cron
                sudo service cron start
+               crontab -r
                echo "sudo apt-get -y update"
                sudo apt-get -y update
                echo
