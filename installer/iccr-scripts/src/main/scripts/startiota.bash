@@ -12,18 +12,18 @@ iotaPidFile=$iotaDir/iota.pid
 iotaOnBoot=`grep startIotaOnBoot $iccrDir/conf/iccr.properties | sed -e 's/startIotaOnBoot=//g'`
 
 cd $iotaDir
-startCmd="nohup ${iotaStartCmd} ${iotaPortNumber} > console.log 2>&1 &"
+
 
 if [ "$iotaOnBoot" = true ] ; then
+    cronJob=" nohup (cd $iotaDir && ${iotaStartCmd} ${iotaPortNumber} > console.log 2>&1 )"
     echo "Creating cron job"
-    if  crontab -l | grep -q "$startCmd"; then
+    if  crontab -l | grep -q "$cronJob"; then
 	    echo "crontab already exists... Ignoring"
     else
-        	crontab -l | { cat; echo "@reboot $startCmd"; } | crontab -
+        crontab -l | { cat; echo "@reboot $cronJob"; } | crontab -
     fi
 fi
 
-echo "${startCmd}"
 
 nohup ${iotaStartCmd} ${iotaPortNumber}  > console.log 2>&1 &
 
