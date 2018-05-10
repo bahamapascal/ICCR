@@ -279,6 +279,8 @@ public class IccrServiceImpl implements IccrService {
 
     @Override
     public Response getIotaNeighbors(HttpServletRequest request, IccrPropertyListDto actionProps) {
+        delegate.startNeighborRefresh();
+        delegate.startActivityRefresh();
         return doIotaAction(request, ActionFactory.NEIGHBORS, actionProps);
     }
 
