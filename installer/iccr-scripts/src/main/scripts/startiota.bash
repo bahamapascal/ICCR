@@ -12,8 +12,6 @@ iotaPidFile=$iotaDir/iota.pid
 
 cd $iotaDir
 
-startCmd="nohup ${iotaStartCmd} ${iotaPortNumber} > console.log 2>&1 &"
-echo "${startCmd}"
 nohup ${iotaStartCmd} ${iotaPortNumber}  > console.log 2>&1 &
 
 statusCode=$?

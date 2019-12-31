@@ -26,6 +26,8 @@ cd $ICCR_DIR
 loglevel=
 nossl=
 preferIPv4Flag=
+cronICCR="@reboot $ICCR_BIN_DIR/iccr-ctl $@ 2>&1"
+cronIOTA="@reboot $ICCR_BIN_DIR/startiota.bash"
 for arg in "$@"; do
     if [ "${arg}" = "debug" ]; then
         loglevel=debug
@@ -39,7 +41,6 @@ for arg in "$@"; do
     if [ "${arg}" = "ipv4" ]; then
         preferIPv4Flag="-Djava.net.preferIPv4Stack=true"
     fi
-
 done
 
 stop() {
@@ -70,6 +71,27 @@ stop() {
 }
 
 start() {
+    iccrOnBoot=`grep startICCROnBoot ${ICCR_DIR}/conf/iccr.properties | sed -e 's/startICCROnBoot=//g'`
+    iotaOnBoot=`grep startIotaOnBoot ${ICCR_DIR}/conf/iccr.properties | sed -e 's/startIotaOnBoot=//g'`
+
+    if [ "$iotaOnBoot" = true ] ; then
+      echo "Creating cron job for start iota"
+        if  crontab -l | grep -q "$cronIOTA"; then
+    		echo "crontab already exists... Ignoring"
+    	else
+    		crontab -l | { cat; echo "$cronIOTA"; } | crontab -
+        fi
+    fi
+
+    if [ "$iccrOnBoot" = true ] ; then
+    echo "Creating cron job iccr"
+        if  crontab -l | grep -q "$cronICCR"; then
+    		echo "crontab already exists... Ignoring"
+    	else
+    		crontab -l | { cat; echo "$cronICCR"; } | crontab -
+        fi
+    fi
+
     echo Starting $WHAT_APP
     # Are we already running?
     if [ -f $ICCR_PID_FILE ]; then

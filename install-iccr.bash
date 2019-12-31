@@ -163,6 +163,10 @@ if [ "${hasJava}" = "0" -o "${hasRightJava}" = "0" ]; then
        echo
        if [ "${doesApt}" = "1" ]; then
            if [ "${doWhat}" = "install" ]; then
+               echo Setting cronjobs
+               sudo systemctl enable cron
+               sudo service cron start
+               crontab -r
                echo "sudo apt-get -y update"
                sudo apt-get -y update
                echo
@@ -296,7 +300,6 @@ if [ "${mac}" = "1" ]; then
 else
     sed -i "s/^${iccrApiKeyProp}=.*$/${iccrApiKeyProp}=${pwd}/g" $iccrPropFile
 fi
-
 echo
 echo Done
 echo
